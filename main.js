@@ -12,7 +12,7 @@ const MetaData = require('musicmetadata');
 const Datastore = require('nedb');
 const db = {};
 db.songs =  new Datastore({ filename: 'data/songs.json', autoload: true });
-db.songs.persistence.setAutocompactionInterval(1000);
+db.songs.persistence.setAutocompactionInterval(5000);
 db.songs.ensureIndex({ fieldName: 'path', unique: true}, function(err) {
   console.log("Attempted to add duplicate file: ", err);
 });
@@ -42,8 +42,7 @@ function createWindow () {
 
   // To-be generic library search function, parse options to query
   ipcMain.on('getListData', function(event, options) {
-    let response;
-    db.songs.find({}, function(err, docs) {
+    db.songs.find({}).sort({artist: 1}).exec(function(err, docs) {
       if (!err) {
         event.sender.send("listData", docs);
       }
@@ -52,13 +51,15 @@ function createWindow () {
 
   // Generate library from renderer command.
   ipcMain.on('generateLibrary', function(event, options) {
-    generateLibrary("D:/Music/");
+    generateLibrary("D:/Music/Beirut/");
     db.songs.persistence.compactDatafile();
     // console.log("Generated.");
   });
 
+  playerWindow.webContents.on('did-finish-load', function(e) {
+    sendInitialLibrary();
+  })
   playerWindow.loadURL('file://' + __dirname + '/views/index.html');
-  sendInitialLibrary();
 }
 
 app.on('ready', createWindow);
@@ -93,20 +94,19 @@ function generateLibrary(path) {
       console.log("Going into directory: ", curFilePath);
       generateLibrary(curFilePath);
     } else if (pathTools.extname(curFilePath) === ".mp3") {
-      trackDataWorker.push({path: curFilePath}, function (err) {
+      trackDataWorker.push({path: curFilePath}, function(err) {
         console.log('Processed ', curFilePath);
         return;
       });
     }
   }
-
-  
 };
 
 function createTrackData(filePath, callback) {
   let fileStream = fs.createReadStream(filePath);
-  MetaData(fileStream, function (err, metaData) {
+  MetaData(fileStream, function(err, metaData) {
     metaData.path = filePath;
+    metaData.artist = metaData.artist[0];
     metaData.picture = ""; // picture data is huge
     db.songs.insert(metaData, function(err, newDoc) {
       if (!err) {
@@ -119,7 +119,7 @@ function createTrackData(filePath, callback) {
 }
 
 function sendInitialLibrary() {
-  db.songs.find({}, function(err, docs) {
+  db.songs.find({}).sort({artist: 1}).exec(function(err, docs) {
     if (!err) {
       playerWindow.webContents.send("listData", docs);
     }

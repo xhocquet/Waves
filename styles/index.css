@@ -1,0 +1,77 @@
+.wrapper {
+  height:100%;
+  position: relative;
+  width: 100%;
+}
+
+.header {
+  border-bottom: 1px solid black; 
+  height: 70px;
+  position: fixed;
+  text-align: center;
+  top: 0;
+  width: 100%;
+}
+
+.content {
+  overflow: scroll;
+}
+
+.footer {
+  background-color: #fff;
+  border-top: 1px solid black;
+  bottom: 0;
+  height: 70px;
+  position: fixed;
+  text-align: center;
+  width: 100%;
+}
+
+.navContainer {
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  width: 200px;
+}
+
+.previous {
+  background: url("../assets/previous.svg") no-repeat right top;
+  border: 1px solid #eee;
+  float: left;
+  height: 50px;
+  margin: 5px;
+  width: 50px;
+}
+
+.next {
+  background: url("../assets/next.svg") no-repeat right top;
+  border: 1px solid #eee;
+  float: left;
+  height: 50px;
+  margin: 5px;
+  width: 50px;
+}
+
+.pause {
+  background: url("../assets/play.svg") no-repeat right top;
+  border: 1px solid #eee;
+  float: left;
+  height: 50px;
+  margin: 5px;
+  width: 50px;
+}
+
+.songListContainer {
+  overflow-y: scroll;
+}
+
+.songListItem, .songListItemAlternate {
+  background-color: #fff;
+  height: 20px;
+  line-height: 20px;
+  width: 100%;
+}
+
+.songListItemAlternate {
+  background-color: #ccc;
+}

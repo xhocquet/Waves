@@ -1,51 +1,127 @@
 'use strict';
 
 const electron = require('electron');
-// Module to control application life.
+const ipcMain = electron.ipcMain;
 const app = electron.app;
-// Module to create native browser window.
+const fs = require('graceful-fs')
+const async = require('async');
+const pathTools = require('path');
 const BrowserWindow = electron.BrowserWindow;
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
+const MetaData = require('musicmetadata');
+const Datastore = require('nedb');
+const db = {};
+db.songs =  new Datastore({ filename: 'data/songs.json', autoload: true });
+db.songs.persistence.setAutocompactionInterval(1000);
+db.songs.ensureIndex({ fieldName: 'path', unique: true}, function(err) {
+  console.log("Attempted to add duplicate file: ", err);
+});
+const trackDataWorker = async.queue(function (file, callback) {
+  console.log("Worker working on ", file.path);
+  createTrackData(file.path, callback);
+}, 5);
+trackDataWorker.drain = function() {
+  console.log("All items have been processed");
+};
+
+let playerWindow;
 
 function createWindow () {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600});
-
-  // and load the index.html of the app.
-  mainWindow.loadURL('file://' + __dirname + '/index.html');
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
-
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
+  playerWindow = new BrowserWindow({
+    width: 1440,
+    height: 900,
+    center: true,
+    title: "Waves",
+    autoHideMenuBar: true
   });
+  // playerWindow.toggleDevTools();
+
+  playerWindow.on('closed', function() {
+    playerWindow = null;
+  });
+
+  // To-be generic library search function, parse options to query
+  ipcMain.on('getListData', function(event, options) {
+    let response;
+    db.songs.find({}, function(err, docs) {
+      if (!err) {
+        event.sender.send("listData", docs);
+      }
+    });
+  });
+
+  // Generate library from renderer command.
+  ipcMain.on('generateLibrary', function(event, options) {
+    generateLibrary("D:/Music/");
+    db.songs.persistence.compactDatafile();
+    // console.log("Generated.");
+  });
+
+  playerWindow.loadURL('file://' + __dirname + '/views/index.html');
+  sendInitialLibrary();
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
 app.on('ready', createWindow);
 
-// Quit when all windows are closed.
+// Mac quit
 app.on('window-all-closed', function () {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
+// Mac recreate window
 app.on('activate', function () {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
+  if (playerWindow === null) {
     createWindow();
   }
 });
+
+function generateLibrary(path) {
+  if (!fs.existsSync(path)) {
+    console.log(path ,"' does not exist.");
+    return;
+  }
+
+  let items = fs.readdirSync(path);
+  for (let i = 0; i < items.length; i++) {
+    console.log(items[i]);
+    let curFilePath = pathTools.join(path, items[i]);
+    console.log(curFilePath);
+    let curFileStats = fs.lstatSync(curFilePath);
+    if (curFileStats.isDirectory()) {
+      console.log("Going into directory: ", curFilePath);
+      generateLibrary(curFilePath);
+    } else if (pathTools.extname(curFilePath) === ".mp3") {
+      trackDataWorker.push({path: curFilePath}, function (err) {
+        console.log('Processed ', curFilePath);
+        return;
+      });
+    }
+  }
+
+  
+};
+
+function createTrackData(filePath, callback) {
+  let fileStream = fs.createReadStream(filePath);
+  MetaData(fileStream, function (err, metaData) {
+    metaData.path = filePath;
+    metaData.picture = ""; // picture data is huge
+    db.songs.insert(metaData, function(err, newDoc) {
+      if (!err) {
+        console.log("Inserted: " + newDoc.artist[0] + " - " + newDoc.title);
+        fileStream ? fileStream.destroy() : null;
+        callback();
+      }
+    });
+  });
+}
+
+function sendInitialLibrary() {
+  db.songs.find({}, function(err, docs) {
+    if (!err) {
+      playerWindow.webContents.send("listData", docs);
+    }
+  });
+}

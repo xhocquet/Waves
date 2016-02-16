@@ -1,28 +1,25 @@
 {
-  "name": "electron-quick-start",
+  "name": "Waves",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "Javascript native music player",
   "main": "main.js",
   "scripts": {
     "start": "electron main.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/atom/electron-quick-start.git"
-  },
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial"
+    "music"
   ],
-  "author": "GitHub",
+  "author": "Xavier Hocquet",
   "license": "CC0-1.0",
-  "bugs": {
-    "url": "https://github.com/atom/electron-quick-start/issues"
-  },
-  "homepage": "https://github.com/atom/electron-quick-start#readme",
   "devDependencies": {
-    "electron-prebuilt": "^0.36.0"
+    "electron-prebuilt": "^0.36.0",
+    "electron-rebuild": "^1.1.3"
+  },
+  "dependencies": {
+    "async": "^1.5.2",
+    "forerunnerdb": "^1.3.580",
+    "graceful-fs": "^4.1.3",
+    "musicmetadata": "^2.0.2",
+    "nedb": "^1.8.0"
   }
 }

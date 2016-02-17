@@ -9,64 +9,71 @@ body {
   position: fixed;
   text-align: center;
   top: 0;
+  left: 0;
   width: 100%;
 }
 
-.body {
-  height: 100% - 140px;
+.content {
+  position: relative;
+  top: 71px;
+  height: 720px;
 }
 
 .footer {
-  border-top: 1px solid black;
   bottom: 0;
+  left: 0;
   height: 70px;
   position: fixed;
-  text-align: center;
   width: 100%;
+}
+
+.progressBar {
+  width: 100%;
+  background-color: orange;
+  height: 2px;
 }
 
 .navContainer {
   height: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  width: 200px;
+  width: 300px;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .previous {
-  background: url("../assets/previous.svg") no-repeat right top;
-  border: 1px solid #eee;
+  background: url("../assets/previous.svg") no-repeat left top;
   float: left;
-  height: 50px;
-  margin: 5px;
-  width: 50px;
+  height: 70px;
+  margin: 0 10px;
+  width: 70px;
 }
 
 .next {
-  background: url("../assets/next.svg") no-repeat right top;
-  border: 1px solid #eee;
+  background: url("../assets/next.svg") no-repeat left top;
   float: left;
-  height: 50px;
-  margin: 5px;
-  width: 50px;
+  height: 70px;
+  margin: 0 10px;
+  width: 70px;
 }
 
 .pause {
-  background: url("../assets/play.svg") no-repeat right top;
-  border: 1px solid #eee;
+  background: url("../assets/play.svg") no-repeat left top;
   float: left;
-  height: 50px;
-  margin: 5px;
-  width: 50px;
+  height: 70px;
+  margin: 0 10px;
+  width: 70px;
 }
 
-.songListContainer {
-  overflow-y: scroll;
+.songList {
+  height: 100%;
+  overflow-y: auto;
 }
 
 .songListItem, .songListItemAlternate {
   background-color: #fff;
   height: 25px;
-  line-height: 20px;
+  line-height: 25px;
+  vertical-align: middle;
   width: 100%;
 }
 
@@ -76,7 +83,6 @@ body {
 
 .rowItem {
   height: 100%;
-  padding: 1px;
   float: left;
   -webkit-user-select: none; /* webkit (safari, chrome) browsers */
   -moz-user-select: none; /* mozilla browsers */
@@ -85,14 +91,21 @@ body {
   cursor: default;
 }
 
+.rowIndex {
+  width: 0;
+  visibility: hidden;
+}
+
 .rowArtist {
   width: 15%;
   border-right: 1px solid #aaa;
+  padding-right: 1px;
 }
 
 .rowTitle {
   width: 30%;
   border-right: 1px solid #aaa;
+  padding-right: 1px;
 }
 
 .rowDuration {
@@ -101,6 +114,6 @@ body {
 }
 
 .rowPath {
-  width: 20%;
+  width: 0;
   visibility: hidden;
 }

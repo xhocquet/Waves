@@ -32,7 +32,9 @@ function createWindow () {
     height: 900,
     center: true,
     title: "Waves",
-    autoHideMenuBar: true
+    autoHideMenuBar: true,
+    minHeight: 500,
+    minWidth: 500,
   });
   // playerWindow.toggleDevTools();
 

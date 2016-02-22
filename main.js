@@ -3,26 +3,30 @@
 const electron = require('electron');
 const ipcMain = electron.ipcMain;
 const app = electron.app;
-const fs = require('graceful-fs')
-const async = require('async');
-const pathTools = require('path');
+
+const lm = require('./scripts/libraryManager.js');
+const libraryManager = new lm();
+
+// const fs = require('graceful-fs')
+// const async = require('async');
+// const pathTools = require('path');
 const BrowserWindow = electron.BrowserWindow;
 
-const MetaData = require('musicmetadata');
-const Datastore = require('nedb');
-const db = {};
-db.songs =  new Datastore({ filename: 'data/songs.json', autoload: true });
-db.songs.persistence.setAutocompactionInterval(5000);
-db.songs.ensureIndex({ fieldName: 'path', unique: true}, function(err) {
-  console.log("Attempted to add duplicate file: ", err);
-});
-const trackDataWorker = async.queue(function (file, callback) {
-  console.log("Worker working on ", file.path);
-  createTrackData(file.path, callback);
-}, 5);
-trackDataWorker.drain = function() {
-  console.log("All items have been processed");
-};
+// const MetaData = require('musicmetadata');
+// const Datastore = require('nedb');
+// const db = {};
+// db.songs =  new Datastore({ filename: 'data/songs.json', autoload: true });
+// db.songs.persistence.setAutocompactionInterval(5000);
+// db.songs.ensureIndex({ fieldName: 'path', unique: true}, function(err) {
+//   console.log("Attempted to add duplicate file: ", err);
+// });
+// const trackDataWorker = async.queue(function (file, callback) {
+//   console.log("Worker working on ", file.path);
+//   createTrackData(file.path, callback);
+// }, 5);
+// trackDataWorker.drain = function() {
+//   console.log("All items have been processed");
+// };
 
 let playerWindow;
 
@@ -36,18 +40,15 @@ function createWindow () {
     minHeight: 500,
     minWidth: 500,
   });
-  // playerWindow.toggleDevTools();
+  playerWindow.toggleDevTools();
 
   playerWindow.on('closed', function() {
     playerWindow = null;
   });
 
-  // To-be generic library search function, parse options to query
   ipcMain.on('getListData', function(event, options) {
-    db.songs.find({}).sort({artist: 1}).exec(function(err, docs) {
-      if (!err) {
-        event.sender.send("listData", docs);
-      }
+    libraryManager.queryLibrary(options, function(response) {
+      event.sender.send("listData", response);
     });
   });
 
@@ -105,25 +106,23 @@ function generateLibrary(path) {
 };
 
 function createTrackData(filePath, callback) {
-  let fileStream = fs.createReadStream(filePath);
-  MetaData(fileStream, function(err, metaData) {
-    metaData.path = filePath;
-    metaData.artist = metaData.artist[0];
-    metaData.picture = ""; // picture data is huge
-    db.songs.insert(metaData, function(err, newDoc) {
-      if (!err) {
-        console.log("Inserted: " + newDoc.artist[0] + " - " + newDoc.title);
-        fileStream ? fileStream.destroy() : null;
-        callback();
-      }
-    });
-  });
+  // let fileStream = fs.createReadStream(filePath);
+  // MetaData(fileStream, function(err, metaData) {
+  //   metaData.path = filePath;
+  //   metaData.artist = metaData.artist[0];
+  //   metaData.picture = ""; // picture data is huge
+  //   db.songs.insert(metaData, function(err, newDoc) {
+  //     if (!err) {
+  //       console.log("Inserted: " + newDoc.artist[0] + " - " + newDoc.title);
+  //       fileStream ? fileStream.destroy() : null;
+  //       callback();
+  //     }
+  //   });
+  // });
 }
 
 function sendInitialLibrary() {
-  db.songs.find({}).sort({artist: 1}).exec(function(err, docs) {
-    if (!err) {
-      playerWindow.webContents.send("listData", docs);
-    }
+  libraryManager.queryLibrary({}, function(response) {
+    playerWindow.webContents.send("listData", response);
   });
 }

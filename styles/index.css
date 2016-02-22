@@ -113,6 +113,12 @@ body {
   border-right: 1px solid #aaa;
 }
 
+.rowAlbum {
+  width: 15%;
+  border-right: 1px solid #aaa;
+  padding-right: 1px;
+}
+
 .rowPath {
   width: 0;
   visibility: hidden;

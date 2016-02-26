@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../styles/settings.css">
+  </head>
+  <body>
+    <table class="settingsTable">
+    <tr class="settingRow">
+      <td class="label">Music Folders</td>
+      <td class="setting"><textarea rows="5" class="importFolders"></textarea></td>
+    </tr>
+    <tr>
+      <td class="label">Process Track Image Metadata?</td>
+      <td class="setting"><input type="checkbox" class="processImages" /></td>
+    </tr>
+    </table>
+    <div class="saveClose">
+      <button class="saveCloseButton saveButton" onclick="saveSettings()">Save</button>
+      <button class="saveCloseButton closeButton" onclick="closeWindow()">Close</button>
+    </div>
+  </body>
+  <script type="text/javascript" src="../scripts/settings.js" ></script>
+</html>

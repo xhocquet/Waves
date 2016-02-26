@@ -1,67 +1,63 @@
 body {
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
 .header {
+  background-color: #555;
   border-bottom: 1px solid black; 
   height: 70px;
+  left: 0;
   position: fixed;
   text-align: center;
   top: 0;
-  left: 0;
   width: 100%;
 }
 
 .content {
+  height: 700px;
   position: relative;
   top: 71px;
-  height: 720px;
 }
 
 .footer {
   bottom: 0;
   left: 0;
-  height: 70px;
   position: fixed;
   width: 100%;
 }
 
 .progressBar {
-  width: 100%;
   background-color: orange;
   height: 2px;
+  width: 100%;
 }
 
 .navContainer {
-  height: 100%;
-  width: 300px;
-  margin: 0 auto;
+  height: 60px;
+  margin: 5px auto;
   text-align: center;
+  width: 200px;
+}
+
+.navButton {
+  display: inline;
+  float: left;
+  height: 60px;
+  padding: 0 3px;
+  width: 60px;
 }
 
 .previous {
   background: url("../assets/previous.svg") no-repeat left top;
-  float: left;
-  height: 70px;
-  margin: 0 10px;
-  width: 70px;
 }
 
 .next {
   background: url("../assets/next.svg") no-repeat left top;
-  float: left;
-  height: 70px;
-  margin: 0 10px;
-  width: 70px;
 }
 
 .pause {
   background: url("../assets/play.svg") no-repeat left top;
-  float: left;
-  height: 70px;
-  margin: 0 10px;
-  width: 70px;
 }
 
 .songList {
@@ -73,7 +69,6 @@ body {
   background-color: #fff;
   height: 25px;
   line-height: 25px;
-  vertical-align: middle;
   width: 100%;
 }
 
@@ -82,44 +77,42 @@ body {
 }
 
 .rowItem {
-  height: 100%;
-  float: left;
-  -webkit-user-select: none; /* webkit (safari, chrome) browsers */
-  -moz-user-select: none; /* mozilla browsers */
   -khtml-user-select: none; /* webkit (konqueror) browsers */
+  -moz-user-select: none; /* mozilla browsers */
   -ms-user-select: none; /* IE10+ */
+  -webkit-user-select: none; /* webkit (safari, chrome) browsers */
   cursor: default;
+  float: left;
+  height: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rowIndex {
-  width: 0;
   visibility: hidden;
+  width: 0;
 }
 
 .rowArtist {
-  width: 15%;
   border-right: 1px solid #aaa;
-  padding-right: 1px;
-}
-
-.rowTitle {
-  width: 30%;
-  border-right: 1px solid #aaa;
-  padding-right: 1px;
-}
-
-.rowDuration {
+  padding-left: 5px;
   width: 20%;
-  border-right: 1px solid #aaa;
 }
 
 .rowAlbum {
-  width: 15%;
   border-right: 1px solid #aaa;
-  padding-right: 1px;
+  padding-left: 5px;
+  width: 20%;
 }
 
-.rowPath {
-  width: 0;
-  visibility: hidden;
+.rowTitle {
+  border-right: 1px solid #aaa;
+  padding-left: 5px;
+  width: 30%;
+}
+
+.rowDuration {
+  padding-left: 5px;
+  width: 10%;
 }

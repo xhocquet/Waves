@@ -3,32 +3,19 @@
 const electron = require('electron');
 const ipcMain = electron.ipcMain;
 const app = electron.app;
-
-const lm = require('./scripts/libraryManager.js');
-const libraryManager = new lm();
-
-// const fs = require('graceful-fs')
-// const async = require('async');
-// const pathTools = require('path');
 const BrowserWindow = electron.BrowserWindow;
+const Menu = electron.Menu;
+const Tray = electron.Tray;
 
-// const MetaData = require('musicmetadata');
-// const Datastore = require('nedb');
-// const db = {};
-// db.songs =  new Datastore({ filename: 'data/songs.json', autoload: true });
-// db.songs.persistence.setAutocompactionInterval(5000);
-// db.songs.ensureIndex({ fieldName: 'path', unique: true}, function(err) {
-//   console.log("Attempted to add duplicate file: ", err);
-// });
-// const trackDataWorker = async.queue(function (file, callback) {
-//   console.log("Worker working on ", file.path);
-//   createTrackData(file.path, callback);
-// }, 5);
-// trackDataWorker.drain = function() {
-//   console.log("All items have been processed");
-// };
+const dm = require('./scripts/databaseManager.js');
+const databaseManager = new dm();
+
+const mainWindowMenu = require('./scripts/menus/mainWindowMenu.js');
+const trayIconMenu = require('./scripts/menus/trayContextMenu.js');
 
 let playerWindow;
+let settingsWindow;
+let trayIcon;
 
 function createWindow () {
   playerWindow = new BrowserWindow({
@@ -36,33 +23,47 @@ function createWindow () {
     height: 900,
     center: true,
     title: "Waves",
-    autoHideMenuBar: true,
     minHeight: 500,
-    minWidth: 500,
-  });
-  playerWindow.toggleDevTools();
-
-  playerWindow.on('closed', function() {
-    playerWindow = null;
+    minWidth: 500
   });
 
-  ipcMain.on('getListData', function(event, options) {
-    libraryManager.queryLibrary(options, function(response) {
-      event.sender.send("listData", response);
-    });
+  settingsWindow = new BrowserWindow({
+    width: 400,
+    height: 400,
+    show: false,
+    center: true,
+    minHeight: 400,
+    minWidth: 400,
+    frame: false,
+    resizable: false,
+    movable: false
   });
 
-  // Generate library from renderer command.
-  ipcMain.on('generateLibrary', function(event, options) {
-    generateLibrary("D:/Music/Beirut/");
-    db.songs.persistence.compactDatafile();
-    // console.log("Generated.");
-  });
+  trayIcon = new Tray('assets/icon.png');
 
-  playerWindow.webContents.on('did-finish-load', function(e) {
-    sendInitialLibrary();
-  })
   playerWindow.loadURL('file://' + __dirname + '/views/index.html');
+  playerWindow.openSettingsWindow = function() {
+    settingsWindow.show();
+  }
+  playerWindow.generateLibrary = function() {
+    databaseManager.getSettings(function(settings) {
+      settings.importFolders.forEach(function(element, index, array) {
+        databaseManager.generateLibrary(element);
+      })
+    })
+  }
+  playerWindow.refreshLibrary = function() {
+    // librarymanager.generate
+  }
+  playerWindow.setMenu(Menu.buildFromTemplate(mainWindowMenu));
+
+  setupListeners();
+
+  settingsWindow.loadURL('file://' + __dirname + '/views/settings.html');
+  // settingsWindow.toggleDevTools();
+  // settingsWindow.show();
+
+  trayIcon.setContextMenu(Menu.buildFromTemplate(trayIconMenu));
 }
 
 app.on('ready', createWindow);
@@ -81,48 +82,58 @@ app.on('activate', function () {
   }
 });
 
-function generateLibrary(path) {
-  if (!fs.existsSync(path)) {
-    console.log(path ,"' does not exist.");
-    return;
-  }
-
-  let items = fs.readdirSync(path);
-  for (let i = 0; i < items.length; i++) {
-    console.log(items[i]);
-    let curFilePath = pathTools.join(path, items[i]);
-    console.log(curFilePath);
-    let curFileStats = fs.lstatSync(curFilePath);
-    if (curFileStats.isDirectory()) {
-      console.log("Going into directory: ", curFilePath);
-      generateLibrary(curFilePath);
-    } else if (pathTools.extname(curFilePath) === ".mp3") {
-      trackDataWorker.push({path: curFilePath}, function(err) {
-        console.log('Processed ', curFilePath);
-        return;
-      });
-    }
-  }
-};
-
-function createTrackData(filePath, callback) {
-  // let fileStream = fs.createReadStream(filePath);
-  // MetaData(fileStream, function(err, metaData) {
-  //   metaData.path = filePath;
-  //   metaData.artist = metaData.artist[0];
-  //   metaData.picture = ""; // picture data is huge
-  //   db.songs.insert(metaData, function(err, newDoc) {
-  //     if (!err) {
-  //       console.log("Inserted: " + newDoc.artist[0] + " - " + newDoc.title);
-  //       fileStream ? fileStream.destroy() : null;
-  //       callback();
-  //     }
-  //   });
-  // });
+function sendInitialLibrary() {
+  databaseManager.queryLibrary({page: 0}, function(response) {
+    playerWindow.webContents.send("listData", response);
+  });
 }
 
-function sendInitialLibrary() {
-  libraryManager.queryLibrary({}, function(response) {
-    playerWindow.webContents.send("listData", response);
+function setupListeners() {
+  // Pass-through database query for library
+  ipcMain.on('getListData', function(event, options) {
+    databaseManager.queryLibrary(options, function(response) {
+      event.sender.send("listData", response);
+    });
+  });
+
+  // Generate library from renderer command.
+  ipcMain.on('generateLibrary', function(event, options) {
+    generateLibrary("D:/Music/Beirut/");
+    db.songs.persistence.compactDatafile();
+    // console.log("Generated.");
+  });
+
+  // Close settings window
+  ipcMain.on('closeSettings', function(event, options) {
+    settingsWindow.hide();
+  });
+
+  // Save the settings in the db
+  ipcMain.on('saveSettings', function(event, message) {
+    databaseManager.saveSettings(message.userSettings, function(response) {
+      event.sender.send("saveResponse", response);
+    });
+  });
+
+  // Send initial library when the page loads
+  playerWindow.webContents.on('did-finish-load', function(e) {
+    sendInitialLibrary();
+  });
+
+  // Close the window, quit the app
+  // TODO: Just hide the window so you can play minimized or something
+  playerWindow.on('closed', function() {
+    playerWindow = null;
+    settingsWindow = null;
+    trayIcon = null;
+    app.quit();
+  });
+
+  // Fetches the settings when you open the settings window
+  // TODO: change this to when it opens, not focus
+  settingsWindow.on('focus', function() {
+    databaseManager.getSettings(function(settings) {
+      settingsWindow.webContents.send("settingsData", settings);
+    });
   });
 }

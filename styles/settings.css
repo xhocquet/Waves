@@ -1,0 +1,34 @@
+body {
+  margin: 5px;
+}
+
+.settingsTable {
+  width: 100%;
+}
+
+.label {
+  width: 30%;
+  padding: 5px;
+  border-right: 1px solid #777;
+}
+
+.setting {
+  text-align: center;
+}
+
+.saveClose {
+  background-color: #333;
+  width: 400px;
+  height: 40px;
+  padding: 5px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  vertical-align: middle;
+}
+
+.saveCloseButton {
+  height: 30px;
+  margin: auto;
+  display: inline-block;
+}

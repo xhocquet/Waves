@@ -17,7 +17,9 @@ let playerWindow;
 let settingsWindow;
 let trayIcon;
 
-function createWindow () {
+setupAppListeners();
+
+function createWindows () {
   playerWindow = new BrowserWindow({
     width: 1440,
     height: 900,
@@ -39,53 +41,63 @@ function createWindow () {
     movable: false
   });
 
-  trayIcon = new Tray('assets/icon.png');
-
-  playerWindow.loadURL('file://' + __dirname + '/views/index.html');
-  playerWindow.openSettingsWindow = function() {
-    settingsWindow.show();
-  }
-  playerWindow.generateLibrary = function() {
-    databaseManager.getSettings(function(settings) {
-      settings.importFolders.forEach(function(element, index, array) {
-        databaseManager.generateLibrary(element);
-      })
-    })
-  }
-  playerWindow.refreshLibrary = function() {
-    // librarymanager.generate
-  }
-  playerWindow.setMenu(Menu.buildFromTemplate(mainWindowMenu));
-
+  setupPlayerWindow();
   setupListeners();
 
   settingsWindow.loadURL('file://' + __dirname + '/views/settings.html');
   // settingsWindow.toggleDevTools();
   // settingsWindow.show();
 
+  trayIcon = new Tray('assets/icon.png');
   trayIcon.setContextMenu(Menu.buildFromTemplate(trayIconMenu));
+  trayIcon.on('double-click', function(event, bounds) {
+    event.preventDefault();
+    if (playerWindow.isVisible()) {
+      playerWindow.hide();
+    } else {
+      playerWindow.show();
+    }
+  })
 }
-
-app.on('ready', createWindow);
-
-// Mac quit
-app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-// Mac recreate window
-app.on('activate', function () {
-  if (playerWindow === null) {
-    createWindow();
-  }
-});
 
 function sendInitialLibrary() {
   databaseManager.queryLibrary({page: 0}, function(response) {
     playerWindow.webContents.send("listData", response);
   });
+}
+
+function setupPlayerWindow() {
+  playerWindow.openSettingsWindow = function() {
+    settingsWindow.show();
+  }
+  playerWindow.refreshLibrary = function() {
+    // librarymanager.generate
+  }
+  playerWindow.playPause = function() {
+    playerWindow.webContents.send("playPause", {});
+  }
+
+  playerWindow.curTrackID = null;
+
+  playerWindow.setMenu(Menu.buildFromTemplate(mainWindowMenu));
+  playerWindow.loadURL('file://' + __dirname + '/views/index.html');
+}
+
+function setupAppListeners() {
+  app.on('ready', createWindows);
+
+  // Mac recreate window
+  app.on('activate', function () {
+    if (playerWindow === null) {
+      createWindow();
+    }
+  });
+
+  app.on('quit', function(event, exitCode) {
+    playerWindow = null;
+    settingsWindow = null;
+    trayIcon = null;
+  })
 }
 
 function setupListeners() {
@@ -98,9 +110,17 @@ function setupListeners() {
 
   // Generate library from renderer command.
   ipcMain.on('generateLibrary', function(event, options) {
-    generateLibrary("D:/Music/Beirut/");
-    db.songs.persistence.compactDatafile();
-    // console.log("Generated.");
+    if (options.path) {
+      databaseManager.generateLibrary(options.path);
+    } else {
+      // TODO Just make a specific function in the manager for adding user setting folders,
+      // OR conditional in the dbmanager and pass along the options
+      databaseManager.getSettings(function(settings) {
+        settings.importFolders.forEach(function(element, index, array) {
+          databaseManager.generateLibrary(element);
+        })
+      })
+    }
   });
 
   // Close settings window
@@ -120,13 +140,11 @@ function setupListeners() {
     sendInitialLibrary();
   });
 
-  // Close the window, quit the app
-  // TODO: Just hide the window so you can play minimized or something
-  playerWindow.on('closed', function() {
-    playerWindow = null;
-    settingsWindow = null;
-    trayIcon = null;
-    app.quit();
+  // When X is clicked, just hide window.
+  // TODO: Setting to enable this
+  playerWindow.on('close', function(e) {
+    e.preventDefault();
+    playerWindow.hide();
   });
 
   // Fetches the settings when you open the settings window

@@ -123,6 +123,7 @@ var databaseManager = function() {
     MetaData(fileStream, { duration: true }, function(err, metaData) {
       metaData.path = filePath;
       metaData.artist = metaData.artist[0];
+      let coverImage = metaData.picture.data;
       metaData.picture = userSettings.processTrackImages ? metaData.picture  : '';
       db.songs.insert(metaData, function(err, newDoc) {
         if (!err) {

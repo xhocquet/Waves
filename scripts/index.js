@@ -1,8 +1,15 @@
 'use strict';
 const ipcRenderer = require('electron').ipcRenderer;
+const Remote = require('electron').remote;
+const Menu = Remote.Menu;
 const mp = require('../scripts/musicPlayer.js');
 const musicPlayer = new mp();
+const playerWindow = Remote.getCurrentWindow();
 
+const trackContextMenuSource = require('../scripts/menus/trackContextMenu.js');
+let trackContextMenu = Menu.buildFromTemplate(trackContextMenuSource);
+
+let contentDiv = document.getElementsByClassName("content")[0];
 let pauseButton = document.getElementsByClassName("pause")[0];
 let previousButton = document.getElementsByClassName("previous")[0];
 let nextButton = document.getElementsByClassName("next")[0];
@@ -10,15 +17,11 @@ let progressBarDiv = document.getElementsByClassName("progressBar")[0];
 let songList = document.getElementsByClassName("songList")[0];
 let progressBarTimer = null;
 
+
 setupEventListeners();
 setupProgressBarTimer();
 
 ipcRenderer.on('listData', function(event, response) {
-  // let titleHTML = '<div class="songListTitle"><div class="rowItem rowIndex">0'
-  // titleHTML += '</div><div class="rowItem rowArtist">Artist';
-  // titleHTML += '</div><div class="rowItem rowAlbum">Album';
-  // titleHTML += '</div><div class="rowItem rowTitle">Title';
-  // titleHTML += '</div><div class="rowItem rowDuration">x:xx</div></div>';
   songList.innerHTML = '';
 
   let count = 0;
@@ -49,6 +52,10 @@ ipcRenderer.on('listData', function(event, response) {
   }
 });
 
+ipcRenderer.on('playPause', function(event, response) {
+  musicPlayer.playPause();
+})
+
 function generateLibrary() {
   ipcRenderer.send('generateLibrary', {});
 }
@@ -56,19 +63,31 @@ function generateLibrary() {
 function playSong(event) {
   event.preventDefault();
   if (event.target !== event.currentTarget) {
-    let songID = event.target.parentElement.firstChild.innerHTML;
-    musicPlayer.playSong(songID);
+    let trackID = event.target.parentElement.firstChild.innerHTML;
+    musicPlayer.playSong(trackID);
   }
   event.stopPropagation();
 }
 
-function queueSong(event) {
+function addTracksToQueue(...tracks) {
+  musicPlayer.queueNext(tracks[0]);
+}
 
+function clickHandler(event) {
   event.preventDefault();
   if (event.target !== event.currentTarget) {
-    if (event.button === 1) {
-      let songID = event.target.parentElement.firstChild.innerHTML;
-      musicPlayer.queueNext(songID);
+    let trackID = event.target.parentElement.firstChild.innerHTML;
+    switch(event.button) {
+      case 0:
+        // select
+        break;
+      case 1:
+        musicPlayer.queueNext(trackID);
+        break;
+      case 2:
+        playerWindow.curTrackID = trackID;
+        trackContextMenu.popup(playerWindow);
+        break;
     }
   }
   event.stopPropagation();
@@ -76,10 +95,22 @@ function queueSong(event) {
 
 function setupEventListeners() {
   songList.ondblclick = playSong;
-  songList.onmousedown = queueSong;
+  songList.onmousedown = clickHandler;
   pauseButton.onclick = musicPlayer.playPause;
   previousButton.onclick = musicPlayer.previousTrack;
   nextButton.onclick = musicPlayer.nextTrack;
+
+  contentDiv.ondragover = function() {
+    return false;
+  }
+  contentDiv.ondragleave = function() {
+    return false;
+  }
+  contentDiv.ondrop = function(e) {
+    e.preventDefault();
+    let file = e.dataTransfer.files[0];
+    ipcRenderer.send('generateLibrary', { path: file.path });
+  }
 }
 
 function setupProgressBarTimer() {

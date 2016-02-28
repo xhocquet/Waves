@@ -54,6 +54,10 @@ ipcRenderer.on('listData', function(event, response) {
 
 ipcRenderer.on('playPause', function(event, response) {
   musicPlayer.playPause();
+});
+
+ipcRenderer.on('addToQueue', function(event, response) {  
+  musicPlayer.queueNext(response.trackID);
 })
 
 function generateLibrary() {
@@ -73,13 +77,13 @@ function addTracksToQueue(...tracks) {
   musicPlayer.queueNext(tracks[0]);
 }
 
-function clickHandler(event) {
+function trackClickHandler(event) {
   event.preventDefault();
   if (event.target !== event.currentTarget) {
     let trackID = event.target.parentElement.firstChild.innerHTML;
     switch(event.button) {
       case 0:
-        // select
+        event.target.parentElement.className += ' songListItemSelected';
         break;
       case 1:
         musicPlayer.queueNext(trackID);
@@ -95,7 +99,7 @@ function clickHandler(event) {
 
 function setupEventListeners() {
   songList.ondblclick = playSong;
-  songList.onmousedown = clickHandler;
+  songList.onmousedown = trackClickHandler;
   pauseButton.onclick = musicPlayer.playPause;
   previousButton.onclick = musicPlayer.previousTrack;
   nextButton.onclick = musicPlayer.nextTrack;

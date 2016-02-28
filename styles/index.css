@@ -76,6 +76,10 @@ body {
   background-color: #ccc;
 }
 
+.songListItemSelected {
+  outline: 2px solid #222;songListItemSelected
+}
+
 .rowItem {
   -khtml-user-select: none; /* webkit (konqueror) browsers */
   -moz-user-select: none; /* mozilla browsers */

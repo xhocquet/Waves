@@ -21,7 +21,7 @@ var mainMenu = [
   {
     label: 'Add to Queue',
     click: function(item, curWindow) {
-      console.log(curWindow.curTrackID);
+      curWindow.addToQueue(curWindow.curTrackID);
     }
   },
 ];

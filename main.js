@@ -76,6 +76,9 @@ function setupPlayerWindow() {
   playerWindow.playPause = function() {
     playerWindow.webContents.send("playPause", {});
   }
+  playerWindow.addToQueue = function(track) {
+    playerWindow.webContents.send("addToQueue", { trackID: track });
+  }
 
   playerWindow.curTrackID = null;
 
@@ -121,6 +124,7 @@ function setupListeners() {
         })
       })
     }
+    databaseManager.saveLibraryData();
   });
 
   // Close settings window
@@ -144,7 +148,9 @@ function setupListeners() {
   // TODO: Setting to enable this
   playerWindow.on('close', function(e) {
     e.preventDefault();
-    playerWindow.hide();
+    databaseManager.getSettings(function(settings) {
+      settings.minimizeOnClose ? playerWindow.hide() : app.quit();
+    });
   });
 
   // Fetches the settings when you open the settings window

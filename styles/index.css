@@ -6,7 +6,7 @@ body {
 .header {
   background-color: #555;
   border-bottom: 1px solid black; 
-  height: 70px;
+  height: 120px;
   left: 0;
   position: fixed;
   text-align: center;
@@ -15,9 +15,9 @@ body {
 }
 
 .content {
-  height: 700px;
+  height: 649px;
   position: relative;
-  top: 71px;
+  top: 121px;
 }
 
 .footer {
@@ -77,7 +77,7 @@ body {
 }
 
 .songListItemSelected {
-  outline: 2px solid #222;songListItemSelected
+  background-color: #555;
 }
 
 .rowItem {

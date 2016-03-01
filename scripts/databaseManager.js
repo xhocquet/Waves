@@ -12,15 +12,16 @@ var databaseManager = function() {
 
   let db = {};
   let DEFAULT_SORT = {
-    artist: 1,
-    album: 1
+    'album': 1,
+    'track.no': 1,
+    'artist': 1
   };
-  self.userSettings = '';
   self.libraryData = '';
+  self.userSettings = '';
 
+  db.libraryData =  new Datastore({ filename: './data/libraryData.json', autoload: true });
   db.settings =  new Datastore({ filename: './data/settings.json', autoload: true });
   db.songs =  new Datastore({ filename: './data/songs.json', autoload: true });
-  db.libraryData =  new Datastore({ filename: './data/libraryData.json', autoload: true });
 
   db.songs.persistence.setAutocompactionInterval(10000);
 
@@ -124,6 +125,18 @@ var databaseManager = function() {
   self.generateLibrary = function(path) {
     if (!fs.existsSync(path)) {
       console.log(path ," does not exist.");
+      return;
+    }
+    // Dragging in a single file
+    if (pathTools.extname(path) === ".mp3") {
+      trackDataWorker.push({path: path}, function(err) {
+        if (!err) {
+          console.log('Processed ', path);
+        } else {
+          console.log(err);
+        }
+        return;
+      });
       return;
     }
 

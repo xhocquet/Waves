@@ -17,48 +17,63 @@ let progressBarDiv = document.getElementsByClassName("progressBar")[0];
 let songList = document.getElementsByClassName("songList")[0];
 let progressBarTimer = null;
 
+let curSelectedTrackIDs = [];
 
+setupIPCListeners();
 setupEventListeners();
 setupProgressBarTimer();
 
-ipcRenderer.on('listData', function(event, response) {
-  songList.innerHTML = '';
+function setupIPCListeners() {
 
-  let count = 0;
-  for (let track of response) {
-    let newRow = document.createElement("div");
-    let rowClass = count % 2 ? 'songListItem' : 'songListItemAlternate';
-    newRow.setAttribute('class', rowClass);
+  ipcRenderer.on('listData', function(event, response) {
+    songList.innerHTML = '';
 
-    let htmlString = '<div class="rowItem rowIndex">'
-    htmlString += track._id;
-    htmlString += '</div><div class="rowItem rowArtist">';
-    htmlString += track.artist;
-    htmlString += '</div><div class="rowItem rowAlbum">';
-    htmlString += track.album;
-    htmlString += '</div><div class="rowItem rowTitle">';
-    htmlString += track.title;
-    htmlString += '</div><div class="rowItem rowDuration">';
-    htmlString += sanitizeDuration(track.duration);
-    htmlString += '</div>';
+    let count = 0;
+    curSelectedTrackIDs = [];
+    for (let track of response) {
+      let newRow = document.createElement("div");
+      let rowClass = count % 2 ? 'songListItem' : 'songListItemAlternate';
+      newRow.setAttribute('class', rowClass);
+      newRow.setAttribute('id', track._id);
 
-    newRow.innerHTML = htmlString;
+      let htmlString = '<div class="rowItem rowIndex">'
+      htmlString += track._id;
+      htmlString += '</div><div class="rowItem rowArtist">';
+      htmlString += track.artist;
+      htmlString += '</div><div class="rowItem rowAlbum">';
+      htmlString += track.album;
+      htmlString += '</div><div class="rowItem rowTitle">';
+      htmlString += track.title;
+      htmlString += '</div><div class="rowItem rowDuration">';
+      htmlString += sanitizeDuration(track.duration);
+      htmlString += '</div>';
 
-    musicPlayer.paths.push(track.path);
-    musicPlayer.IDs.push(track._id);
+      newRow.innerHTML = htmlString;
 
-    songList.appendChild(newRow);
-    count++;
-  }
-});
+      musicPlayer.paths.push(track.path);
+      musicPlayer.IDs.push(track._id);
 
-ipcRenderer.on('playPause', function(event, response) {
-  musicPlayer.playPause();
-});
+      songList.appendChild(newRow);
+      count++;
+    }
+  });
 
-ipcRenderer.on('addToQueue', function(event, response) {  
-  musicPlayer.queueNext(response.trackID);
-})
+  ipcRenderer.on('playPause', function(event, response) {
+    musicPlayer.playPause();
+  });
+
+  ipcRenderer.on('nextTrack', function(event, response) {
+    musicPlayer.nextTrack();
+  });
+
+  ipcRenderer.on('previousTrack', function(event, response) {
+    musicPlayer.previousTrack();
+  });
+
+  ipcRenderer.on('addToQueue', function(event, response) {  
+    musicPlayer.queueNext(response.trackID);
+  });
+}
 
 function generateLibrary() {
   ipcRenderer.send('generateLibrary', {});
@@ -77,18 +92,43 @@ function addTracksToQueue(...tracks) {
   musicPlayer.queueNext(tracks[0]);
 }
 
+// Handles clicking on a track
+// Left click: Select song, apply style
+// Right click: Open context menu
+// Middle click: Queue song
 function trackClickHandler(event) {
   event.preventDefault();
   if (event.target !== event.currentTarget) {
     let trackID = event.target.parentElement.firstChild.innerHTML;
     switch(event.button) {
-      case 0:
-        event.target.parentElement.className += ' songListItemSelected';
+      case 0: // Left
+        // If ctrl is pressed, add to selection
+        if(!event.ctrlKey) {
+          if (curSelectedTrackIDs.length > 0) {
+            curSelectedTrackIDs.forEach(function(element, index, array) {
+              document.getElementById(element).classList.remove('songListItemSelected');
+            });
+            curSelectedTrackIDs = [];
+          }
+        }
+
+        curSelectedTrackIDs.push(trackID);
+        event.target.parentElement.classList.add('songListItemSelected');
         break;
-      case 1:
+      case 1: // Middle
         musicPlayer.queueNext(trackID);
         break;
-      case 2:
+      case 2: // Right
+        if (curSelectedTrackIDs.length > 0) {
+          curSelectedTrackIDs.forEach(function(element, index, array) {
+            document.getElementById(element).classList.remove('songListItemSelected');
+          });
+          curSelectedTrackIDs = [];
+        }
+        curSelectedTrackIDs.push(trackID);
+        event.target.parentElement.classList.add('songListItemSelected');
+        // TODO: Highlight doesn't show up until context menu is closed. Timing thing?
+
         playerWindow.curTrackID = trackID;
         trackContextMenu.popup(playerWindow);
         break;
@@ -110,6 +150,7 @@ function setupEventListeners() {
   contentDiv.ondragleave = function() {
     return false;
   }
+  // Drag file handler
   contentDiv.ondrop = function(e) {
     e.preventDefault();
     let file = e.dataTransfer.files[0];

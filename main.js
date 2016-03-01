@@ -58,7 +58,7 @@ function createWindows () {
     } else {
       playerWindow.show();
     }
-  })
+  });
 
   databaseManager.loadSettings();
   databaseManager.loadLibraryData();
@@ -155,4 +155,16 @@ function setupPlayerWindowListeners() {
   playerWindow.on('closed', function() {
     app.quit();
   });
+}
+
+app.playPause = function() {
+  playerWindow.webContents.send("playPause");
+}
+
+app.nextTrack = function() {
+  playerWindow.webContents.send("nextTrack");
+}
+
+app.previousTrack = function() {
+  playerWindow.webContents.send("previousTrack");
 }

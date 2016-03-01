@@ -1,9 +1,12 @@
 'use strict';
 const ipcRenderer = require('electron').ipcRenderer;
+// const databaseManager = require('databaseManager.js');
+
 let userSettings;
 let curWindow = this;
 let importFolderTextarea = document.getElementsByClassName("importFolders")[0];
 let processImagesCheckbox = document.getElementsByClassName("processImages")[0];
+let minimizeOnCloseCheckbox = document.getElementsByClassName("minimizeOnClose")[0];
 
 // When you receive settings data, populate the form
 ipcRenderer.on('settingsData', function(event, response) {
@@ -30,6 +33,10 @@ processImagesCheckbox.addEventListener("click", function() {
   userSettings.processTrackImages = processImagesCheckbox.checked;
 })
 
+minimizeOnCloseCheckbox.addEventListener("click", function() {
+  userSettings.minimizeOnClose = minimizeOnCloseCheckbox.checked;
+})
+
 // Send updated settings back to main for saving
 let saveSettings = function() {
   ipcRenderer.send("saveSettings", { userSettings });
@@ -51,4 +58,5 @@ let fillInCurrentSettings = function() {
   importFolderTextarea.focus();
 
   processImagesCheckbox.checked = userSettings.processTrackImages
+  minimizeOnCloseCheckbox.checked = userSettings.minimizeOnClose
 }

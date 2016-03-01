@@ -15,8 +15,8 @@ var databaseManager = function() {
     artist: 1,
     album: 1
   };
-  let userSettings = '';
-  let libraryData = '';
+  self.userSettings = '';
+  self.libraryData = '';
 
   db.settings =  new Datastore({ filename: './data/settings.json', autoload: true });
   db.songs =  new Datastore({ filename: './data/songs.json', autoload: true });
@@ -70,11 +70,10 @@ var databaseManager = function() {
   }
 
   // Returns the single record in the settings db, the user's settings.
-  self.getSettings = function(callback) {
+  self.loadSettings = function() {
     db.settings.find({ settingName: 'user' }, function( err, docs) {
-      userSettings = docs[0];
-      callback(docs[0]);
-    })
+      self.userSettings = docs[0];
+    });
   }
 
   // Save settings to db, just replace the file
@@ -89,16 +88,15 @@ var databaseManager = function() {
         callback(err);
       } else {
         db.settings.persistence.compactDatafile();
-        userSettings = newDoc; // Update usersettings so they're up to date
+        self.userSettings = newDoc; // Update usersettings so they're up to date
         callback("Successfully saved settings");
       }
     })
   }
 
-  self.getLibraryData = function(callback) {
+  self.loadLibraryData = function() {
     db.libraryData.find({settingName: 'user'}, function( err, docs) {
-      libraryData = docs[0];
-      callback(libraryData);
+      self.libraryData = docs[0];
     })
   }
 
@@ -113,7 +111,7 @@ var databaseManager = function() {
         console.log(err);
       } else {
         db.libraryData.persistence.compactDatafile();
-        libraryData = newDoc; // Update libraryData so it stays up to date.
+        self.libraryData = newDoc; // Update libraryData so it stays up to date.
         console.log("Successfully saved libraryData");
       }
     })
@@ -145,23 +143,16 @@ var databaseManager = function() {
   }
 
   self.createTrackData = function(filePath, callback) {
-    if (!libraryData) {
-      self.getLibraryData(function(data) {
-        console.log(data)
-        libraryData = data;
-      })
-    }
-
     let fileStream = fs.createReadStream(filePath);
     MetaData(fileStream, { duration: true }, function(err, metaData) {
       metaData.path = filePath;
       metaData.artist = metaData.artist[0];
 
-      if (libraryData.artists.indexOf(metaData.artist) < 0) {
-        libraryData.artists.push(metaData.artist);
+      if (self.libraryData.artists.indexOf(metaData.artist) < 0) {
+        self.libraryData.artists.push(metaData.artist);
       }
-      if (libraryData.albums.indexOf(metaData.album) < 0) {
-        libraryData.albums.push(metaData.album);
+      if (self.libraryData.albums.indexOf(metaData.album) < 0) {
+        self.libraryData.albums.push(metaData.album);
       }
 
       let coverImage = metaData.picture.data;

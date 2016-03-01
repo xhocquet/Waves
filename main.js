@@ -41,8 +41,10 @@ function createWindows () {
     movable: false
   });
 
+  setupIPCListeners();
   setupPlayerWindow();
-  setupListeners();
+  setupPlayerWindowListeners();
+  setupSettingsWindowListeners();
 
   settingsWindow.loadURL('file://' + __dirname + '/views/settings.html');
   // settingsWindow.toggleDevTools();
@@ -58,6 +60,8 @@ function createWindows () {
       playerWindow.show();
     }
   })
+
+  databaseManager.loadSettings();
 }
 
 function sendInitialLibrary() {
@@ -96,14 +100,14 @@ function setupAppListeners() {
     }
   });
 
-  app.on('quit', function(event, exitCode) {
+  app.on('will-quit', function(e) {
     playerWindow = null;
     settingsWindow = null;
     trayIcon = null;
   })
 }
 
-function setupListeners() {
+function setupIPCListeners() {
   // Pass-through database query for library
   ipcMain.on('getListData', function(event, options) {
     databaseManager.queryLibrary(options, function(response) {
@@ -118,10 +122,8 @@ function setupListeners() {
     } else {
       // TODO Just make a specific function in the manager for adding user setting folders,
       // OR conditional in the dbmanager and pass along the options
-      databaseManager.getSettings(function(settings) {
-        settings.importFolders.forEach(function(element, index, array) {
-          databaseManager.generateLibrary(element);
-        })
+      databaseManager.userSettings.importFolders.forEach(function(element, index, array) {
+        databaseManager.generateLibrary(element);
       })
     }
     databaseManager.saveLibraryData();
@@ -138,26 +140,33 @@ function setupListeners() {
       event.sender.send("saveResponse", response);
     });
   });
+}
 
+function setupPlayerWindowListeners() {
   // Send initial library when the page loads
   playerWindow.webContents.on('did-finish-load', function(e) {
     sendInitialLibrary();
   });
 
-  // When X is clicked, just hide window.
-  // TODO: Setting to enable this
+  // When X is clicked, action based on user settings
   playerWindow.on('close', function(e) {
-    e.preventDefault();
-    databaseManager.getSettings(function(settings) {
-      settings.minimizeOnClose ? playerWindow.hide() : app.quit();
-    });
+    if (databaseManager.userSettings.minimizeOnClose) {
+      e.preventDefault();
+      playerWindow.hide();
+    }
   });
 
+  playerWindow.on('closed', function() {
+    app.quit();
+  })
+
+  
+}
+
+function setupSettingsWindowListeners() {
   // Fetches the settings when you open the settings window
   // TODO: change this to when it opens, not focus
   settingsWindow.on('focus', function() {
-    databaseManager.getSettings(function(settings) {
-      settingsWindow.webContents.send("settingsData", settings);
-    });
+    settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
   });
 }

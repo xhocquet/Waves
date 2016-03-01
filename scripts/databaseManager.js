@@ -36,6 +36,7 @@ var databaseManager = function() {
   }, 5);
 
   trackDataWorker.drain = function() {
+    self.saveLibraryData();
     console.log("All tracks have been processed");
   };
 
@@ -76,7 +77,7 @@ var databaseManager = function() {
     });
   }
 
-  // Save settings to db, just replace the file
+  // Save settings to db
   self.saveSettings = function(settings, callback) {
     db.settings.remove({settingName: 'user'}, { multi: true }, function(err, numRemoved) {
       if (err) {
@@ -88,25 +89,27 @@ var databaseManager = function() {
         callback(err);
       } else {
         db.settings.persistence.compactDatafile();
-        self.userSettings = newDoc; // Update usersettings so they're up to date
+        self.userSettings = newDoc; // Update usersettings so it stays up to date.
         callback("Successfully saved settings");
       }
     })
   }
 
+  // Returns the single record in the libraryDataDB, the user's library data
   self.loadLibraryData = function() {
     db.libraryData.find({settingName: 'user'}, function( err, docs) {
       self.libraryData = docs[0];
     })
   }
 
+  // Save library data to db
   self.saveLibraryData = function() {
     db.libraryData.remove({settingName: 'user'}, { multi: true }, function(err, numRemoved) {
       if (err) {
         console.log(err);
       }
     })
-    db.libraryData.insert(libraryData, function(err, newDoc) {
+    db.libraryData.insert(self.libraryData, function(err, newDoc) {
       if (err) {
         console.log(err);
       } else {
@@ -117,9 +120,10 @@ var databaseManager = function() {
     })
   }
 
+  // Iterate folders and push filepaths to track data workers
   self.generateLibrary = function(path) {
     if (!fs.existsSync(path)) {
-      console.log(path ,"' does not exist.");
+      console.log(path ," does not exist.");
       return;
     }
 
@@ -142,6 +146,13 @@ var databaseManager = function() {
     }
   }
 
+  // Calls generateLibrary on all the folders in userSettings.importFolders
+  self.generateLibraryFromSettings = function() {
+    self.userSettings.importFolders.forEach(function(element, index, array) {
+      self.generateLibrary(element);
+    });
+  }
+
   self.createTrackData = function(filePath, callback) {
     let fileStream = fs.createReadStream(filePath);
     MetaData(fileStream, { duration: true }, function(err, metaData) {
@@ -156,7 +167,7 @@ var databaseManager = function() {
       }
 
       let coverImage = metaData.picture.data;
-      metaData.picture = userSettings.processTrackImages ? metaData.picture  : '';
+      metaData.picture = self.userSettings.processTrackImages ? metaData.picture  : '';
       db.songs.insert(metaData, function(err, newDoc) {
         if (!err) {
           console.log("Inserted: " + newDoc.artist + " - " + newDoc.title);

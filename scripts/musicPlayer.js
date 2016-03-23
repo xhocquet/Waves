@@ -11,8 +11,6 @@ var musicPlayer = function() {
     curIndex = idArray.indexOf(songID);
     $musicPlayer.src = pathArray[curIndex];
     $musicPlayer.play();
-
-
   }
 
   self.playPause = function() {
@@ -53,6 +51,10 @@ var musicPlayer = function() {
 
     idArray.splice(curIndex + 1, 0, songID);
     pathArray.splice(curIndex + 1, 0, songPath);
+  }
+
+  self.setVolume = function(event) {
+    $musicPlayer.volume = event.target.value / 100;
   }
 
   self.paths = pathArray;

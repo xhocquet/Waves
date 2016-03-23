@@ -1,4 +1,5 @@
 'use strict';
+let self = this;
 const ipcRenderer = require('electron').ipcRenderer;
 const Remote = require('electron').remote;
 const Menu = Remote.Menu;
@@ -15,13 +16,15 @@ let previousButton = document.getElementsByClassName("previous")[0];
 let nextButton = document.getElementsByClassName("next")[0];
 let progressBarDiv = document.getElementsByClassName("progressBar")[0];
 let songList = document.getElementsByClassName("songList")[0];
-let progressBarTimer = null;
+let volumeSlider = document.getElementsByClassName("volumeSlider")[0];
 
+let prevPlayingTrackID = null
+let curPlayingTrackID = null;
 let curSelectedTrackIDs = [];
 
 setupIPCListeners();
 setupEventListeners();
-setupProgressBarTimer();
+// setupProgressBarTimer();
 
 function setupIPCListeners() {
 
@@ -38,7 +41,7 @@ function setupIPCListeners() {
 
       let htmlString = '<div class="rowItem rowIndex">'
       htmlString += track._id;
-      htmlString += '</div><div class="rowItem rowArtist">';
+      htmlString += '</div><div class="rowItem rowPlaying"></div><div class="rowItem rowArtist">';
       htmlString += track.artist;
       htmlString += '</div><div class="rowItem rowAlbum">';
       htmlString += track.album;
@@ -59,7 +62,7 @@ function setupIPCListeners() {
   });
 
   ipcRenderer.on('playPause', function(event, response) {
-    musicPlayer.playPause();
+    self.playPause();
   });
 
   ipcRenderer.on('nextTrack', function(event, response) {
@@ -83,6 +86,8 @@ function playSong(event) {
   event.preventDefault();
   if (event.target !== event.currentTarget) {
     let trackID = event.target.parentElement.firstChild.innerHTML;
+    prevPlayingTrackID = curPlayingTrackID;
+    curPlayingTrackID = trackID;
     musicPlayer.playSong(trackID);
   }
   event.stopPropagation();
@@ -140,9 +145,13 @@ function trackClickHandler(event) {
 function setupEventListeners() {
   songList.ondblclick = playSong;
   songList.onmousedown = trackClickHandler;
-  pauseButton.onclick = musicPlayer.playPause;
+  pauseButton.onclick = self.playPause;
   previousButton.onclick = musicPlayer.previousTrack;
   nextButton.onclick = musicPlayer.nextTrack;
+  volumeSlider.oninput = musicPlayer.setVolume;
+  musicPlayer.audio.onplay = self.playHandler;
+  musicPlayer.audio.onpause = self.playHandler;
+  musicPlayer.audio.ontimeupdate = self.progressHandler;
 
   contentDiv.ondragover = function() {
     return false;
@@ -158,17 +167,36 @@ function setupEventListeners() {
   }
 }
 
-function setupProgressBarTimer() {
-  progressBarTimer = window.setInterval(function() {
-    if (!musicPlayer.audio.ended) {
-      let progress = musicPlayer.audio.currentTime;
-      let total = musicPlayer.audio.duration;
-      let ratio = (progress/total) * 100;
-      progressBarDiv.style.width = ratio+"%";
-    } else {
-      progressBarDiv.style.width = "0%";
-    }
-  }, 500);
+function playPause() {
+  musicPlayer.playPause();
+}
+
+function playHandler() {
+  // Update the play/pause button
+  if (!musicPlayer.audio.paused) {
+    pauseButton.style.background = "url('../assets/pause.svg') no-repeat left top";
+  } else {
+    pauseButton.style.background = "url('../assets/play.svg') no-repeat left top";
+  }
+
+  // Clear last playing song icon, set new one
+  if (prevPlayingTrackID) {
+    let prevPlayingRow = document.getElementById(prevPlayingTrackID);
+    prevPlayingRow.children[1].innerHTML = '';
+  }
+  let curPlayingRow = document.getElementById(curPlayingTrackID);
+  curPlayingRow.children[1].innerHTML = '<img src="../assets/volume.svg" />';
+}
+
+function progressHandler() {
+  if (!musicPlayer.audio.ended) {
+    let progress = musicPlayer.audio.currentTime;
+    let total = musicPlayer.audio.duration;
+    let ratio = (progress/total) * 100;
+    progressBarDiv.style.width = ratio+"%";
+  } else {
+    progressBarDiv.style.width = "0%";
+  }
 }
 
 function sanitizeDuration(duration) {

@@ -3,6 +3,8 @@
 var databaseManager = function() {
   var self = this;
 
+  const app = require('electron').app;
+
   const MetaData = require('musicmetadata');
   const Datastore = require('nedb');
 
@@ -12,9 +14,9 @@ var databaseManager = function() {
 
   let db = {};
   let DEFAULT_SORT = {
+    'albumartist': 1,
     'album': 1,
-    'track.no': 1,
-    'artist': 1
+    'track.no': 1
   };
   self.libraryData = '';
   self.userSettings = '';
@@ -38,6 +40,7 @@ var databaseManager = function() {
 
   trackDataWorker.drain = function() {
     self.saveLibraryData();
+    app.sendLibrary();
     console.log("All tracks have been processed");
   };
 
@@ -171,6 +174,7 @@ var databaseManager = function() {
     MetaData(fileStream, { duration: true }, function(err, metaData) {
       metaData.path = filePath;
       metaData.artist = metaData.artist[0];
+      metaData.albumartist = metaData.albumartist[0];
 
       if (self.libraryData.artists.indexOf(metaData.artist) < 0) {
         self.libraryData.artists.push(metaData.artist);

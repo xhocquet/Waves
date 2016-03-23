@@ -9,6 +9,8 @@ const Tray = electron.Tray;
 
 const dm = require('./scripts/databaseManager.js');
 const databaseManager = new dm();
+databaseManager.loadSettings();
+databaseManager.loadLibraryData();
 
 const mainWindowMenu = require('./scripts/menus/mainWindowMenu.js');
 const trayIconMenu = require('./scripts/menus/trayContextMenu.js');
@@ -59,9 +61,6 @@ function createWindows () {
       playerWindow.show();
     }
   });
-
-  databaseManager.loadSettings();
-  databaseManager.loadLibraryData();
 }
 
 function sendInitialLibrary() {
@@ -167,4 +166,8 @@ app.nextTrack = function() {
 
 app.previousTrack = function() {
   playerWindow.webContents.send("previousTrack");
+}
+
+app.sendLibrary = function() {
+  sendInitialLibrary();
 }

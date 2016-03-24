@@ -48,7 +48,7 @@ function createWindows () {
   });
 
   settingsWindow.loadURL('file://' + __dirname + '/views/settings.html');
-  // settingsWindow.toggleDevTools();
+  playerWindow.toggleDevTools();
   // settingsWindow.show();
 
   trayIcon = new Tray('assets/icon.png');

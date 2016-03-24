@@ -1,80 +1,57 @@
-'use strict';
-let self = this;
-const ipcRenderer = require('electron').ipcRenderer;
-const Remote = require('electron').remote;
-const Menu = Remote.Menu;
-const mp = require('../scripts/musicPlayer.js');
-const musicPlayer = new mp();
-const playerWindow = Remote.getCurrentWindow();
+var ipcRenderer = require('electron').ipcRenderer;
+var Remote = require('electron').remote;
+var Menu = Remote.Menu;
+var playerWindow = Remote.getCurrentWindow();
+var mp = require('../scripts/musicPlayer.js');
+playerWindow.musicPlayer = new mp();
+var React = require('react');
+var ReactDOM = require('react-dom');
+var TrackList = require('../scripts/modules/trackList.jsx');
 
-const trackContextMenuSource = require('../scripts/menus/trackContextMenu.js');
-let trackContextMenu = Menu.buildFromTemplate(trackContextMenuSource);
+var trackContextMenuSource = require('../scripts/menus/trackContextMenu.js');
+var trackContextMenu = Menu.buildFromTemplate(trackContextMenuSource);
 
-let contentDiv = document.getElementsByClassName("content")[0];
-let pauseButton = document.getElementsByClassName("pause")[0];
-let previousButton = document.getElementsByClassName("previous")[0];
-let nextButton = document.getElementsByClassName("next")[0];
-let progressBarDiv = document.getElementsByClassName("progressBar")[0];
-let songList = document.getElementsByClassName("songList")[0];
-let volumeSlider = document.getElementsByClassName("volumeSlider")[0];
+var contentDiv = document.getElementsByClassName("content")[0];
+var pauseButton = document.getElementsByClassName("pause")[0];
+var previousButton = document.getElementsByClassName("previous")[0];
+var nextButton = document.getElementsByClassName("next")[0];
+var progressBarDiv = document.getElementsByClassName("progressBar")[0];
+var songList = document.getElementsByClassName("songList")[0];
+var volumeSlider = document.getElementsByClassName("volumeSlider")[0];
 
-let prevPlayingTrackID = null
-let curPlayingTrackID = null;
-let curSelectedTrackIDs = [];
+var prevPlayingTrackID = null
+var curPlayingTrackID = null;
+var curSelectedTrackIDs = [];
+
+var trackList = React.createElement(TrackList, {musicPlayer: playerWindow.musicPlayer} ,null);
+var songListReactElement = ReactDOM.render(trackList, contentDiv);
 
 setupIPCListeners();
 setupEventListeners();
-// setupProgressBarTimer();
 
 function setupIPCListeners() {
-
   ipcRenderer.on('listData', function(event, response) {
-    songList.innerHTML = '';
-
-    let count = 0;
-    curSelectedTrackIDs = [];
-    for (let track of response) {
-      let newRow = document.createElement("div");
-      let rowClass = count % 2 ? 'songListItem' : 'songListItemAlternate';
-      newRow.setAttribute('class', rowClass);
-      newRow.setAttribute('id', track._id);
-
-      let htmlString = '<div class="rowItem rowIndex">'
-      htmlString += track._id;
-      htmlString += '</div><div class="rowItem rowPlaying"></div><div class="rowItem rowArtist">';
-      htmlString += track.artist;
-      htmlString += '</div><div class="rowItem rowAlbum">';
-      htmlString += track.album;
-      htmlString += '</div><div class="rowItem rowTitle">';
-      htmlString += track.title;
-      htmlString += '</div><div class="rowItem rowDuration">';
-      htmlString += sanitizeDuration(track.duration);
-      htmlString += '</div>';
-
-      newRow.innerHTML = htmlString;
-
-      musicPlayer.paths.push(track.path);
-      musicPlayer.IDs.push(track._id);
-
-      songList.appendChild(newRow);
-      count++;
+    renderTracklist(response);
+    for (var track of response) {
+      playerWindow.musicPlayer.paths.push(track.path);
+      playerWindow.musicPlayer.IDs.push(track._id);
     }
   });
 
   ipcRenderer.on('playPause', function(event, response) {
-    self.playPause();
+    playerWindow.playPause();
   });
 
   ipcRenderer.on('nextTrack', function(event, response) {
-    musicPlayer.nextTrack();
+    playerWindow.musicPlayer.nextTrack();
   });
 
   ipcRenderer.on('previousTrack', function(event, response) {
-    musicPlayer.previousTrack();
+    playerWindow.musicPlayer.previousTrack();
   });
 
   ipcRenderer.on('addToQueue', function(event, response) {  
-    musicPlayer.queueNext(response.trackID);
+    playerWindow.musicPlayer.queueNext(response.trackID);
   });
 }
 
@@ -85,16 +62,20 @@ function generateLibrary() {
 function playSong(event) {
   event.preventDefault();
   if (event.target !== event.currentTarget) {
-    let trackID = event.target.parentElement.firstChild.innerHTML;
+    var trackID = event.target.parentElement.firstChild.innerHTML;
     prevPlayingTrackID = curPlayingTrackID;
     curPlayingTrackID = trackID;
-    musicPlayer.playSong(trackID);
+    playerWindow.musicPlayer.playSong(trackID);
   }
   event.stopPropagation();
 }
 
+function renderTracklist(tracks) {
+  songListReactElement.setState({tracks: tracks});
+}
+
 function addTracksToQueue(...tracks) {
-  musicPlayer.queueNext(tracks[0]);
+  playerWindow.musicPlayer.queueNext(tracks[0]);
 }
 
 // Handles clicking on a track
@@ -104,7 +85,7 @@ function addTracksToQueue(...tracks) {
 function trackClickHandler(event) {
   event.preventDefault();
   if (event.target !== event.currentTarget) {
-    let trackID = event.target.parentElement.firstChild.innerHTML;
+    var trackID = event.target.parentElement.firstChild.innerHTML;
     switch(event.button) {
       case 0: // Left
         // If ctrl is pressed, add to selection
@@ -121,7 +102,7 @@ function trackClickHandler(event) {
         event.target.parentElement.classList.add('songListItemSelected');
         break;
       case 1: // Middle
-        musicPlayer.queueNext(trackID);
+        playerWindow.musicPlayer.queueNext(trackID);
         break;
       case 2: // Right
         if (curSelectedTrackIDs.length > 0) {
@@ -142,16 +123,49 @@ function trackClickHandler(event) {
   event.stopPropagation();
 }
 
+function playPause() {
+  debugger;
+  playerWindow.musicPlayer.playPause();
+}
+
+function playHandler() {
+  // Update the play/pause button
+  if (!playerWindow.musicPlayer.audio.paused) {
+    pauseButton.style.background = "url('../assets/pause.svg') no-repeat left top";
+  } else {
+    pauseButton.style.background = "url('../assets/play.svg') no-repeat left top";
+  }
+
+  // Clear last playing song icon, set new one
+  if (prevPlayingTrackID) {
+    var prevPlayingRow = document.getElementById(prevPlayingTrackID);
+    prevPlayingRow.children[1].innerHTML = '';
+  }
+  var curPlayingRow = document.getElementById(curPlayingTrackID);
+  curPlayingRow.children[1].innerHTML = '<img src="../assets/volume.svg" />';
+}
+
+function progressHandler() {
+  if (!playerWindow.musicPlayer.audio.ended) {
+    var progress = playerWindow.musicPlayer.audio.currentTime;
+    var total = playerWindow.musicPlayer.audio.duration;
+    var ratio = (progress/total) * 100;
+    progressBarDiv.style.width = ratio+"%";
+  } else {
+    progressBarDiv.style.width = "0%";
+  }
+}
+
 function setupEventListeners() {
-  songList.ondblclick = playSong;
-  songList.onmousedown = trackClickHandler;
-  pauseButton.onclick = self.playPause;
-  previousButton.onclick = musicPlayer.previousTrack;
-  nextButton.onclick = musicPlayer.nextTrack;
-  volumeSlider.oninput = musicPlayer.setVolume;
-  musicPlayer.audio.onplay = self.playHandler;
-  musicPlayer.audio.onpause = self.playHandler;
-  musicPlayer.audio.ontimeupdate = self.progressHandler;
+  // songList.ondblclick = playSong;
+  // songList.onmousedown = trackClickHandler;
+  pauseButton.onclick = playPause;
+  previousButton.onclick = playerWindow.musicPlayer.previousTrack;
+  nextButton.onclick = playerWindow.musicPlayer.nextTrack;
+  volumeSlider.oninput = playerWindow.musicPlayer.setVolume;
+  playerWindow.musicPlayer.audio.onplay = playHandler;
+  playerWindow.musicPlayer.audio.onpause = playHandler;
+  playerWindow.musicPlayer.audio.ontimeupdate = progressHandler;
 
   contentDiv.ondragover = function() {
     return false;
@@ -162,45 +176,7 @@ function setupEventListeners() {
   // Drag file handler
   contentDiv.ondrop = function(e) {
     e.preventDefault();
-    let file = e.dataTransfer.files[0];
+    var file = e.dataTransfer.files[0];
     ipcRenderer.send('generateLibrary', { path: file.path });
   }
-}
-
-function playPause() {
-  musicPlayer.playPause();
-}
-
-function playHandler() {
-  // Update the play/pause button
-  if (!musicPlayer.audio.paused) {
-    pauseButton.style.background = "url('../assets/pause.svg') no-repeat left top";
-  } else {
-    pauseButton.style.background = "url('../assets/play.svg') no-repeat left top";
-  }
-
-  // Clear last playing song icon, set new one
-  if (prevPlayingTrackID) {
-    let prevPlayingRow = document.getElementById(prevPlayingTrackID);
-    prevPlayingRow.children[1].innerHTML = '';
-  }
-  let curPlayingRow = document.getElementById(curPlayingTrackID);
-  curPlayingRow.children[1].innerHTML = '<img src="../assets/volume.svg" />';
-}
-
-function progressHandler() {
-  if (!musicPlayer.audio.ended) {
-    let progress = musicPlayer.audio.currentTime;
-    let total = musicPlayer.audio.duration;
-    let ratio = (progress/total) * 100;
-    progressBarDiv.style.width = ratio+"%";
-  } else {
-    progressBarDiv.style.width = "0%";
-  }
-}
-
-function sanitizeDuration(duration) {
-  let minutes = Math.floor(duration / 60);
-  let remainder = Math.floor(duration % 60);
-  return minutes.toString() + ":" + ("0" + remainder).slice(-2)
 }

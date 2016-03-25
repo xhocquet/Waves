@@ -83,6 +83,9 @@ function setupPlayerWindow() {
   playerWindow.addToQueue = function(track) {
     playerWindow.webContents.send("addToQueue", { trackID: track });
   }
+  playerWindow.setVolume = function(value) {
+    playerWindow.webContents.send("setVolume", { value: value });
+  }
 
   playerWindow.curTrackID = null;
 

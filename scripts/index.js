@@ -19,12 +19,14 @@ var progressBarDiv = document.getElementsByClassName("progressBar")[0];
 var songList = document.getElementsByClassName("songList")[0];
 var volumeSlider = document.getElementsByClassName("volumeSlider")[0];
 
-var prevPlayingTrackID = null
-var curPlayingTrackID = null;
-var curSelectedTrackIDs = [];
+var prevPlayingTrackId = null
+var curPlayingTrackId = null;
+var curSelectedTrackIds = [];
 
 var trackList = React.createElement(TrackList, {
-  musicPlayer: playerWindow.musicPlayer
+  playerWindow: playerWindow,
+  musicPlayer: playerWindow.musicPlayer,
+  trackContextMenu: trackContextMenu
 } ,null);
 var songListReactElement = ReactDOM.render(trackList, contentDiv);
 
@@ -33,15 +35,20 @@ setupEventListeners();
 
 function setupIPCListeners() {
   ipcRenderer.on('listData', function(event, response) {
+    var idArray = response.map(track => {
+      return track._id;
+    });
+    var pathArray = response.map(track => {
+      return track.path;
+    });
+    playerWindow.musicPlayer.ids = idArray;
+    playerWindow.musicPlayer.paths = pathArray;
+
     renderTracklist(response);
-    for (var track of response) {
-      playerWindow.musicPlayer.paths.push(track.path);
-      playerWindow.musicPlayer.IDs.push(track._id);
-    }
   });
 
   ipcRenderer.on('playPause', function(event, response) {
-    playerWindow.playPause();
+    playerWindow.musicPlayer.playPause();
   });
 
   ipcRenderer.on('nextTrack', function(event, response) {
@@ -55,6 +62,10 @@ function setupIPCListeners() {
   ipcRenderer.on('addToQueue', function(event, response) {  
     playerWindow.musicPlayer.queueNext(response.trackID);
   });
+
+  ipcRenderer.on('setVolume', function(event, response) {
+    playerWindow.musicPlayer.audio.volume = response.value / 100;
+  })
 }
 
 function generateLibrary() {
@@ -72,51 +83,6 @@ function addTracksToQueue(...tracks) {
   playerWindow.musicPlayer.queueNext(tracks[0]);
 }
 
-// Handles clicking on a track
-// Left click: Select song, apply style
-// Right click: Open context menu
-// Middle click: Queue song
-function trackClickHandler(event) {
-  event.preventDefault();
-  if (event.target !== event.currentTarget) {
-    var trackID = event.target.parentElement.firstChild.innerHTML;
-    switch(event.button) {
-      case 0: // Left
-        // If ctrl is pressed, add to selection
-        if(!event.ctrlKey) {
-          if (curSelectedTrackIDs.length > 0) {
-            curSelectedTrackIDs.forEach(function(element, index, array) {
-              document.getElementById(element).classList.remove('songListItemSelected');
-            });
-            curSelectedTrackIDs = [];
-          }
-        }
-
-        curSelectedTrackIDs.push(trackID);
-        event.target.parentElement.classList.add('songListItemSelected');
-        break;
-      case 1: // Middle
-        playerWindow.musicPlayer.queueNext(trackID);
-        break;
-      case 2: // Right
-        if (curSelectedTrackIDs.length > 0) {
-          curSelectedTrackIDs.forEach(function(element, index, array) {
-            document.getElementById(element).classList.remove('songListItemSelected');
-          });
-          curSelectedTrackIDs = [];
-        }
-        curSelectedTrackIDs.push(trackID);
-        event.target.parentElement.classList.add('songListItemSelected');
-        // TODO: Highlight doesn't show up until context menu is closed. Timing thing?
-
-        playerWindow.curTrackID = trackID;
-        trackContextMenu.popup(playerWindow);
-        break;
-    }
-  }
-  event.stopPropagation();
-}
-
 function playPause() {
   playerWindow.musicPlayer.playPause();
 }
@@ -128,14 +94,6 @@ function playHandler() {
   } else {
     pauseButton.style.background = "url('../assets/play.svg') no-repeat left top";
   }
-
-  // Clear last playing song icon, set new one
-  if (prevPlayingTrackID) {
-    var prevPlayingRow = document.getElementById(prevPlayingTrackID);
-    prevPlayingRow.children[1].innerHTML = '';
-  }
-  var curPlayingRow = document.getElementById(curPlayingTrackID);
-  curPlayingRow.children[1].innerHTML = '<img src="../assets/volume.svg" />';
 }
 
 function progressHandler() {
@@ -149,8 +107,12 @@ function progressHandler() {
   }
 }
 
+function volumeHandler() {
+  var volume = playerWindow.musicPlayer.audio.volume;
+  volumeSlider.value = volume * 100;
+}
+
 function setupEventListeners() {
-  // songList.onmousedown = trackClickHandler;
   pauseButton.onclick = playPause;
   previousButton.onclick = playerWindow.musicPlayer.previousTrack;
   nextButton.onclick = playerWindow.musicPlayer.nextTrack;
@@ -158,6 +120,7 @@ function setupEventListeners() {
   playerWindow.musicPlayer.audio.onplay = playHandler;
   playerWindow.musicPlayer.audio.onpause = playHandler;
   playerWindow.musicPlayer.audio.ontimeupdate = progressHandler;
+  playerWindow.musicPlayer.audio.onvolumechange = volumeHandler;
 
   contentDiv.ondragover = function() {
     return false;

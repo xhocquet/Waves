@@ -17,12 +17,10 @@ var trackEntry = React.createClass({
 
   // Pass up this element to the list
   clickHandler: function(event) {
-    event.preventDefault();
     this.props.onClick(this, event.nativeEvent);
   },
 
   doubleClickHandler: function(event) {
-    event.preventDefault();
     this.props.onDoubleClick(this, event.nativeEvent);
   },
 
@@ -35,13 +33,13 @@ var trackEntry = React.createClass({
   },
 
   render: function() {
-    var nowPlaying = this.state.nowPlaying ? "<img src='../assets/volume.svg' />" : "";
+    var nowPlaying = this.state.nowPlaying ? "rowItem rowPlaying rowCurrentlyPlaying" : "rowItem rowPlaying";
     var rowClass = this.getRowClass();
 
     return (
       <div className={rowClass} onMouseDown ={this.clickHandler} onDoubleClick={this.doubleClickHandler}>
         <div className="rowItem rowIndex"></div>
-        <div className="rowItem rowPlaying">{nowPlaying}</div>
+        <div className={nowPlaying}></div>
         <div className="rowItem rowArtist">{this.props.track.artist}</div>
         <div className="rowItem rowAlbum">{this.props.track.album}</div>
         <div className="rowItem rowTitle">{this.props.track.title}</div>

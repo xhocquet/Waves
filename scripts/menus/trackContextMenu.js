@@ -13,31 +13,31 @@ var mainMenu = [
       {
         label: '100%',
         click: function(item, curWindow) {
-          curWindow.setVolume(100);
+          curWindow.setVolume(1);
         }
       },
       {
         label: '80%',
         click: function(item, curWindow) {
-          curWindow.setVolume(80);
+          curWindow.setVolume(0.8);
         }
       },
       {
         label: '60%',
         click: function(item, curWindow) {
-          curWindow.setVolume(60);
+          curWindow.setVolume(0.6);
         }
       },
       {
         label: '40%',
         click: function(item, curWindow) {
-          curWindow.setVolume(40);
+          curWindow.setVolume(0.4);
         }
       },
       {
         label: '20%',
         click: function(item, curWindow) {
-          curWindow.setVolume(20);
+          curWindow.setVolume(0.2);
         }
       },
       {

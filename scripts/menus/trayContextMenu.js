@@ -20,6 +20,47 @@ var trayMenu = [
       app.previousTrack();
     }
   },
+  {
+    label: 'Set Volume',
+    submenu: [
+      {
+        label: '100%',
+        click: function(item, curWindow) {
+          app.setVolume(1);
+        }
+      },
+      {
+        label: '80%',
+        click: function(item, curWindow) {
+          app.setVolume(0.8);
+        }
+      },
+      {
+        label: '60%',
+        click: function(item, curWindow) {
+          app.setVolume(0.6);
+        }
+      },
+      {
+        label: '40%',
+        click: function(item, curWindow) {
+          app.setVolume(0.4);
+        }
+      },
+      {
+        label: '20%',
+        click: function(item, curWindow) {
+          app.setVolume(0.2);
+        }
+      },
+      {
+        label: '0%',
+        click: function(item, curWindow) {
+          app.setVolume(0);
+        }
+      },
+    ]
+  },
   { 
     label: 'Close Application', 
     click: function(item, focusedWindow) {

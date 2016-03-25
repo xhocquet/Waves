@@ -80,6 +80,12 @@ function setupPlayerWindow() {
   playerWindow.playPause = function() {
     playerWindow.webContents.send("playPause", {});
   }
+  playerWindow.nextTrack = function() {
+    playerWindow.webContents.send("nextTrack");
+  }
+  playerWindow.previousTrack = function() {
+    playerWindow.webContents.send("previousTrack");
+  }
   playerWindow.addToQueue = function(track) {
     playerWindow.webContents.send("addToQueue", { trackID: track });
   }
@@ -160,17 +166,21 @@ function setupPlayerWindowListeners() {
 }
 
 app.playPause = function() {
-  playerWindow.webContents.send("playPause");
+  playerWindow.playPause();
 }
 
 app.nextTrack = function() {
-  playerWindow.webContents.send("nextTrack");
+  playerWindow.nextTrack();
 }
 
 app.previousTrack = function() {
-  playerWindow.webContents.send("previousTrack");
+  playerWindow.previousTrack();
 }
 
 app.sendLibrary = function() {
   sendInitialLibrary();
+}
+
+app.setVolume = function(value) {
+  playerWindow.setVolume(value);
 }

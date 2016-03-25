@@ -64,7 +64,7 @@ function setupIPCListeners() {
   });
 
   ipcRenderer.on('setVolume', function(event, response) {
-    playerWindow.musicPlayer.audio.volume = response.value / 100;
+    playerWindow.musicPlayer.audio.volume = response.value;
   })
 }
 

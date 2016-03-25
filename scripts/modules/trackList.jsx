@@ -1,7 +1,16 @@
 var React = require('react');
 var TrackEntry = require('./trackEntry.jsx');
+var currentlyPlayingNode;
 
 var trackList = React.createClass({
+  getInitialState: function() {
+    return {
+      tracks: [],
+      selectedTracks: [],
+      playingTrack: null
+    }
+  },
+
   // Returns an array of TrackEntry modules
   getTrackEntries: function(){
     if (!this.state) {
@@ -19,15 +28,49 @@ var trackList = React.createClass({
           key={track._id}
           track={track}
           className={rowClass}
-          onDoubleClick={this.playSong.bind(this, track)}
+          onClick={this.clickHandler}
+          onDoubleClick={this.playSong}
         />
       );
     })
     return trackEntries;
   },
 
-  playSong: function(track) {
-    this.props.musicPlayer.playSong(track._id);
+  clickHandler: function(element, event) {
+    switch(event.button) {
+      case 0: // Left click
+        if(event.ctrlKey) {
+          this.state.selectedTracks.push(element)
+        } else {
+          this.state.selectedTracks.forEach(track => {
+            track.setState({selected: false});
+            track.render();
+          });
+          this.state.selectedTracks = [element]
+        }
+        element.setState({selected: true});
+        element.render();
+        break;
+      case 1: // Middle click
+        var trackID = element.props.track._id;
+        this.props.musicPlayer.queueNext(trackID);
+        break;
+      case 2: // Right click
+      break;
+    }
+  },
+
+  playSong: function(element, event) {
+    var trackID = element.props.track._id;
+    this.props.musicPlayer.playSong(trackID);
+
+    playingTrack.setState({
+      nowPlaying: false
+    })
+    playingTrack = element;
+    playingTrack.setState({
+      nowPlaying: true
+    });
   },
 
   render: function() {

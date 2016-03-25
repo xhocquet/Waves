@@ -23,7 +23,9 @@ var prevPlayingTrackID = null
 var curPlayingTrackID = null;
 var curSelectedTrackIDs = [];
 
-var trackList = React.createElement(TrackList, {musicPlayer: playerWindow.musicPlayer} ,null);
+var trackList = React.createElement(TrackList, {
+  musicPlayer: playerWindow.musicPlayer
+} ,null);
 var songListReactElement = ReactDOM.render(trackList, contentDiv);
 
 setupIPCListeners();
@@ -59,19 +61,11 @@ function generateLibrary() {
   ipcRenderer.send('generateLibrary', {});
 }
 
-function playSong(event) {
-  event.preventDefault();
-  if (event.target !== event.currentTarget) {
-    var trackID = event.target.parentElement.firstChild.innerHTML;
-    prevPlayingTrackID = curPlayingTrackID;
-    curPlayingTrackID = trackID;
-    playerWindow.musicPlayer.playSong(trackID);
-  }
-  event.stopPropagation();
-}
-
 function renderTracklist(tracks) {
-  songListReactElement.setState({tracks: tracks});
+  songListReactElement.setState({
+    tracks: tracks,
+    selectedTracks: []
+  });
 }
 
 function addTracksToQueue(...tracks) {
@@ -124,7 +118,6 @@ function trackClickHandler(event) {
 }
 
 function playPause() {
-  debugger;
   playerWindow.musicPlayer.playPause();
 }
 
@@ -157,7 +150,6 @@ function progressHandler() {
 }
 
 function setupEventListeners() {
-  // songList.ondblclick = playSong;
   // songList.onmousedown = trackClickHandler;
   pauseButton.onclick = playPause;
   previousButton.onclick = playerWindow.musicPlayer.previousTrack;

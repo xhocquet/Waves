@@ -3,6 +3,24 @@ body {
   padding: 0;
 }
 
+.sidebar {
+  float: left;
+  width: 20%;
+}
+
+.albumArt {
+  width: 100%;
+  height: 200px;
+  padding: 1px;
+  border: 1px solid black;
+  background-color: #ccc;
+}
+
+#albumArt {
+  width: 200px;
+  height: 200px;
+}
+
 .content {
   height: 770px;
   position: relative;

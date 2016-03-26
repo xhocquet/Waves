@@ -7,6 +7,8 @@ playerWindow.musicPlayer = new mp();
 var React = require('react');
 var ReactDOM = require('react-dom');
 var TrackList = require('../scripts/modules/trackList.jsx');
+const MetaData = require('musicmetadata');
+const fs = require('graceful-fs');
 
 var trackContextMenuSource = require('../scripts/menus/trackContextMenu.js');
 var trackContextMenu = Menu.buildFromTemplate(trackContextMenuSource);
@@ -18,6 +20,7 @@ var nextButton = document.getElementsByClassName("next")[0];
 var progressBarDiv = document.getElementsByClassName("progressBar")[0];
 var songList = document.getElementsByClassName("songList")[0];
 var volumeSlider = document.getElementsByClassName("volumeSlider")[0];
+var albumArtImage = document.getElementById("albumArt");
 
 var prevPlayingTrackId = null
 var curPlayingTrackId = null;
@@ -94,6 +97,23 @@ function playHandler() {
   } else {
     pauseButton.style.background = "url('../assets/play.svg') no-repeat left top";
   }
+  updateAlbumCoverImage(playerWindow.musicPlayer.audio.src);
+}
+
+function updateAlbumCoverImage(filePath) {
+  let newFilePath = decodeURI(filePath.slice(8));
+
+  let fileStream = fs.createReadStream(newFilePath);
+  MetaData(fileStream, function(err, metaData) {
+    let coverImage = metaData.picture[0];
+    var base64String = "";
+    for (var i = 0; i < coverImage.data.length; i++) {
+      base64String += String.fromCharCode(coverImage.data[i]);
+    }
+    var base64 = "data:" + coverImage.format + ";base64," + window.btoa(base64String);
+
+    albumArtImage.setAttribute('src',base64);
+  });
 }
 
 function progressHandler() {

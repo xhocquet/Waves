@@ -7,6 +7,10 @@ let curWindow = this;
 let importFolderTextarea = document.getElementsByClassName("importFolders")[0];
 let processImagesCheckbox = document.getElementsByClassName("processImages")[0];
 let minimizeOnCloseCheckbox = document.getElementsByClassName("minimizeOnClose")[0];
+let hotkeyInputs = document.querySelectorAll(".hotkeyInput");
+let playPauseInput = document.getElementsByClassName("playPauseInput")[0];
+let previousTrackInput = document.getElementsByClassName("previousTrackInput")[0];
+let nextTrackInput = document.getElementsByClassName("nextTrackInput")[0];
 
 // When you receive settings data, populate the form
 ipcRenderer.on('settingsData', function(event, response) {
@@ -31,11 +35,56 @@ importFolderTextarea.addEventListener("input", function() {
 
 processImagesCheckbox.addEventListener("click", function() {
   userSettings.processTrackImages = processImagesCheckbox.checked;
-})
+});
 
 minimizeOnCloseCheckbox.addEventListener("click", function() {
   userSettings.minimizeOnClose = minimizeOnCloseCheckbox.checked;
-})
+});
+
+playPauseInput.addEventListener("keydown", function(e) {
+  e.preventDefault();
+  var accelerator = eventToAcceleratorString(e);
+  playPauseInput.value = accelerator;
+  userSettings.playPauseHotkey = accelerator;
+});
+
+nextTrackInput.addEventListener("keydown", function(e) {
+  e.preventDefault();
+  var accelerator = eventToAcceleratorString(e);
+  nextTrackInput.value = accelerator;
+  userSettings.nextTrackHotkey = accelerator;
+});
+
+previousTrackInput.addEventListener("keydown", function(e) {
+  e.preventDefault();
+  var accelerator = eventToAcceleratorString(e);
+  previousTrackInput.value = accelerator;
+  userSettings.previousTrackHotkey = accelerator;
+});
+
+let eventToAcceleratorString = function(e) {
+  var accelerator = "";
+  e.ctrlKey ? accelerator += "Ctrl+" : null;
+  e.shiftKey ? accelerator += "Shift+" : null;
+  switch(e.keyCode) {
+    case 38: 
+      accelerator += "Up";
+      break;
+    case 40: 
+      accelerator += "Down";
+      break;
+    case 37: 
+      accelerator += "Left";
+      break;
+    case 39: 
+      accelerator += "Right";
+      break;
+    default: 
+      accelerator += String.fromCharCode(e.keyCode);
+      break;
+  }
+  return accelerator;
+}
 
 // Send updated settings back to main for saving
 let saveSettings = function() {
@@ -59,4 +108,8 @@ let fillInCurrentSettings = function() {
 
   processImagesCheckbox.checked = userSettings.processTrackImages
   minimizeOnCloseCheckbox.checked = userSettings.minimizeOnClose
+
+  playPauseInput.value = userSettings.playPauseHotkey;
+  previousTrackInput.value = userSettings.previousTrackHotkey;
+  nextTrackInput.value = userSettings.nextTrackHotkey;
 }

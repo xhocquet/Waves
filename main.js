@@ -4,12 +4,13 @@ const electron = require('electron');
 const ipcMain = electron.ipcMain;
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
+const GlobalShortcut = electron.globalShortcut;
 const Menu = electron.Menu;
 const Tray = electron.Tray;
 
 const dm = require('./scripts/databaseManager.js');
 const databaseManager = new dm();
-databaseManager.loadSettings();
+databaseManager.loadSettings(afterSettingsLoad);
 databaseManager.loadLibraryData();
 
 const mainWindowMenu = require('./scripts/menus/mainWindowMenu.js');
@@ -48,7 +49,7 @@ function createWindows () {
   });
 
   settingsWindow.loadURL('file://' + __dirname + '/views/settings.html');
-  playerWindow.toggleDevTools();
+  // settingsWindow.toggleDevTools();
   // settingsWindow.show();
 
   trayIcon = new Tray('assets/icon.png');
@@ -63,6 +64,23 @@ function createWindows () {
   });
 }
 
+function setupGlobalShorcuts() {
+  GlobalShortcut.unregisterAll();
+
+  var playPauseHotkey = databaseManager.userSettings.playPauseHotkey;
+  var previousTrackHotkey = databaseManager.userSettings.previousTrackHotkey;
+  var nextTrackHotkey = databaseManager.userSettings.nextTrackHotkey;
+
+  GlobalShortcut.register(playPauseHotkey, app.playPause);
+  GlobalShortcut.register(previousTrackHotkey, app.previousTrack);
+  GlobalShortcut.register(nextTrackHotkey, app.nextTrack);
+}
+
+function afterSettingsLoad() {
+  setupGlobalShorcuts();
+  settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
+}
+
 function sendInitialLibrary() {
   databaseManager.queryLibrary({page: 0}, function(response) {
     playerWindow.webContents.send("listData", response);
@@ -71,7 +89,7 @@ function sendInitialLibrary() {
 
 function setupPlayerWindow() {
   playerWindow.openSettingsWindow = function() {
-    settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
+    GlobalShortcut.unregisterAll();
     settingsWindow.show();
   }
   playerWindow.refreshLibrary = function() {
@@ -110,6 +128,7 @@ function setupAppListeners() {
   });
 
   app.on('will-quit', function(e) {
+    GlobalShortcut.unregisterAll();
     playerWindow = null;
     settingsWindow = null;
     trayIcon = null;

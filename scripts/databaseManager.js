@@ -22,7 +22,15 @@ var databaseManager = function() {
   self.userSettings = '';
 
   db.libraryData =  new Datastore({ filename: './data/libraryData.json', autoload: true });
-  db.settings =  new Datastore({ filename: './data/settings.json', autoload: true });
+  db.settings =  new Datastore({ filename: './data/settings.json', autoload: true , corruptAlertThreshold: 1});
+  // db.settings.insert({
+  //   importFolders: ["D:/Music"],
+  //   processTrackImages: false,
+  //   minimizeOnClose: true,
+  //   playPauseHotkey: "Ctrl+Shift+Up",
+  //   previousTrackHotkey: "Ctrl+Shift+Left",
+  //   nextTrackHotkey: "Ctrl+Shift+Right"
+  // });
   db.songs =  new Datastore({ filename: './data/songs.json', autoload: true });
 
   db.songs.persistence.setAutocompactionInterval(10000);
@@ -75,9 +83,10 @@ var databaseManager = function() {
   }
 
   // Returns the single record in the settings db, the user's settings.
-  self.loadSettings = function() {
+  self.loadSettings = function(callback) {
     db.settings.find({ settingName: 'user' }, function( err, docs) {
       self.userSettings = docs[0];
+      callback();
     });
   }
 

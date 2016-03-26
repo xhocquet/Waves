@@ -16,6 +16,10 @@ body {
   text-align: center;
 }
 
+.hotkeyInput {
+  outline: none;
+}
+
 .saveClose {
   background-color: #333;
   width: 400px;

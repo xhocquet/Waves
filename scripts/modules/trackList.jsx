@@ -12,7 +12,7 @@ var trackList = React.createClass({
       recordHeight: this.props.recordHeight,
       recordsPerBody: recordsPerBody,
       scroll: 0,
-      selectedTracks: [],
+      selectedTrackComponents: [],
       total: 0,
       tracks: [],
       visibleEnd: recordsPerBody,
@@ -25,11 +25,15 @@ var trackList = React.createClass({
   },
 
   scrollState: function(scroll) {
-    var visibleStart = Math.floor(scroll / this.state.recordHeight);
-    var visibleEnd = Math.min(visibleStart + this.state.recordsPerBody, this.state.total - 1);
+    var recordHeight = this.state.recordHeight;
+    var recordsPerBody = this.state.recordsPerBody;
+    var total = this.state.total;
 
-    var displayStart = Math.max(0, Math.floor(scroll / this.state.recordHeight) - this.state.recordsPerBody * 1.5);
-    var displayEnd = Math.min(displayStart + (4 * this.state.recordsPerBody), this.state.total - 1);
+    var visibleStart = Math.floor(scroll / recordHeight);
+    var visibleEnd = Math.min(visibleStart + recordsPerBody, total - 1);
+
+    var displayStart = Math.max(0, visibleStart - recordsPerBody * 1.5);
+    var displayEnd = Math.min(displayStart + (4 * recordsPerBody), total - 1);
 
     this.setState({
       displayEnd: displayEnd,
@@ -37,7 +41,6 @@ var trackList = React.createClass({
       visibleEnd: visibleEnd,
       visibleStart: visibleStart
     });
-
   },
 
   // Returns the Tracks and filler divs to space out the scrollbar
@@ -54,6 +57,8 @@ var trackList = React.createClass({
     for (var i = this.state.displayStart; i < this.state.displayEnd; ++i) {
       var track = this.state.tracks[i];
       var rowClass = counter % 2 ? "songListItem" : "songListItemAlternate";
+      var selected = this.state.selectedTrackComponents.map(module=>module.props.track._id).indexOf(track._id) > -1;
+
       trackEntries.push(
         <Track
           className={rowClass}
@@ -61,6 +66,7 @@ var trackList = React.createClass({
           onClick={this.clickHandler}
           onDoubleClick={this.playSong}
           track={track}
+          selected={selected}
         />
       );
       counter += 1;
@@ -73,17 +79,18 @@ var trackList = React.createClass({
   },
 
   clickHandler: function(element, event) {
+    var clickTrack = element.props.track;
     switch(event.button) {
       case 0: // Left click
         if(event.ctrlKey) {
-          this.state.selectedTracks.push(element)
+          this.state.selectedTrackComponents.push(element);
         } else {
-          this.state.selectedTracks.forEach(track => {
+          this.state.selectedTrackComponents.forEach(track => {
             if (track.isMounted()) {
               track.setState({selected: false});
             }
           });
-          this.state.selectedTracks = [element];
+          this.state.selectedTrackComponents = [element];
         }
         element.setState({selected: true});
         break;
@@ -93,12 +100,12 @@ var trackList = React.createClass({
         break;
       case 2: // Right click
         if(event.ctrlKey) {
-          this.state.selectedTracks.push(element)
+          this.state.selectedTrackComponents.push(element)
         } else {
           this.state.selectedTracks.forEach(track => {
             track.setState({selected: false});
           });
-          this.state.selectedTracks = [element];
+          this.state.selectedTrackComponents = [element];
         }
         element.setState({selected: true});
         this.props.trackContextMenu.popup(this.props.playerWindow);

@@ -5,7 +5,7 @@ var Track = React.createClass({
   getInitialState: function() {
     return {
       nowPlaying: false,
-      selected: false
+      selected: this.props.selected
     }
   },
 

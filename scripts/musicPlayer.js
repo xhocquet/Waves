@@ -15,11 +15,15 @@ var musicPlayer = function() {
   }
 
   self.playPause = function() {
+    if ($musicPlayer.src === '') {
+      self.curIndex = 0;
+      $musicPlayer.src = self.paths[self.curIndex];
+    }
     $musicPlayer.paused ? $musicPlayer.play() : $musicPlayer.pause();
   }
 
   self.nextTrack = function() {
-    let nextTrackPath = self.paths[self.curIndex + 1];
+    let nextTrackPath = self.paths[self.curIndex + 1]
 
     if (nextTrackPath) {
       $musicPlayer.src = nextTrackPath;

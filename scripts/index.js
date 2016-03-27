@@ -26,12 +26,12 @@ var prevPlayingTrackId = null
 var curPlayingTrackId = null;
 var curSelectedTrackIds = [];
 
-var trackList = React.createElement(TrackList, {
-  playerWindow: playerWindow,
-  musicPlayer: playerWindow.musicPlayer,
-  trackContextMenu: trackContextMenu
-} ,null);
-var songListReactElement = ReactDOM.render(trackList, contentDiv);
+var TrackListComponent = ReactDOM.render(<TrackList
+  height={770}
+  recordHeight={25}
+  musicPlayer={playerWindow.musicPlayer}
+  trackContextMenu={trackContextMenu}
+/>, contentDiv);
 
 setupIPCListeners();
 setupEventListeners();
@@ -76,9 +76,9 @@ function generateLibrary() {
 }
 
 function renderTracklist(tracks) {
-  songListReactElement.setState({
+  TrackListComponent.setState({
     tracks: tracks,
-    selectedTracks: []
+    total: tracks.length
   });
 }
 
@@ -97,22 +97,26 @@ function playHandler() {
   } else {
     pauseButton.style.background = "url('../assets/play.svg') no-repeat left top";
   }
-  updateAlbumCoverImage(playerWindow.musicPlayer.audio.src);
+  updateAlbumArtImage(playerWindow.musicPlayer.audio.src);
 }
 
-function updateAlbumCoverImage(filePath) {
+function updateAlbumArtImage(filePath) {
   let newFilePath = decodeURI(filePath.slice(8));
 
   let fileStream = fs.createReadStream(newFilePath);
   MetaData(fileStream, function(err, metaData) {
     let coverImage = metaData.picture[0];
-    var base64String = "";
-    for (var i = 0; i < coverImage.data.length; i++) {
-      base64String += String.fromCharCode(coverImage.data[i]);
-    }
-    var base64 = "data:" + coverImage.format + ";base64," + window.btoa(base64String);
+    if (coverImage) {
+      var base64String = "";
+      for (var i = 0; i < coverImage.data.length; i++) {
+        base64String += String.fromCharCode(coverImage.data[i]);
+      }
+      var base64 = "data:" + coverImage.format + ";base64," + window.btoa(base64String);
 
-    albumArtImage.setAttribute('src',base64);
+      albumArtImage.setAttribute('src',base64);
+    } else {
+      albumArtImage.setAttribute('src', "../assets/missing_album_art.png")
+    }
   });
 }
 

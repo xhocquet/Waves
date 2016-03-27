@@ -1,6 +1,5 @@
 'use strict';
 const ipcRenderer = require('electron').ipcRenderer;
-// const databaseManager = require('databaseManager.js');
 
 let userSettings;
 let curWindow = this;

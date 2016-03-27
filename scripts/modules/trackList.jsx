@@ -1,40 +1,74 @@
 var React = require('react');
-var TrackEntry = require('./trackEntry.jsx');
+var ReactDOM = require('react-dom');
+var Track = require('./track.jsx');
 
 var trackList = React.createClass({
-  // This goes a bit against pattern, since selected and playing will be manipulated
-  // in here. However, eventually the selections/playing could come from the outside,
-  // so I want to keep that in mind.
   getInitialState: function() {
+    var recordsPerBody = Math.floor((this.props.height - 2) / this.props.recordHeight);
     return {
-      tracks: [],
+      displayEnd: recordsPerBody * 2,
+      displayStart: 0,
+      playingTrack: null,
+      recordHeight: this.props.recordHeight,
+      recordsPerBody: recordsPerBody,
+      scroll: 0,
       selectedTracks: [],
-      playingTrack: null
+      total: 0,
+      tracks: [],
+      visibleEnd: recordsPerBody,
+      visibleStart: 0
     }
   },
 
-  // Returns an array of TrackEntry modules
-  getTrackEntries: function(){
-    if (!this.state) {
-      return null;
-    }
+  onScroll: function(event) {
+    this.scrollState(this.refs.scrollable.scrollTop);
+  },
 
+  scrollState: function(scroll) {
+    var visibleStart = Math.floor(scroll / this.state.recordHeight);
+    var visibleEnd = Math.min(visibleStart + this.state.recordsPerBody, this.state.total - 1);
+
+    var displayStart = Math.max(0, Math.floor(scroll / this.state.recordHeight) - this.state.recordsPerBody * 1.5);
+    var displayEnd = Math.min(displayStart + (4 * this.state.recordsPerBody), this.state.total - 1);
+
+    this.setState({
+      displayEnd: displayEnd,
+      displayStart: displayStart,
+      visibleEnd: visibleEnd,
+      visibleStart: visibleStart
+    });
+
+  },
+
+  // Returns the Tracks and filler divs to space out the scrollbar
+  getTrackEntries: function(){
     var trackEntries = [];
     var counter = 0;
 
-    this.state.tracks.forEach(track => {
+    var topFillerHeight = this.state.displayStart * this.state.recordHeight;
+    var bottomFillerHeight = (this.state.tracks.length - this.state.displayEnd) * this.state.recordHeight;
+
+    // Top filler for scrollbar
+    trackEntries.push(<div key={1} style={{height: topFillerHeight}}></div>);
+
+    for (var i = this.state.displayStart; i < this.state.displayEnd; ++i) {
+      var track = this.state.tracks[i];
       var rowClass = counter % 2 ? "songListItem" : "songListItemAlternate";
-      counter += 1;
       trackEntries.push(
-        <TrackEntry
-          key={track._id}
-          track={track}
+        <Track
           className={rowClass}
+          key={track._id}
           onClick={this.clickHandler}
           onDoubleClick={this.playSong}
+          track={track}
         />
       );
-    })
+      counter += 1;
+    }
+
+    // Bottom filler for scrollbar
+    trackEntries.push(<div key={2} style={{height: bottomFillerHeight}}></div>);
+
     return trackEntries;
   },
 
@@ -45,7 +79,9 @@ var trackList = React.createClass({
           this.state.selectedTracks.push(element)
         } else {
           this.state.selectedTracks.forEach(track => {
-            track.setState({selected: false});
+            if (track.isMounted()) {
+              track.setState({selected: false});
+            }
           });
           this.state.selectedTracks = [element];
         }
@@ -78,21 +114,26 @@ var trackList = React.createClass({
       this.state.playingTrack.setState({nowPlaying: false})
       this.state.playingTrack.render();
     }
+
     this.state.playingTrack = element;
+
     this.state.playingTrack.setState({nowPlaying: true});
-    this.state.playingTrack.render();
   },
 
   render: function() {
-    var entries = this.getTrackEntries();
-    if (entries) {
+    if (this.state.total > 0) {
+      var trackEntries = this.getTrackEntries();
       return (
-        <div className="songList">
-          {entries}
+        <div  className="songList" ref="scrollable" onScroll={this.onScroll}>
+          {trackEntries}
         </div>
       );
     } else {
-      return null;
+      return (
+        <div  className="songList" ref="scrollable" onScroll={this.onScroll}>
+          Add some tracks!
+        </div>
+      );
     }
   }
 });

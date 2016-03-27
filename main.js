@@ -18,6 +18,7 @@ const trayIconMenu = require('./scripts/menus/trayContextMenu.js');
 
 let playerWindow;
 let settingsWindow;
+// let testWindow;
 let trayIcon;
 
 setupAppListeners();
@@ -47,6 +48,20 @@ function createWindows () {
     resizable: false,
     movable: false
   });
+
+  // testWindow = new BrowserWindow({
+  //   width: 700,
+  //   height: 700,
+  //   show: false,
+  //   center: true,
+  //   minHeight: 700,
+  //   minWidth: 700,
+  //   frame: false,
+  //   resizable: false,
+  //   movable: false
+  // });
+  // testWindow.loadURL('file://' + __dirname + '/views/test.html');
+  // testWindow.show();
 
   settingsWindow.loadURL('file://' + __dirname + '/views/settings.html');
   // settingsWindow.toggleDevTools();
@@ -78,11 +93,14 @@ function setupGlobalShorcuts() {
 
 function afterSettingsLoad() {
   setupGlobalShorcuts();
-  settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
+
+  settingsWindow.webContents.on('did-finish-load', function() {
+    settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
+  });
 }
 
 function sendInitialLibrary() {
-  databaseManager.queryLibrary({page: 0}, function(response) {
+  databaseManager.queryLibrary({}, function(response) {
     playerWindow.webContents.send("listData", response);
   });
 }
@@ -155,6 +173,7 @@ function setupIPCListeners() {
   // Close settings window
   ipcMain.on('closeSettings', function(event, options) {
     settingsWindow.hide();
+    setupGlobalShorcuts();
   });
 
   // Save the settings in the db

@@ -1,7 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var trackEntry = React.createClass({
+var Track = React.createClass({
   getInitialState: function() {
     return {
       nowPlaying: false,
@@ -24,7 +24,7 @@ var trackEntry = React.createClass({
     this.props.onDoubleClick(this, event.nativeEvent);
   },
 
-  getRowClass: function() {
+  getRowSelectedClass: function() {
     if (this.state.selected) {
       return this.props.className + " songListItemSelected";
     } else {
@@ -34,7 +34,7 @@ var trackEntry = React.createClass({
 
   render: function() {
     var nowPlaying = this.state.nowPlaying ? "rowItem rowPlaying rowCurrentlyPlaying" : "rowItem rowPlaying";
-    var rowClass = this.getRowClass();
+    var rowClass = this.getRowSelectedClass();
 
     return (
       <div className={rowClass} onMouseDown ={this.clickHandler} onDoubleClick={this.doubleClickHandler}>
@@ -49,4 +49,4 @@ var trackEntry = React.createClass({
   }
 });
 
-module.exports = trackEntry;
+module.exports = Track;

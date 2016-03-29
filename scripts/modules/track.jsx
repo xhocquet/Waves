@@ -1,5 +1,4 @@
 var React = require('react');
-var ReactDOM = require('react-dom');
 
 var Track = React.createClass({
   getInitialState: function() {
@@ -37,7 +36,7 @@ var Track = React.createClass({
     var rowClass = this.getRowSelectedClass();
 
     return (
-      <div className={rowClass} onMouseDown ={this.clickHandler} onDoubleClick={this.doubleClickHandler}>
+      <div className={rowClass} onMouseDown={this.clickHandler} onDoubleClick={this.doubleClickHandler}>
         <div className="rowItem rowIndex"></div>
         <div className={nowPlaying}></div>
         <div className="rowItem rowArtist">{this.props.track.artist}</div>

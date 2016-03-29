@@ -11,14 +11,13 @@ const Tray = electron.Tray;
 const dm = require('./scripts/databaseManager.js');
 const databaseManager = new dm();
 databaseManager.loadSettings(afterSettingsLoad);
-databaseManager.loadLibraryData();
+databaseManager.loadLibraryData(afterLibraryDataLoad);
 
 const mainWindowMenu = require('./scripts/menus/mainWindowMenu.js');
 const trayIconMenu = require('./scripts/menus/trayContextMenu.js');
 
 let playerWindow;
 let settingsWindow;
-// let testWindow;
 let trayIcon;
 
 setupAppListeners();
@@ -48,20 +47,6 @@ function createWindows () {
     resizable: false,
     movable: false
   });
-
-  // testWindow = new BrowserWindow({
-  //   width: 700,
-  //   height: 700,
-  //   show: false,
-  //   center: true,
-  //   minHeight: 700,
-  //   minWidth: 700,
-  //   frame: false,
-  //   resizable: false,
-  //   movable: false
-  // });
-  // testWindow.loadURL('file://' + __dirname + '/views/test.html');
-  // testWindow.show();
 
   settingsWindow.loadURL('file://' + __dirname + '/views/settings.html');
   // settingsWindow.toggleDevTools();
@@ -97,6 +82,12 @@ function afterSettingsLoad() {
   settingsWindow.webContents.on('did-finish-load', function() {
     settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
   });
+}
+
+function afterLibraryDataLoad() {
+  playerWindow.webContents.on('did-finish-load', function() {
+    playerWindow.webContents.send("artistListData", databaseManager.libraryData.artists);
+  })
 }
 
 function sendInitialLibrary() {

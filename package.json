@@ -2,9 +2,9 @@
   "name": "Waves",
   "version": "1.0.0",
   "description": "Javascript native music player",
-  "main": "main.js",
+  "main": "app.js",
   "scripts": {
-    "start": "electron main.js"
+    "start": "electron app.js"
   },
   "keywords": [
     "music"
@@ -15,10 +15,9 @@
     "babel-core": "^6.7.4",
     "babel-preset-es2015": "^6.6.0",
     "babel-runtime": "^6.6.1",
-    "electron-hot-loader": "geowarin/electron-hot-loader#fix-windows-paths",
     "electron-prebuilt-compile": "^0.37.2",
     "electron-rebuild": "^1.1.3",
-    "react-addons-test-utils": "^0.14.7",
+    "react-addons-test-utils": "^0.14.8",
     "react-deep-force-update": "^2.0.1",
     "react-proxy": "^2.0.3",
     "reactify": "^1.1.1"
@@ -28,9 +27,8 @@
     "graceful-fs": "^4.1.3",
     "musicmetadata": "^2.0.2",
     "nedb": "^1.8.0",
-    "node-base64-image": "^0.1.2",
-    "react": "^0.14.7",
-    "react-dom": "^0.14.7",
+    "react": "^0.14.8",
+    "react-dom": "^0.14.8",
     "react-lazy-render": "^0.3.0"
   }
 }

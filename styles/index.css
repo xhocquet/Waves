@@ -21,9 +21,28 @@ body {
   height: 200px;
 }
 
+.artistList {
+  padding: 5px;
+}
+
+.artistEntry, .artistEntryAlternate {
+  padding: 1px;
+  background-color: #fff;
+  cursor: default;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.artistEntryAlternate {
+  background-color: #ccc;
+}
+
 .content {
   height: 770px;
   position: relative;
+  float: right;
+  width: 80%;
 }
 
 .footer {

@@ -1,5 +1,4 @@
 var React = require('react');
-var ReactDOM = require('react-dom');
 var Track = require('./track.jsx');
 
 var trackList = React.createClass({
@@ -14,6 +13,7 @@ var trackList = React.createClass({
       scroll: 0,
       selectedTrackComponents: [],
       total: 0,
+      prevTotal: 0,
       tracks: [],
       visibleEnd: recordsPerBody,
       visibleStart: 0
@@ -57,13 +57,16 @@ var trackList = React.createClass({
     var trackEntries = [];
     var counter = 0;
 
+    var displayStart = this.state.displayStart;
+    var displayEnd = this.state.displayEnd > this.state.total - 1 ? Math.min(this.state.recordsPerBody * 2, this.state.total - 1) : this.state.displayEnd;
+
     var topFillerHeight = this.state.displayStart * this.state.recordHeight;
     var bottomFillerHeight = (this.state.tracks.length - this.state.displayEnd) * this.state.recordHeight;
 
     // Top filler for scrollbar
     trackEntries.push(<div key={1} style={{height: topFillerHeight}}></div>);
 
-    for (var i = this.state.displayStart; i < this.state.displayEnd; ++i) {
+    for (var i = displayStart; i < displayEnd - 1; i++) {
       var track = this.state.tracks[i];
       var rowClass = counter % 2 ? "songListItem" : "songListItemAlternate";
       var selected = this.state.selectedTrackComponents.map(module=>module.props.track._id).indexOf(track._id) > -1;

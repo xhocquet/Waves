@@ -2,7 +2,10 @@
 var musicPlayer = function() {
   var self = this;
 
-  const $musicPlayer = document.createElement('audio');
+  var $musicPlayer = document.createElement('audio');
+  // var $musicPlayerNextBuffer = document.createElement('audio');
+  // var $musicPlayerPreviousBuffer = document.createElement('audio');
+
   $musicPlayer.volume = 1;
   self.ids = [];
   self.paths = [];

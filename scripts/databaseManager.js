@@ -54,8 +54,9 @@ var databaseManager = function() {
 
   // Returns the specified tracks with options.
   self.queryLibrary = function(options, callback) {
-    if (options.page > -1) {
-      db.songs.find({}).sort(DEFAULT_SORT).skip(100 * options.page).limit(100).exec(function(err, docs) {
+    if (options.artist) {
+      let regexValue = new RegExp(options.artist, 'i');
+      db.songs.find({ artist: { $regex: regexValue }}).sort(DEFAULT_SORT).exec(function(err, docs) {
         if (!err) {
           callback(docs);
         } else {
@@ -109,9 +110,10 @@ var databaseManager = function() {
   }
 
   // Returns the single record in the libraryDataDB, the user's library data
-  self.loadLibraryData = function() {
+  self.loadLibraryData = function(callback) {
     db.libraryData.find({settingName: 'user'}, function( err, docs) {
       self.libraryData = docs[0];
+      callback();
     })
   }
 

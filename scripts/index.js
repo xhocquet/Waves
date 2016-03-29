@@ -1,18 +1,17 @@
+// MODULES
 var ipcRenderer = require('electron').ipcRenderer;
 var Remote = require('electron').remote;
 var Menu = Remote.Menu;
 var playerWindow = Remote.getCurrentWindow();
 var mp = require('../scripts/musicPlayer.js');
-playerWindow.musicPlayer = new mp();
-var React = require('react');
-var ReactDOM = require('react-dom');
-var TrackList = require('../scripts/modules/trackList.jsx');
 const MetaData = require('musicmetadata');
 const fs = require('graceful-fs');
 
+// ELECTRON MENUS
 var trackContextMenuSource = require('../scripts/menus/trackContextMenu.js');
 var trackContextMenu = Menu.buildFromTemplate(trackContextMenuSource);
 
+// DOM REFERENCES
 var contentDiv = document.getElementsByClassName("content")[0];
 var pauseButton = document.getElementsByClassName("pause")[0];
 var previousButton = document.getElementsByClassName("previous")[0];
@@ -21,10 +20,20 @@ var progressBarDiv = document.getElementsByClassName("progressBar")[0];
 var songList = document.getElementsByClassName("songList")[0];
 var volumeSlider = document.getElementsByClassName("volumeSlider")[0];
 var albumArtImage = document.getElementById("albumArt");
+var artistListContainer = document.getElementsByClassName("artistListContainer")[0];
 
 var prevPlayingTrackId = null
 var curPlayingTrackId = null;
 var curSelectedTrackIds = [];
+
+playerWindow.musicPlayer = new mp();
+
+
+// REACT
+var React = require('react');
+var ReactDOM = require('react-dom');
+var TrackList = require('../scripts/modules/trackList.jsx');
+var ArtistList = require('../scripts/modules/artistList.jsx');
 
 var TrackListComponent = ReactDOM.render(<TrackList
   height={770}
@@ -32,6 +41,18 @@ var TrackListComponent = ReactDOM.render(<TrackList
   musicPlayer={playerWindow.musicPlayer}
   trackContextMenu={trackContextMenu}
 />, contentDiv);
+
+
+function artistClick(artist, event) {
+  event.preventDefault();
+  ipcRenderer.send('getListData', {
+    artist: artist
+  });
+}
+
+var ArtistListComponent = ReactDOM.render(<ArtistList
+  onClick={artistClick}
+/>, artistListContainer);
 
 setupIPCListeners();
 setupEventListeners();
@@ -68,7 +89,13 @@ function setupIPCListeners() {
 
   ipcRenderer.on('setVolume', function(event, response) {
     playerWindow.musicPlayer.audio.volume = response.value;
-  })
+  });
+
+  ipcRenderer.on('artistListData', function(event, response) {
+    ArtistListComponent.setState({
+      artists: response
+    })
+  });
 }
 
 function generateLibrary() {
@@ -78,7 +105,8 @@ function generateLibrary() {
 function renderTracklist(tracks) {
   TrackListComponent.setState({
     tracks: tracks,
-    total: tracks.length
+    total: tracks.length,
+    selectedTrackComponents: []
   });
 }
 

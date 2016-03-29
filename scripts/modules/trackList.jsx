@@ -24,6 +24,8 @@ var trackList = React.createClass({
     this.scrollState(this.refs.scrollable.scrollTop);
   },
 
+  // Calculates new visible and display limits based on scroll.
+  // Only set the display if the visible is approaching the limit. Reduces number of re-renders.
   scrollState: function(scroll) {
     var recordHeight = this.state.recordHeight;
     var recordsPerBody = this.state.recordsPerBody;
@@ -35,12 +37,19 @@ var trackList = React.createClass({
     var displayStart = Math.max(0, visibleStart - recordsPerBody * 1.5);
     var displayEnd = Math.min(displayStart + (4 * recordsPerBody), total - 1);
 
-    this.setState({
-      displayEnd: displayEnd,
-      displayStart: displayStart,
-      visibleEnd: visibleEnd,
-      visibleStart: visibleStart
-    });
+    if (visibleEnd - displayEnd < 5 || visibleStart - displayStart < 5) {
+      this.setState({
+        displayEnd: displayEnd,
+        displayStart: displayStart,
+        visibleEnd: visibleEnd,
+        visibleStart: visibleStart
+      });
+    } else {
+      this.setState({
+        visibleEnd: visibleEnd,
+        visibleStart: visibleStart
+      })
+    }
   },
 
   // Returns the Tracks and filler divs to space out the scrollbar

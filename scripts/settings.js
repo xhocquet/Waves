@@ -4,7 +4,6 @@ const ipcRenderer = require('electron').ipcRenderer;
 let userSettings;
 let curWindow = this;
 let importFolderTextarea = document.getElementsByClassName("importFolders")[0];
-let processImagesCheckbox = document.getElementsByClassName("processImages")[0];
 let minimizeOnCloseCheckbox = document.getElementsByClassName("minimizeOnClose")[0];
 let hotkeyInputs = document.querySelectorAll(".hotkeyInput");
 let playPauseInput = document.getElementsByClassName("playPauseInput")[0];
@@ -31,10 +30,6 @@ ipcRenderer.on('saveResponse', function(event, response) {
 importFolderTextarea.addEventListener("input", function() {
   userSettings.importFolders = importFolderTextarea.value.split('\n');
 }, false);
-
-processImagesCheckbox.addEventListener("click", function() {
-  userSettings.processTrackImages = processImagesCheckbox.checked;
-});
 
 minimizeOnCloseCheckbox.addEventListener("click", function() {
   userSettings.minimizeOnClose = minimizeOnCloseCheckbox.checked;
@@ -105,7 +100,6 @@ let fillInCurrentSettings = function() {
   })
   importFolderTextarea.focus();
 
-  processImagesCheckbox.checked = userSettings.processTrackImages
   minimizeOnCloseCheckbox.checked = userSettings.minimizeOnClose
 
   playPauseInput.value = userSettings.playPauseHotkey;

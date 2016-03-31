@@ -1,16 +1,14 @@
-'use strict';
+const app = require('electron').app;
+
+const MetaData = require('musicmetadata');
+const Datastore = require('nedb');
+
+const async = require('async');
+const fs = require('graceful-fs');
+const pathTools = require('path');
 
 var databaseManager = function() {
   var self = this;
-
-  const app = require('electron').app;
-
-  const MetaData = require('musicmetadata');
-  const Datastore = require('nedb');
-
-  const async = require('async');
-  const fs = require('graceful-fs');
-  const pathTools = require('path');
 
   let db = {};
   let DEFAULT_SORT = {
@@ -22,15 +20,7 @@ var databaseManager = function() {
   self.userSettings = '';
 
   db.libraryData =  new Datastore({ filename: './data/libraryData.json', autoload: true });
-  db.settings =  new Datastore({ filename: './data/settings.json', autoload: true , corruptAlertThreshold: 1});
-  // db.settings.insert({
-  //   importFolders: ["D:/Music"],
-  //   processTrackImages: false,
-  //   minimizeOnClose: true,
-  //   playPauseHotkey: "Ctrl+Shift+Up",
-  //   previousTrackHotkey: "Ctrl+Shift+Left",
-  //   nextTrackHotkey: "Ctrl+Shift+Right"
-  // });
+  db.settings =  new Datastore({ filename: './data/settings.json', autoload: true});
   db.songs =  new Datastore({ filename: './data/songs.json', autoload: true });
 
   db.songs.persistence.setAutocompactionInterval(10000);
@@ -48,7 +38,7 @@ var databaseManager = function() {
 
   trackDataWorker.drain = function() {
     self.saveLibraryData();
-    app.sendLibrary();
+    app.afterNewLibraryData();
     console.log("All tracks have been processed");
   };
 
@@ -83,11 +73,31 @@ var databaseManager = function() {
     }
   }
 
+  self.setupInitialSettings = function(callback) {
+    db.settings.insert({
+      settingName: 'user',
+      importFolders: [],
+      minimizeOnClose: false,
+      nextTrackHotkey: null,
+      previousTrackHotkey: null,
+      playPauseHotkey: null
+    }, function(err, newDoc) {
+      if (!err) {
+        self.userSettings = newDoc;
+        callback();
+      }
+    });
+  }
+
   // Returns the single record in the settings db, the user's settings.
   self.loadSettings = function(callback) {
     db.settings.find({ settingName: 'user' }, function( err, docs) {
-      self.userSettings = docs[0];
-      callback();
+      if (docs.length === 0) {
+        self.setupInitialSettings(callback);
+      } else {
+        self.userSettings = docs[0];
+        callback();
+      }
     });
   }
 
@@ -112,9 +122,26 @@ var databaseManager = function() {
   // Returns the single record in the libraryDataDB, the user's library data
   self.loadLibraryData = function(callback) {
     db.libraryData.find({settingName: 'user'}, function( err, docs) {
-      self.libraryData = docs[0];
-      callback();
+      if (docs.length === 0) {
+        self.setupInitialLibraryData(callback);
+      } else {
+        self.libraryData = docs[0];
+        callback();
+      }
     })
+  }
+
+  self.setupInitialLibraryData = function(callback) {
+    db.libraryData.insert({
+      settingName: 'user',
+      artists: [],
+      albums: []
+    }, function(err, newDoc) {
+      if (!err) {
+        self.libraryData = newDoc;
+        callback();
+      }
+    });
   }
 
   // Save library data to db

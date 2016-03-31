@@ -64,18 +64,6 @@ function createWindows () {
   });
 }
 
-function setupGlobalShorcuts() {
-  GlobalShortcut.unregisterAll();
-
-  var playPauseHotkey = databaseManager.userSettings.playPauseHotkey;
-  var previousTrackHotkey = databaseManager.userSettings.previousTrackHotkey;
-  var nextTrackHotkey = databaseManager.userSettings.nextTrackHotkey;
-
-  GlobalShortcut.register(playPauseHotkey, app.playPause);
-  GlobalShortcut.register(previousTrackHotkey, app.previousTrack);
-  GlobalShortcut.register(nextTrackHotkey, app.nextTrack);
-}
-
 function afterSettingsLoad() {
   setupGlobalShorcuts();
 
@@ -84,10 +72,26 @@ function afterSettingsLoad() {
   });
 }
 
+function setupGlobalShorcuts() {
+  GlobalShortcut.unregisterAll();
+
+  var playPauseHotkey = databaseManager.userSettings.playPauseHotkey;
+  var previousTrackHotkey = databaseManager.userSettings.previousTrackHotkey;
+  var nextTrackHotkey = databaseManager.userSettings.nextTrackHotkey;
+
+  playPauseHotkey ? GlobalShortcut.register(playPauseHotkey, app.playPause) : null;
+  previousTrackHotkey? GlobalShortcut.register(previousTrackHotkey, app.previousTrack) : null;
+  nextTrackHotkey ? GlobalShortcut.register(nextTrackHotkey, app.nextTrack) : null;
+}
+
 function afterLibraryDataLoad() {
   playerWindow.webContents.on('did-finish-load', function() {
     playerWindow.webContents.send("artistListData", databaseManager.libraryData.artists);
   })
+}
+
+function sendLibraryData() {
+  playerWindow.webContents.send("artistListData", databaseManager.libraryData.artists);
 }
 
 function sendInitialLibrary() {
@@ -206,8 +210,9 @@ app.previousTrack = function() {
   playerWindow.previousTrack();
 }
 
-app.sendLibrary = function() {
+app.afterNewLibraryData = function() {
   sendInitialLibrary();
+  sendLibraryData();
 }
 
 app.setVolume = function(value) {

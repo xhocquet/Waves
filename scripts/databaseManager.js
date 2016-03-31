@@ -135,6 +135,7 @@ var databaseManager = function() {
     db.libraryData.insert({
       settingName: 'user',
       artists: [],
+      albumArtists: [],
       albums: []
     }, function(err, newDoc) {
       if (!err) {
@@ -210,21 +211,31 @@ var databaseManager = function() {
   self.createTrackData = function(filePath, callback) {
     let fileStream = fs.createReadStream(filePath);
     MetaData(fileStream, { duration: true }, function(err, metaData) {
-      metaData.path = filePath;
-      metaData.artist = metaData.artist[0];
-      metaData.albumartist = metaData.albumartist[0];
+      let songData = {};
 
-      if (self.libraryData.artists.indexOf(metaData.artist) < 0) {
-        self.libraryData.artists.push(metaData.artist);
-      }
-      if (self.libraryData.albums.indexOf(metaData.album) < 0) {
-        self.libraryData.albums.push(metaData.album);
-      }
+      songData.path = filePath;
+      songData.title = metaData.title;
+      songData.artist = metaData.artist[0];
+      songData.albumArtist = metaData.albumartist[0];
+      songData.album = metaData.album;
+      songData.year = metaData.year;
+      songData.track = metaData.track;
+      songData.genre = metaData.genre;
+      songData.disk = metaData.disk;
+      songData.duration = metaData.duration;
 
-      let coverImage = metaData.picture.data;
-      metaData.picture = self.userSettings.processTrackImages ? metaData.picture  : '';
-      db.songs.insert(metaData, function(err, newDoc) {
+      db.songs.insert(songData, function(err, newDoc) {
         if (!err) {
+          if (self.libraryData.artists.indexOf(songData.artist) < 0) {
+            self.libraryData.artists.push(songData.artist);
+          }
+          if (self.libraryData.albumArtists.indexOf(songData.albumArtist) < 0) {
+            self.libraryData.albumArtists.push(songData.albumArtist);
+          }
+          if (self.libraryData.albums.indexOf(songData.album) < 0) {
+            self.libraryData.albums.push(songData.album);
+          }
+
           console.log("Inserted: " + newDoc.artist + " - " + newDoc.title);
           fileStream ? fileStream.destroy() : null;
           callback();

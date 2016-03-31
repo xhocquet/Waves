@@ -31,8 +31,16 @@ var Track = React.createClass({
     }
   },
 
+  getRowPlayingClass: function() {
+    if (this.props.playing || this.state.nowPlaying) {
+      return "rowItem rowPlaying rowCurrentlyPlaying";
+    } else {
+      return "rowItem rowPlaying";
+    }
+  },
+
   render: function() {
-    var nowPlaying = this.state.nowPlaying ? "rowItem rowPlaying rowCurrentlyPlaying" : "rowItem rowPlaying";
+    var nowPlaying = this.getRowPlayingClass();
     var rowClass = this.getRowSelectedClass();
 
     return (

@@ -10,8 +10,10 @@ var musicPlayer = function() {
   self.ids = [];
   self.paths = [];
   self.curIndex = 0;
+  self.curTrackId = 0;
   
   self.playSong = function(songId) {
+    self.curTrackId = songId;
     self.curIndex = self.ids.indexOf(songId);
     $musicPlayer.src = self.paths[self.curIndex];
     $musicPlayer.play();
@@ -32,8 +34,10 @@ var musicPlayer = function() {
       $musicPlayer.src = nextTrackPath;
       $musicPlayer.play();
       self.curIndex++;
+      self.curTrackId = self.ids[self.curIndex];
     } else {
       self.curIndex = 0;
+      self.curTrackId = self.ids[self.curIndex];
       $musicPlayer.src = self.paths[self.curIndex];
       $musicPlayer.play();
     }
@@ -46,8 +50,10 @@ var musicPlayer = function() {
       $musicPlayer.src = previousTrackPath;
       $musicPlayer.play();
       self.curIndex--;
+      self.curTrackId = self.ids[self.curIndex];
     } else {
       self.curIndex = self.paths.length - 1;
+      self.curTrackId = self.ids[self.curIndex];
       $musicPlayer.src = self.paths[self.curIndex];
       $musicPlayer.play();
     }
@@ -63,6 +69,17 @@ var musicPlayer = function() {
 
   self.setVolume = function(event) {
     $musicPlayer.volume = event.target.value / 100;
+  }
+
+  self.updateListData = function(tracks) {
+    var idArray = tracks.map(track => {
+      return track._id;
+    });
+    var pathArray = tracks.map(track => {
+      return track.path;
+    });
+    self.ids = idArray;
+    self.paths = pathArray;
   }
 
   self.audio = $musicPlayer;

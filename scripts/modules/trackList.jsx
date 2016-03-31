@@ -7,13 +7,14 @@ var trackList = React.createClass({
     return {
       displayEnd: recordsPerBody * 2,
       displayStart: 0,
-      playingTrack: null,
+      playingTrackComponent: null,
+      playingTrackId: null,
+      prevTotal: 0,
       recordHeight: this.props.recordHeight,
       recordsPerBody: recordsPerBody,
       scroll: 0,
       selectedTrackComponents: [],
       total: 0,
-      prevTotal: 0,
       tracks: [],
       visibleEnd: recordsPerBody,
       visibleStart: 0
@@ -65,12 +66,16 @@ var trackList = React.createClass({
 
     // Top filler for scrollbar
     trackEntries.push(<div key={1} style={{height: topFillerHeight}}></div>);
-    console.log(displayStart)
-    console.log(displayEnd)
+    
     for (var i = displayStart; i < displayEnd; i++) {
       var track = this.state.tracks[i];
       var rowClass = counter % 2 ? "songListItem" : "songListItemAlternate";
+      var playing = false;
       var selected = this.state.selectedTrackComponents.map(module=>module.props.track._id).indexOf(track._id) > -1;
+
+      if (this.state.playingTrackId) {
+        playing = this.state.playingTrackId === track._id;
+      }
 
       trackEntries.push(
         <Track
@@ -78,8 +83,10 @@ var trackList = React.createClass({
           key={track._id}
           onClick={this.clickHandler}
           onDoubleClick={this.playSong}
-          track={track}
+          playing={playing}
+          ref={track._id}
           selected={selected}
+          track={track}
         />
       );
       counter += 1;
@@ -128,16 +135,18 @@ var trackList = React.createClass({
 
   playSong: function(element, event) {
     var trackId = element.props.track._id;
+    var trackComponent = this.refs[trackId];
+
     this.props.musicPlayer.playSong(trackId);
 
-    if (this.state.playingTrack) {
-      this.state.playingTrack.setState({nowPlaying: false})
-      this.state.playingTrack.render();
+    if (this.state.playingTrackComponent) {
+      this.state.playingTrackComponent.setState({nowPlaying: false})
     }
 
-    this.state.playingTrack = element;
-
-    this.state.playingTrack.setState({nowPlaying: true});
+    this.setState({
+      playingTrackId: trackId,
+      playingTrackComponent: trackComponent
+    });
   },
 
   render: function() {

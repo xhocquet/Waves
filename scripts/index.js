@@ -22,12 +22,7 @@ var volumeSlider = document.getElementsByClassName("volumeSlider")[0];
 var albumArtImage = document.getElementById("albumArt");
 var artistListContainer = document.getElementsByClassName("artistListContainer")[0];
 
-var prevPlayingTrackId = null
-var curPlayingTrackId = null;
-var curSelectedTrackIds = [];
-
 playerWindow.musicPlayer = new mp();
-
 
 // REACT
 var React = require('react');
@@ -59,15 +54,7 @@ setupEventListeners();
 
 function setupIPCListeners() {
   ipcRenderer.on('listData', function(event, response) {
-    var idArray = response.map(track => {
-      return track._id;
-    });
-    var pathArray = response.map(track => {
-      return track.path;
-    });
-    playerWindow.musicPlayer.ids = idArray;
-    playerWindow.musicPlayer.paths = pathArray;
-
+    playerWindow.musicPlayer.updateListData(response);
     renderTracklist(response);
   });
 
@@ -119,12 +106,23 @@ function playPause() {
 }
 
 function playHandler() {
+  var trackId = playerWindow.musicPlayer.curTrackId;
+  var trackComponent = TrackListComponent.refs;
+
+  // Update now playing track
+  TrackListComponent.setState({
+    playingTrackId: trackId,
+    playingTrackComponent: trackComponent
+  });
+
   // Update the play/pause button
   if (!playerWindow.musicPlayer.audio.paused) {
     pauseButton.style.background = "url('../assets/pause.svg') no-repeat left top";
   } else {
     pauseButton.style.background = "url('../assets/play.svg') no-repeat left top";
   }
+
+  // Update album art
   updateAlbumArtImage(playerWindow.musicPlayer.audio.src);
 }
 

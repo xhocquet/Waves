@@ -14,7 +14,7 @@ var artistList = React.createClass({
 
   getArtistEntries: function() {
     var artistEntries = [];
-    for (var i = 0; i < this.state.artists.length - 1; i++) {
+    for (var i = 0; i < this.state.artists.length; i++) {
       var rowClass = i % 2 ? "artistEntry" : "artistEntryAlternate";
       artistEntries.push(
         <ArtistEntry

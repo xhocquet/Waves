@@ -1,45 +1,28 @@
 'use strict';
+var app = require('electron').app;
 
 var mainMenu = [
   {
-    label: 'Music',
+    label: 'Controls',
     submenu: [
       {
         label: 'Play/Pause',
-        accelerator: 'CmdOrCtrl+Shift+Up',
         click: function(item, focusedWindow) {
-          console.log(item)
+          app.playPause();
         }
       },
       {
-        label: 'Toggle Developer Tools',
-        accelerator: (function() {
-          if (process.platform == 'darwin')
-            return 'Alt+Command+I';
-          else
-            return 'Ctrl+Shift+I';
-        })(),
+        label: 'Next Track',
         click: function(item, focusedWindow) {
-          if (focusedWindow)
-            focusedWindow.toggleDevTools();
+          app.nextTrack();
+        }
+      },
+      {
+        label: 'Previous Track',
+        click: function(item, focusedWindow) {
+          app.previousTrack();
         }
       }
-    ]
-  },
-  {
-    label: 'Window',
-    role: 'window',
-    submenu: [
-      {
-        label: 'Minimize',
-        accelerator: 'CmdOrCtrl+M',
-        role: 'minimize'
-      },
-      {
-        label: 'Close',
-        accelerator: 'CmdOrCtrl+W',
-        role: 'close'
-      },
     ]
   },
   {
@@ -53,7 +36,20 @@ var mainMenu = [
       {
         label: 'Settings',
         click: function(item, focusedWindow) { 
-          focusedWindow.openSettingsWindow();
+          app.openSettings();
+        }
+      },
+      {
+        label: 'Toggle Developer Tools',
+        accelerator: (function() {
+          if (process.platform == 'darwin')
+            return 'Alt+Command+I';
+          else
+            return 'Ctrl+Shift+I';
+        })(),
+        click: function(item, focusedWindow) {
+          if (focusedWindow)
+            focusedWindow.toggleDevTools();
         }
       },
       {
@@ -127,6 +123,5 @@ if (process.platform == 'darwin') {
     }
   );
 }
-
 
 module.exports = mainMenu;

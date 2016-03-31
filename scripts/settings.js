@@ -1,5 +1,5 @@
 'use strict';
-const ipcRenderer = require('electron').ipcRenderer;
+let ipcRenderer = require('electron').ipcRenderer;
 
 let userSettings;
 let curWindow = this;

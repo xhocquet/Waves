@@ -49,8 +49,6 @@ function createWindows () {
   });
 
   settingsWindow.loadURL('file://' + __dirname + '/views/settings.html');
-  // settingsWindow.toggleDevTools();
-  // settingsWindow.show();
 
   trayIcon = new Tray('assets/icon.png');
   trayIcon.setContextMenu(Menu.buildFromTemplate(trayIconMenu));
@@ -101,10 +99,10 @@ function sendInitialLibrary() {
 }
 
 function setupPlayerWindow() {
-  playerWindow.openSettingsWindow = function() {
-    GlobalShortcut.unregisterAll();
-    settingsWindow.show();
-  }
+  // playerWindow.openSettingsWindow = function() {
+  //   GlobalShortcut.unregisterAll();
+  //   settingsWindow.show();
+  // }
   playerWindow.refreshLibrary = function() {
     // librarymanager.generate
   }
@@ -167,8 +165,7 @@ function setupIPCListeners() {
 
   // Close settings window
   ipcMain.on('closeSettings', function(event, options) {
-    settingsWindow.hide();
-    setupGlobalShorcuts();
+    app.closeSettings();
   });
 
   // Save the settings in the db
@@ -217,4 +214,14 @@ app.afterNewLibraryData = function() {
 
 app.setVolume = function(value) {
   playerWindow.setVolume(value);
+}
+
+app.openSettings = function() {
+  GlobalShortcut.unregisterAll();
+  settingsWindow.show();
+}
+
+app.closeSettings = function() {
+  settingsWindow.hide();
+  setupGlobalShorcuts();
 }

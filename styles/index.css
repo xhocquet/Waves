@@ -9,16 +9,16 @@ body {
 }
 
 .albumArt {
-  width: 100%;
+  background-color: #ccc;
+  border: 1px solid black;
   height: 200px;
   padding: 1px;
-  border: 1px solid black;
-  background-color: #ccc;
+  width: 100%;
 }
 
 #albumArt {
-  width: 200px;
   height: 200px;
+  width: 200px;
 }
 
 .artistList {
@@ -26,10 +26,10 @@ body {
 }
 
 .artistEntry, .artistEntryAlternate {
-  padding: 1px;
   background-color: #fff;
   cursor: default;
   overflow: hidden;
+  padding: 1px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -39,9 +39,9 @@ body {
 }
 
 .content {
+  float: right;
   height: 770px;
   position: relative;
-  float: right;
   width: 80%;
 }
 

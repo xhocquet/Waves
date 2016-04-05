@@ -30,13 +30,21 @@ var mainMenu = [
     role: 'help',
     submenu: [
       {
-        label: 'GitHub Repo',
-        click: function() { require('electron').shell.openExternal('http://github.com/xhocquet') }
-      },
-      {
         label: 'Settings',
         click: function(item, focusedWindow) { 
           app.openSettings();
+        }
+      },
+      {
+        label: 'Generate Library',
+        click: function(item, focusedWindow) {
+          focusedWindow.generateLibrary();
+        }
+      },
+      {
+        label: 'Refresh Library',
+        click: function(item, focusedWindow) {
+          focusedWindow.refreshLibrary();
         }
       },
       {
@@ -53,16 +61,8 @@ var mainMenu = [
         }
       },
       {
-        label: 'Generate Library',
-        click: function(item, focusedWindow) {
-          focusedWindow.generateLibrary();
-        }
-      },
-      {
-        label: 'Refresh Library',
-        click: function(item, focusedWindow) {
-          focusedWindow.refreshLibrary();
-        }
+        label: 'GitHub Repo',
+        click: function() { require('electron').shell.openExternal('http://github.com/xhocquet/Waves') }
       }
     ]
   },

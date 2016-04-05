@@ -47,7 +47,7 @@ var Track = React.createClass({
       <div className={rowClass} onMouseDown={this.clickHandler} onDoubleClick={this.doubleClickHandler}>
         <div className="rowItem rowIndex"></div>
         <div className={nowPlaying}></div>
-        <div className="rowItem rowArtist">{this.props.track.artist}</div>
+        <div className="rowItem rowArtist">{this.props.track.albumArtist}</div>
         <div className="rowItem rowAlbum">{this.props.track.album}</div>
         <div className="rowItem rowTitle">{this.props.track.title}</div>
         <div className="rowItem rowDuration">{this.sanitizeDuration(this.props.track.duration)}</div>

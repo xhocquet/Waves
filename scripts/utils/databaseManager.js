@@ -13,6 +13,7 @@ var databaseManager = function() {
   let db = {};
   let DEFAULT_SORT = {
     'albumartist': 1,
+    'artist': 1,
     'album': 1,
     'track.no': 1
   };

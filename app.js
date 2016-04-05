@@ -8,7 +8,7 @@ const GlobalShortcut = electron.globalShortcut;
 const Menu = electron.Menu;
 const Tray = electron.Tray;
 
-const dm = require('./scripts/databaseManager.js');
+const dm = require('./scripts/utils/databaseManager.js');
 const databaseManager = new dm();
 databaseManager.loadSettings(afterSettingsLoad);
 databaseManager.loadLibraryData(afterLibraryDataLoad);
@@ -30,7 +30,7 @@ function createWindows () {
     center: true,
     title: "Waves",
     minHeight: 500,
-    minWidth: 500
+    minWidth: 1050
   });
 
   setupPlayerWindow();
@@ -41,8 +41,6 @@ function createWindows () {
     height: 400,
     show: false,
     center: true,
-    minHeight: 400,
-    minWidth: 400,
     frame: false,
     resizable: false,
     movable: false
@@ -84,12 +82,12 @@ function setupGlobalShorcuts() {
 
 function afterLibraryDataLoad() {
   playerWindow.webContents.on('did-finish-load', function() {
-    playerWindow.webContents.send("artistListData", databaseManager.libraryData.artists);
+    playerWindow.webContents.send("artistListData", databaseManager.libraryData.albumArtists);
   })
 }
 
 function sendLibraryData() {
-  playerWindow.webContents.send("artistListData", databaseManager.libraryData.artists);
+  playerWindow.webContents.send("artistListData", databaseManager.libraryData.albumArtists);
 }
 
 function sendInitialLibrary() {

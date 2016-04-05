@@ -14,14 +14,25 @@ var artistList = React.createClass({
 
   getArtistEntries: function() {
     var artistEntries = [];
+
+    // All Artists entry
+    artistEntries.push(
+      <ArtistEntry
+        rowClass={"artistEntry"}
+        key={1}
+        onClick={this.clickHandler}
+        artist={"All"}
+      />
+    );
+
     for (var i = 0; i < this.state.artists.length; i++) {
       var rowClass = i % 2 ? "artistEntry" : "artistEntryAlternate";
       artistEntries.push(
         <ArtistEntry
           rowClass={rowClass}
-          key={this.state.artists[i]}
+          key={this.state.artists[i] || "Undefined"}
           onClick={this.clickHandler}
-          artist={this.state.artists[i]}
+          artist={this.state.artists[i] || "Undefined"}
         />
       );
     }

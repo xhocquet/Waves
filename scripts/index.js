@@ -3,7 +3,7 @@ var ipcRenderer = require('electron').ipcRenderer;
 var Remote = require('electron').remote;
 var Menu = Remote.Menu;
 var playerWindow = Remote.getCurrentWindow();
-var mp = require('../scripts/musicPlayer.js');
+var mp = require('../scripts/utils/musicPlayer.js');
 const MetaData = require('musicmetadata');
 const fs = require('graceful-fs');
 
@@ -40,9 +40,13 @@ var TrackListComponent = ReactDOM.render(<TrackList
 
 function artistClick(artist, event) {
   event.preventDefault();
-  ipcRenderer.send('getListData', {
-    artist: artist
-  });
+  if (artist === "All") {
+    ipcRenderer.send('getListData', {});
+  } else {
+    ipcRenderer.send('getListData', {
+      artist: artist
+    });
+  }
 }
 
 var ArtistListComponent = ReactDOM.render(<ArtistList

@@ -1,27 +1,26 @@
-body {
-  margin: 0;
-  padding: 0;
-}
-
 .sidebar {
   float: left;
+  position: fixed;
   width: 20%;
+  min-width: 200px;
 }
 
 .albumArt {
-  background-color: #ccc;
-  border: 1px solid black;
   height: 200px;
-  padding: 1px;
+  padding: 5px;
   width: 100%;
+  text-align: center;
 }
 
 #albumArt {
+  background-color: #ccc;
   height: 200px;
   width: 200px;
+  border: 1px solid black;
 }
 
 .artistList {
+  border-top: 1px solid black;
   padding: 5px;
 }
 
@@ -29,7 +28,7 @@ body {
   background-color: #fff;
   cursor: default;
   overflow: hidden;
-  padding: 1px;
+  padding: 2px 5px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -39,16 +38,17 @@ body {
 }
 
 .content {
-  float: right;
-  height: 770px;
-  position: relative;
-  width: 80%;
+  border-left: 1px solid black;
+  left: 20%;
+  height: calc(100vh - 65px);
+  position: absolute;
+  top: 0;
+  width: calc(80% - 1px);
 }
 
 .footer {
   bottom: 0;
   height: 65px;
-  left: 0;
   position: fixed;
   width: 100%;
 }
@@ -60,29 +60,30 @@ body {
 }
 
 .navContainer {
-  display: inline;
+  display: block;
+  float: left;
   height: 60px;
   width: 200px;
 }
 
 .volumeContainer {
-  display: inline;
-  float: right;
-  outline: 1px solid black;
+  display: block;
+  float: left;
+  height: 100%;
+  width: 200px;
 }
 
 .volumeSlider {
-  outline: 1px solid red;
   -webkit-appearance: none;
   background-color: silver;
-  height: 20px;
+  height: 5px;
+  outline: none;
   width: 200px;
 }
 
 .volumeSlider::-webkit-slider-thumb {
   -webkit-appearance: none;
   background-color: #666;
-  opacity: 0.5;
   width: 10px;
   height: 26px;
 }
@@ -112,11 +113,15 @@ body {
   overflow-y: auto;
 }
 
-.songListItem, .songListItemAlternate {
+.songListItem, .songListItemAlternate, .songListHeader {
   background-color: #fff;
   height: 25px;
   line-height: 25px;
   width: 100%;
+}
+
+.songListHeader {
+  font-weight: bold;
 }
 
 .songListItemAlternate {

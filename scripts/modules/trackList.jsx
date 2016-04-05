@@ -62,12 +62,12 @@ var trackList = React.createClass({
     var displayEnd = this.state.displayEnd > this.state.total - 1 ? Math.min(this.state.recordsPerBody * 2, this.state.total) : this.state.displayEnd;
 
     var topFillerHeight = this.state.displayStart * this.state.recordHeight;
-    var bottomFillerHeight = (this.state.tracks.length - this.state.displayEnd) * this.state.recordHeight;
+    var bottomFillerHeight = (this.state.tracks.length - this.state.displayEnd - 1) * this.state.recordHeight;
 
-    // Top filler for scrollbar
+    // Top filler for scrollbar to look the right size
     trackEntries.push(<div key={1} style={{height: topFillerHeight}}></div>);
     
-    for (var i = displayStart; i < displayEnd; i++) {
+    for (var i = displayStart; i <= displayEnd; i++) {
       var track = this.state.tracks[i];
       var rowClass = counter % 2 ? "songListItem" : "songListItemAlternate";
       var playing = false;
@@ -160,7 +160,7 @@ var trackList = React.createClass({
     } else {
       return (
         <div  className="songList" ref="scrollable" onScroll={this.onScroll}>
-          Add some tracks!
+          No tracks found.
         </div>
       );
     }

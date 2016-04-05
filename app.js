@@ -97,10 +97,6 @@ function sendInitialLibrary() {
 }
 
 function setupPlayerWindow() {
-  // playerWindow.openSettingsWindow = function() {
-  //   GlobalShortcut.unregisterAll();
-  //   settingsWindow.show();
-  // }
   playerWindow.refreshLibrary = function() {
     // librarymanager.generate
   }

@@ -1,3 +1,4 @@
+/*MAIN COMPONENTS*/
 .sidebar {
   float: left;
   position: fixed;
@@ -5,6 +6,24 @@
   min-width: 200px;
 }
 
+.content {
+  border-left: 1px solid black;
+  left: 20%;
+  height: calc(100vh - 65px);
+  position: absolute;
+  top: 0;
+  width: calc(80% - 1px);
+}
+
+.footer {
+  bottom: 0;
+  height: 65px;
+  position: fixed;
+  width: 100%;
+  border-top: 1px solid black;
+}
+
+/*SIDEBAR COMPONENTS*/
 .albumArt {
   height: 200px;
   padding: 5px;
@@ -37,22 +56,7 @@
   background-color: #ccc;
 }
 
-.content {
-  border-left: 1px solid black;
-  left: 20%;
-  height: calc(100vh - 65px);
-  position: absolute;
-  top: 0;
-  width: calc(80% - 1px);
-}
-
-.footer {
-  bottom: 0;
-  height: 65px;
-  position: fixed;
-  width: 100%;
-}
-
+/*FOOTER COMPONENTS*/
 .progressBar {
   background-color: orange;
   height: 2px;
@@ -108,6 +112,7 @@
   background: url("../assets/play.svg") no-repeat left top;
 }
 
+/*CONTENT COMPONENTS*/
 .songList {
   height: 100%;
   overflow-y: auto;

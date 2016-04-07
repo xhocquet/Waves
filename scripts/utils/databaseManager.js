@@ -227,14 +227,14 @@ var databaseManager = function() {
 
       db.songs.insert(songData, function(err, newDoc) {
         if (!err) {
-          if (self.libraryData.artists.indexOf(songData.artist) < 0) {
-            self.libraryData.artists.push(songData.artist);
+          if (self.libraryData.artists.indexOf(songData.artist.toLowerCase()) < 0) {
+            self.libraryData.artists.push(songData.artist.toLowerCase());
           }
-          if (self.libraryData.albumArtists.indexOf(songData.albumArtist) < 0) {
-            self.libraryData.albumArtists.push(songData.albumArtist);
+          if (self.libraryData.albumArtists.indexOf(songData.albumArtist.toLowerCase()) < 0) {
+            self.libraryData.albumArtists.push(songData.albumArtist.toLowerCase());
           }
-          if (self.libraryData.albums.indexOf(songData.album) < 0) {
-            self.libraryData.albums.push(songData.album);
+          if (self.libraryData.albums.indexOf(songData.album.toLowerCase()) < 0) {
+            self.libraryData.albums.push(songData.album.toLowerCase());
           }
 
           console.log("Inserted: " + newDoc.artist + " - " + newDoc.title);

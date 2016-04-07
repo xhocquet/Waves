@@ -14,6 +14,7 @@ var artistList = React.createClass({
 
   getArtistEntries: function() {
     var artistEntries = [];
+    var counter = 0;
 
     // All Artists entry
     artistEntries.push(
@@ -26,15 +27,19 @@ var artistList = React.createClass({
     );
 
     for (var i = 0; i < this.state.artists.length; i++) {
-      var rowClass = i % 2 ? "artistEntry" : "artistEntryAlternate";
-      artistEntries.push(
-        <ArtistEntry
-          rowClass={rowClass}
-          key={this.state.artists[i] || "Undefined"}
-          onClick={this.clickHandler}
-          artist={this.state.artists[i] || "Undefined"}
-        />
-      );
+      var rowClass = counter % 2 ? "artistEntry" : "artistEntryAlternate";
+      // Only add non-null artists. Prevents issues with undefined and artist searching
+      if (this.state.artists[i]) {
+        counter++;
+        artistEntries.push(
+          <ArtistEntry
+            rowClass={rowClass}
+            key={this.state.artists[i]}
+            onClick={this.clickHandler}
+            artist={this.state.artists[i]}
+          />
+        );
+      }
     }
     return artistEntries;
   },

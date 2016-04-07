@@ -131,23 +131,27 @@ function playHandler() {
 }
 
 function updateAlbumArtImage(filePath) {
-  let newFilePath = decodeURI(filePath.slice(8));
+  if (filePath) {
+    let newFilePath = decodeURI(filePath.slice(8));
 
-  let fileStream = fs.createReadStream(newFilePath);
-  MetaData(fileStream, function(err, metaData) {
-    let coverImage = metaData.picture[0];
-    if (coverImage) {
-      var base64String = "";
-      for (var i = 0; i < coverImage.data.length; i++) {
-        base64String += String.fromCharCode(coverImage.data[i]);
+    let fileStream = fs.createReadStream(newFilePath);
+    MetaData(fileStream, function(err, metaData) {
+      let coverImage = metaData.picture[0];
+      if (coverImage) {
+        var base64String = "";
+        for (var i = 0; i < coverImage.data.length; i++) {
+          base64String += String.fromCharCode(coverImage.data[i]);
+        }
+        var base64 = "data:" + coverImage.format + ";base64," + window.btoa(base64String);
+
+        albumArtImage.setAttribute('src',base64);
+      } else {
+        albumArtImage.setAttribute('src', "../assets/missing_album_art.png");
       }
-      var base64 = "data:" + coverImage.format + ";base64," + window.btoa(base64String);
-
-      albumArtImage.setAttribute('src',base64);
-    } else {
-      albumArtImage.setAttribute('src', "../assets/missing_album_art.png")
-    }
-  });
+    });
+  } else {
+    albumArtImage.setAttribute('src', "../assets/missing_album_art.png");
+  }
 }
 
 function progressHandler() {
@@ -188,4 +192,6 @@ function setupEventListeners() {
     var file = e.dataTransfer.files[0];
     ipcRenderer.send('generateLibrary', { path: file.path });
   }
+
+  updateAlbumArtImage();
 }

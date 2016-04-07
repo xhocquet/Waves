@@ -59,10 +59,10 @@ var trackList = React.createClass({
     var counter = 0;
 
     var displayStart = this.state.displayStart;
-    var displayEnd = this.state.displayEnd > this.state.total - 1 ? Math.min(this.state.recordsPerBody * 2, this.state.total) : this.state.displayEnd;
-
+    var displayEnd = this.state.displayEnd > this.state.total - 1 ? Math.min(this.state.recordsPerBody * 2, this.state.total - 1) : this.state.displayEnd;
+    
     var topFillerHeight = this.state.displayStart * this.state.recordHeight;
-    var bottomFillerHeight = (this.state.tracks.length - this.state.displayEnd - 1) * this.state.recordHeight;
+    var bottomFillerHeight = (this.state.tracks.length - this.state.displayEnd) * this.state.recordHeight;
 
     // Top filler for scrollbar to look the right size
     trackEntries.push(<div key={1} style={{height: topFillerHeight}}></div>);
@@ -73,6 +73,7 @@ var trackList = React.createClass({
       var playing = false;
       var selected = this.state.selectedTrackComponents.map(module=>module.props.track._id).indexOf(track._id) > -1;
 
+      // Set playing child properly
       if (this.state.playingTrackId) {
         playing = this.state.playingTrackId === track._id;
       }

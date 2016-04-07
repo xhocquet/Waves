@@ -24,18 +24,30 @@
 }
 
 /*SIDEBAR COMPONENTS*/
+/*Hack to make width = height*/
 .albumArt {
-  height: 200px;
-  padding: 5px;
+  display: inline-block;
+  position: relative;
   width: 100%;
-  text-align: center;
+}
+
+.albumArtFiller {
+  margin-top: 100%;
+}
+
+.albumArtContainer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 #albumArt {
-  background-color: #ccc;
-  height: 200px;
-  width: 200px;
-  border: 1px solid black;
+  max-width:100%;
+  max-height:100%;
+  min-width:100%;
+  min-height:100%;
 }
 
 .artistList {
@@ -58,14 +70,17 @@
 /*FOOTER COMPONENTS*/
 .progressBar {
   background-color: orange;
-  height: 2px;
+  box-shadow: 0 -2px 5px grey;
+  cursor: pointer;
+  height: 5px;
+  margin-bottom: 5px;
   width: 100%;
 }
 
 .navContainer {
   display: block;
   float: left;
-  height: 60px;
+  height: 50px;
   width: 200px;
 }
 
@@ -92,11 +107,11 @@
 }
 
 .navButton {
-  display: inline;
+  display: block;
   float: left;
-  height: 60px;
+  height: 50px;
+  width: 50px;
   padding: 0 3px;
-  width: 60px;
 }
 
 .previous {

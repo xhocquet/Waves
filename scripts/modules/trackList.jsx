@@ -76,7 +76,7 @@ var trackList = React.createClass({
       if (this.state.playingTrackId) {
         playing = this.state.playingTrackId === track._id;
       }
-
+      
       trackEntries.push(
         <Track
           className={rowClass}
@@ -139,10 +139,6 @@ var trackList = React.createClass({
 
     this.props.musicPlayer.playSong(trackId);
 
-    if (this.state.playingTrackComponent) {
-      this.state.playingTrackComponent.setState({nowPlaying: false})
-    }
-
     this.setState({
       playingTrackId: trackId,
       playingTrackComponent: trackComponent
@@ -153,13 +149,21 @@ var trackList = React.createClass({
     if (this.state.total > 0) {
       var trackEntries = this.getTrackEntries();
       return (
-        <div  className="songList" ref="scrollable" onScroll={this.onScroll}>
+        <div className="songList" ref="scrollable" onScroll={this.onScroll}>
+          <div className="songListHeader" key={0}>
+            <div className="rowItem rowIndex"></div>
+            <div className="rowItem rowPlaying"></div>
+            <div className="rowItem rowArtist">Album Artist</div>
+            <div className="rowItem rowAlbum">Album</div>
+            <div className="rowItem rowTitle">Title</div>
+            <div className="rowItem rowDuration">Duration</div>
+          </div>
           {trackEntries}
         </div>
       );
     } else {
       return (
-        <div  className="songList" ref="scrollable" onScroll={this.onScroll}>
+        <div className="songList" ref="scrollable" onScroll={this.onScroll}>
           No tracks found.
         </div>
       );

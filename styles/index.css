@@ -40,7 +40,6 @@
 
 .artistList {
   border-top: 1px solid black;
-  padding: 5px;
 }
 
 .artistEntry, .artistEntryAlternate {
@@ -127,6 +126,7 @@
 
 .songListHeader {
   font-weight: bold;
+  border-bottom: 1px solid black;
 }
 
 .songListItemAlternate {

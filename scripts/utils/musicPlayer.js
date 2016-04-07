@@ -11,6 +11,11 @@ var musicPlayer = function() {
   self.paths = [];
   self.curIndex = 0;
   self.curTrackId = 0;
+
+  // LISTENERS
+  $musicPlayer.onended = function() {
+    self.nextTrack();
+  }
   
   self.playSong = function(songId) {
     self.curTrackId = songId;

@@ -69,11 +69,17 @@
 
 /*FOOTER COMPONENTS*/
 .progressBar {
-  background-color: orange;
+  background-color: #ccc;
   box-shadow: 0 -2px 5px grey;
   cursor: pointer;
   height: 5px;
   margin-bottom: 5px;
+  width: 100%;
+}
+
+.curProgress {
+  background-color: orange;
+  height: 5px;
   width: 100%;
 }
 

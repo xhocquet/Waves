@@ -76,6 +76,12 @@ var musicPlayer = function() {
     $musicPlayer.volume = event.target.value / 100;
   }
 
+  self.seek = function(event) {
+    let percentage = event.x / event.target.clientWidth;
+    let targetTime = Math.round($musicPlayer.duration * percentage);
+    $musicPlayer.currentTime = targetTime;
+  }
+
   self.updateListData = function(tracks) {
     var idArray = tracks.map(track => {
       return track._id;

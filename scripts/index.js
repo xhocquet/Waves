@@ -17,6 +17,7 @@ var pauseButton = document.getElementsByClassName("pause")[0];
 var previousButton = document.getElementsByClassName("previous")[0];
 var nextButton = document.getElementsByClassName("next")[0];
 var progressBarDiv = document.getElementsByClassName("progressBar")[0];
+var curProgressDiv = document.getElementsByClassName("curProgress")[0];
 var songList = document.getElementsByClassName("songList")[0];
 var volumeSlider = document.getElementsByClassName("volumeSlider")[0];
 var albumArtImage = document.getElementById("albumArt");
@@ -159,9 +160,9 @@ function progressHandler() {
     var progress = playerWindow.musicPlayer.audio.currentTime;
     var total = playerWindow.musicPlayer.audio.duration;
     var ratio = (progress/total) * 100;
-    progressBarDiv.style.width = ratio+"%";
+    curProgressDiv.style.width = ratio+"%";
   } else {
-    progressBarDiv.style.width = "0%";
+    curProgressDiv.style.width = "0%";
   }
 }
 
@@ -174,7 +175,10 @@ function setupEventListeners() {
   pauseButton.onclick = playPause;
   previousButton.onclick = playerWindow.musicPlayer.previousTrack;
   nextButton.onclick = playerWindow.musicPlayer.nextTrack;
+  // Set volume with the volume slider
   volumeSlider.oninput = playerWindow.musicPlayer.setVolume;
+  // Seek track on clicking the progress bar
+  progressBarDiv.onclick = playerWindow.musicPlayer.seek;
   playerWindow.musicPlayer.audio.onplay = playHandler;
   playerWindow.musicPlayer.audio.onpause = playHandler;
   playerWindow.musicPlayer.audio.ontimeupdate = progressHandler;
@@ -189,8 +193,9 @@ function setupEventListeners() {
   // Drag file handler
   contentDiv.ondrop = function(e) {
     e.preventDefault();
-    var file = e.dataTransfer.files[0];
-    ipcRenderer.send('generateLibrary', { path: file.path });
+    for (let i = 0; i < e.dataTransfer.files.length; i++) {
+      ipcRenderer.send('generateLibrary', { path: e.dataTransfer.files[i].path });
+    }
   }
 
   updateAlbumArtImage();

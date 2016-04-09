@@ -1,21 +1,21 @@
 /*MAIN COMPONENTS*/
-.sidebar {
+#sidebar {
   float: left;
   position: fixed;
+  height: calc(100vh - 60px);
   width: 20%;
   min-width: 200px;
 }
 
-.content {
+#content {
   border-left: 1px solid black;
   left: 20%;
-  height: calc(100vh - 65px);
+  height: calc(100vh - 60px);
   position: absolute;
-  top: 0;
   width: calc(80% - 1px);
 }
 
-.footer {
+#footer {
   bottom: 0;
   height: 65px;
   position: fixed;
@@ -23,19 +23,30 @@
   border-top: 1px solid black;
 }
 
+/*HEADER COMPONENTS*/
+#search {
+  margin: 5px auto;
+  width: 90%;
+  height: 25px;
+  padding: 2px 5px;
+  display: block;
+  outline: none;
+}
+
 /*SIDEBAR COMPONENTS*/
 /*Hack to make width = height*/
-.albumArt {
+#albumArt {
   display: inline-block;
   position: relative;
   width: 100%;
+  border-top: 1px solid black;
 }
 
-.albumArtFiller {
+#albumArtFiller {
   margin-top: 100%;
 }
 
-.albumArtContainer {
+#albumArtContainer {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -43,15 +54,22 @@
   right: 0;
 }
 
-#albumArt {
+#albumArtImage {
   max-width:100%;
   max-height:100%;
   min-width:100%;
   min-height:100%;
 }
 
+/*TODO: How do I make this fill out?*/
+#artistListContainer {
+  height: 430px;
+  overflow-y: auto;
+}
+
 .artistList {
   border-top: 1px solid black;
+  height: 100%;
 }
 
 .artistEntry, .artistEntryAlternate {
@@ -68,7 +86,7 @@
 }
 
 /*FOOTER COMPONENTS*/
-.progressBar {
+#progressBar {
   background-color: #ccc;
   box-shadow: 0 -2px 5px grey;
   cursor: pointer;
@@ -77,27 +95,27 @@
   width: 100%;
 }
 
-.curProgress {
+#curProgress {
   background-color: orange;
   height: 5px;
   width: 100%;
 }
 
-.navContainer {
+#navContainer {
   display: block;
   float: left;
   height: 50px;
   width: 200px;
 }
 
-.volumeContainer {
+#volumeContainer {
   display: block;
   float: left;
   height: 100%;
   width: 200px;
 }
 
-.volumeSlider {
+#volumeSlider {
   -webkit-appearance: none;
   background-color: silver;
   height: 5px;
@@ -105,7 +123,7 @@
   width: 200px;
 }
 
-.volumeSlider::-webkit-slider-thumb {
+#volumeSlider::-webkit-slider-thumb {
   -webkit-appearance: none;
   background-color: #666;
   width: 10px;
@@ -120,15 +138,15 @@
   padding: 0 3px;
 }
 
-.previous {
+#previous {
   background: url("../assets/previous.svg") no-repeat left top;
 }
 
-.next {
+#next {
   background: url("../assets/next.svg") no-repeat left top;
 }
 
-.pause {
+#pause {
   background: url("../assets/play.svg") no-repeat left top;
 }
 

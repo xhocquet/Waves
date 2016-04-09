@@ -6,26 +6,27 @@
     <link rel="stylesheet" type="text/css" href="../styles/index.css">
   </head>
   <body>
-    <div class="sidebar">
-      <div class="albumArt">
-        <div class="albumArtFiller"></div>
-        <div class="albumArtContainer">
-          <img id="albumArt" />
+    <div id="sidebar">
+      <input id="search" placeholder="Search..."></input>
+      <div id="albumArt">
+        <div id="albumArtFiller"></div>
+        <div id="albumArtContainer">
+          <img id="albumArtImage" />
         </div>
       </div>
-      <div class="artistListContainer"></div>
+      <div id="artistListContainer"></div>
     </div>
-    <div class="content">
+    <div id="content">
     </div>
-    <div class="footer">
-      <div class="progressBar"><div class="curProgress"></div></div>
-      <div class="navContainer">
-        <div class="navButton previous"></div>
-        <div class="navButton pause"></div>
-        <div class="navButton next"></div>
+    <div id="footer">
+      <div id="progressBar"><div id="curProgress"></div></div>
+      <div id="navContainer">
+        <div class="navButton previous" id="previous"></div>
+        <div class="navButton pause" id="pause"></div>
+        <div class="navButton next" id="next"></div>
       </div>
-      <div class="volumeContainer">
-        <input type="range" class="volumeSlider" min="0" max="100" value="100" />
+      <div id="volumeContainer">
+        <input type="range" id="volumeSlider" min="0" max="100" value="100" />
       </div>
     </div>
   </body>

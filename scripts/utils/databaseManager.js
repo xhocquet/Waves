@@ -54,6 +54,16 @@ var databaseManager = function() {
           callback(err);
         }
       });
+    } else if (options.searchAll) {
+      // Current only searches title, need to add artist, album, etc
+      let searchTerm = new RegExp(options.searchAll, 'i');
+      db.songs.find({ title: { $regex: searchTerm } }).sort(DEFAULT_SORT).exec(function(err, docs) {
+        if (!err) {
+          callback(docs);
+        } else {
+          callback(err);
+        }
+      });
     } else if (!options.search) {
       db.songs.find({}).sort(DEFAULT_SORT).exec(function(err, docs) {
         if (!err) {
@@ -214,16 +224,16 @@ var databaseManager = function() {
     MetaData(fileStream, { duration: true }, function(err, metaData) {
       let songData = {};
 
-      songData.path = filePath;
-      songData.title = metaData.title;
-      songData.artist = metaData.artist[0];
-      songData.albumArtist = metaData.albumartist[0];
-      songData.album = metaData.album;
-      songData.year = metaData.year;
-      songData.track = metaData.track;
-      songData.genre = metaData.genre;
-      songData.disk = metaData.disk;
-      songData.duration = metaData.duration;
+      songData.path = filePath || "";
+      songData.title = metaData.title || "";
+      songData.artist = metaData.artist[0] || "";
+      songData.albumArtist = metaData.albumartist[0] || "";
+      songData.album = metaData.album || "";
+      songData.year = metaData.year || "";
+      songData.track = metaData.track || "";
+      songData.genre = metaData.genre || "";
+      songData.disk = metaData.disk || "";
+      songData.duration = metaData.duration || "";
 
       db.songs.insert(songData, function(err, newDoc) {
         if (!err) {

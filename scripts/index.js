@@ -12,16 +12,17 @@ var trackContextMenuSource = require('../scripts/menus/trackContextMenu.js');
 var trackContextMenu = Menu.buildFromTemplate(trackContextMenuSource);
 
 // DOM REFERENCES
-var contentDiv = document.getElementsByClassName("content")[0];
-var pauseButton = document.getElementsByClassName("pause")[0];
-var previousButton = document.getElementsByClassName("previous")[0];
-var nextButton = document.getElementsByClassName("next")[0];
-var progressBarDiv = document.getElementsByClassName("progressBar")[0];
-var curProgressDiv = document.getElementsByClassName("curProgress")[0];
-var songList = document.getElementsByClassName("songList")[0];
-var volumeSlider = document.getElementsByClassName("volumeSlider")[0];
-var albumArtImage = document.getElementById("albumArt");
-var artistListContainer = document.getElementsByClassName("artistListContainer")[0];
+var searchDiv = document.getElementById("search");
+var contentDiv = document.getElementById("content");
+var pauseButton = document.getElementById("pause");
+var previousButton = document.getElementById("previous");
+var nextButton = document.getElementById("next");
+var progressBarDiv = document.getElementById("progressBar");
+var curProgressDiv = document.getElementById("curProgress");
+var songList = document.getElementById("songList");
+var volumeSlider = document.getElementById("volumeSlider");
+var albumArtImage = document.getElementById("albumArtImage");
+var artistListContainer = document.getElementById("artistListContainer");
 
 playerWindow.musicPlayer = new mp();
 
@@ -131,6 +132,17 @@ function playHandler() {
   updateAlbumArtImage(playerWindow.musicPlayer.audio.src);
 }
 
+function search(event) {
+  let searchTerm = searchDiv.value;
+  if (searchTerm === "") {
+    ipcRenderer.send('getListData', {});
+  } else {
+    ipcRenderer.send('getListData', {
+      searchAll: searchDiv.value
+    });
+  }
+}
+
 function updateAlbumArtImage(filePath) {
   if (filePath) {
     let newFilePath = decodeURI(filePath.slice(8));
@@ -172,6 +184,8 @@ function volumeHandler() {
 }
 
 function setupEventListeners() {
+  // Search
+  searchDiv.oninput = search;
   pauseButton.onclick = playPause;
   previousButton.onclick = playerWindow.musicPlayer.previousTrack;
   nextButton.onclick = playerWindow.musicPlayer.nextTrack;

@@ -106,9 +106,9 @@ var trackList = React.createClass({
         if(event.ctrlKey) {
           this.state.selectedTrackComponents.push(element);
         } else {
-          this.state.selectedTrackComponents.forEach(track => {
-            if (track.isMounted()) {
-              track.setState({selected: false});
+          this.state.selectedTrackComponents.forEach(trackComponent => {
+            if (trackComponent.isMounted()) {
+              trackComponent.setState({selected: false});
             }
           });
           this.state.selectedTrackComponents = [element];
@@ -123,12 +123,16 @@ var trackList = React.createClass({
         if(event.ctrlKey) {
           this.state.selectedTrackComponents.push(element)
         } else {
-          this.state.selectedTracks.forEach(track => {
-            track.setState({selected: false});
+          this.state.selectedTrackComponents.forEach(trackComponent => {
+            if (trackComponent.isMounted()) {
+              trackComponent.setState({selected: false});
+            }
           });
           this.state.selectedTrackComponents = [element];
         }
         element.setState({selected: true});
+        // Need to set the selection to the window so the menu can access it
+        this.props.playerWindow.selectedTracks = this.state.selectedTrackComponents.map(trackComponent => trackComponent.props.track._id);
         this.props.trackContextMenu.popup(this.props.playerWindow);
         break;
     }

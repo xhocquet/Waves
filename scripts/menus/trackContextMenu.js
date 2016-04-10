@@ -51,7 +51,9 @@ var mainMenu = [
   {
     label: 'Add to Queue',
     click: function(item, curWindow) {
-      curWindow.addToQueue(curWindow.curTrackID);
+      curWindow.selectedTracks.forEach(track => {
+        curWindow.musicPlayer.queueNext(track);
+      });
     }
   },
 ];

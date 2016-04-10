@@ -34,8 +34,9 @@ var ArtistList = require('../scripts/modules/artistList.jsx');
 
 var TrackListComponent = ReactDOM.render(<TrackList
   height={770}
-  recordHeight={25}
   musicPlayer={playerWindow.musicPlayer}
+  playerWindow={playerWindow}
+  recordHeight={25}
   trackContextMenu={trackContextMenu}
 />, contentDiv);
 

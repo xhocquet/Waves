@@ -224,7 +224,7 @@ var databaseManager = function() {
     MetaData(fileStream, { duration: true }, function(err, metaData) {
       let songData = {};
 
-      songData.path = filePath || "";
+      songData.path = filePath;
       songData.title = metaData.title || "";
       songData.artist = metaData.artist[0] || "";
       songData.albumArtist = metaData.albumartist[0] || "";

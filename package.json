@@ -2,6 +2,10 @@
   "name": "Waves",
   "version": "1.0.0",
   "description": "Javascript native music player",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:xhocquet/Waves.git"
+  },
   "main": "app.js",
   "scripts": {
     "start": "electron app.js"
@@ -12,23 +16,19 @@
   "author": "Xavier Hocquet",
   "license": "CC0-1.0",
   "devDependencies": {
-    "babel-core": "^6.7.4",
-    "babel-preset-es2015": "^6.6.0",
-    "babel-runtime": "^6.6.1",
-    "electron-prebuilt-compile": "^0.37.2",
-    "electron-rebuild": "^1.1.3",
-    "react-addons-test-utils": "^0.14.8",
-    "react-deep-force-update": "^2.0.1",
-    "react-proxy": "^2.0.3",
-    "reactify": "^1.1.1"
+    "babel-core": "6.7.6",
+    "babel-preset-es2015": "6.6.0",
+    "babel-runtime": "6.6.1",
+    "electron-prebuilt-compile": "0.37.5",
+    "electron-rebuild": "1.1.3",
+    "reactify": "1.1.1"
   },
   "dependencies": {
-    "async": "^1.5.2",
-    "graceful-fs": "^4.1.3",
-    "musicmetadata": "^2.0.2",
-    "nedb": "^1.8.0",
-    "react": "^0.14.8",
-    "react-dom": "^0.14.8",
-    "react-lazy-render": "^0.3.0"
+    "async": "2.0.0-rc.3",
+    "graceful-fs": "4.1.3",
+    "musicmetadata": "2.0.2",
+    "nedb": "1.8.0",
+    "react": "15.0.1",
+    "react-dom": "15.0.1"
   }
 }

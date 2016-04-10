@@ -33,14 +33,14 @@ var databaseManager = function() {
   });
 
   let trackDataWorker = async.queue(function (file, callback) {
-    console.log("Worker working on ", file.path);
+    console.log("Worker processing data for ", file.path);
     self.createTrackData(file.path, callback);
   }, 5);
 
   trackDataWorker.drain = function() {
     self.saveLibraryData();
     app.afterNewLibraryData();
-    console.log("All tracks have been processed");
+    console.log("All tracks in the queue have been processed");
   };
 
   // Returns the specified tracks with options.

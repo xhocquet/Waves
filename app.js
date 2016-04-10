@@ -97,6 +97,8 @@ function sendInitialLibrary() {
 }
 
 function setupPlayerWindow() {
+  playerWindow.loadURL('file://' + __dirname + '/views/index.html');
+  
   playerWindow.refreshLibrary = function() {
     // librarymanager.generate
   }
@@ -116,10 +118,7 @@ function setupPlayerWindow() {
     playerWindow.webContents.send("setVolume", { value: value });
   }
 
-  playerWindow.curTrackID = null;
-
   playerWindow.setMenu(Menu.buildFromTemplate(mainWindowMenu));
-  playerWindow.loadURL('file://' + __dirname + '/views/index.html');
 }
 
 function setupAppListeners() {

@@ -56,6 +56,16 @@ var mainMenu = [
       });
     }
   },
+  {
+    label: 'Open in Explorer',
+    click: function(item, curWindow) {
+      curWindow.selectedTracks.forEach(track => {
+        let trackIndex = curWindow.musicPlayer.ids.indexOf(track);
+        let trackPath = curWindow.musicPlayer.paths[trackIndex];
+        require('electron').shell.showItemInFolder(trackPath);
+      });
+    }
+  }
 ];
 
 module.exports = mainMenu;

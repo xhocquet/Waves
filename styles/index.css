@@ -226,3 +226,17 @@
   padding-left: 5px;
   width: 10%;
 }
+
+/*SCROLLBARS*/
+::-webkit-scrollbar {
+  width: 12px;
+  background-color: #aaa;
+}
+
+::-webkit-scrollbar-button {
+  background-color: #666;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #333;
+}

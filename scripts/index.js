@@ -160,11 +160,11 @@ function updateAlbumArtImage(filePath) {
 
         albumArtImage.setAttribute('src',base64);
       } else {
-        albumArtImage.setAttribute('src', "../assets/missing_album_art.png");
+        albumArtImage.setAttribute('src', "../assets/albumArt.png");
       }
     });
   } else {
-    albumArtImage.setAttribute('src', "../assets/missing_album_art.png");
+    albumArtImage.setAttribute('src', "../assets/albumArt.png");
   }
 }
 

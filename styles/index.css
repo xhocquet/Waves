@@ -105,7 +105,7 @@
   display: block;
   float: left;
   height: 50px;
-  width: 200px;
+  width: 400px;
 }
 
 #volumeContainer {
@@ -148,6 +148,10 @@
 
 #pause {
   background: url("../assets/play.svg") no-repeat left top;
+}
+
+#shuffle {
+  background: url("../assets/repeat.svg") no-repeat left top;
 }
 
 /*CONTENT COMPONENTS*/

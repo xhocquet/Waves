@@ -1,6 +1,6 @@
-var React = require('react');
+const React = require('react');
 
-var Track = React.createClass({
+let Track = React.createClass({
   getInitialState: function() {
     return {
       nowPlaying: false,
@@ -9,8 +9,8 @@ var Track = React.createClass({
   },
 
   sanitizeDuration: function(duration) {
-    var minutes = Math.floor(duration / 60);
-    var remainder = Math.floor(duration % 60);
+    let minutes = Math.floor(duration / 60);
+    let remainder = Math.floor(duration % 60);
     return minutes.toString() + ":" + ("0" + remainder).slice(-2)
   },
 
@@ -40,8 +40,8 @@ var Track = React.createClass({
   },
 
   render: function() {
-    var nowPlaying = this.getRowPlayingClass();
-    var rowClass = this.getRowSelectedClass();
+    let nowPlaying = this.getRowPlayingClass();
+    let rowClass = this.getRowSelectedClass();
 
     return (
       <div className={rowClass} onMouseDown={this.clickHandler} onDoubleClick={this.doubleClickHandler}>

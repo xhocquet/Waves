@@ -1,7 +1,7 @@
-var React = require('react');
-var ArtistEntry = require('./artistEntry.jsx');
+const React = require('react');
+const ArtistEntry = require('./artistEntry.jsx');
 
-var artistList = React.createClass({
+let artistList = React.createClass({
   getInitialState: function() {
     return {
       artists: []
@@ -13,8 +13,8 @@ var artistList = React.createClass({
   },
 
   getArtistEntries: function() {
-    var artistEntries = [];
-    var counter = 0;
+    let artistEntries = [];
+    let counter = 0;
 
     // All Artists entry
     artistEntries.push(
@@ -26,8 +26,8 @@ var artistList = React.createClass({
       />
     );
 
-    for (var i = 0; i < this.state.artists.length; i++) {
-      var rowClass = counter % 2 ? "artistEntry" : "artistEntryAlternate";
+    for (let i = 0; i < this.state.artists.length; i++) {
+      let rowClass = counter % 2 ? "artistEntry" : "artistEntryAlternate";
       // Only add non-null artists. Prevents issues with undefined and artist searching
       if (this.state.artists[i]) {
         counter++;
@@ -46,7 +46,7 @@ var artistList = React.createClass({
 
   render: function() {
     if (this.state.artists.length > 0) {
-      var artistEntries = this.getArtistEntries();
+      let artistEntries = this.getArtistEntries();
       return (
         <div  className="artistList">
           {artistEntries}

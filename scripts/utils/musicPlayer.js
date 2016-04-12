@@ -9,6 +9,9 @@ var musicPlayer = function() {
   $musicPlayer.volume = 1;
   self.ids = [];
   self.paths = [];
+  self.shuffledIds = [];
+  self.shuffledPaths = [];
+  self.shuffleActivated = false;
   self.curIndex = 0;
   self.curTrackId = 0;
 
@@ -33,40 +36,58 @@ var musicPlayer = function() {
   }
 
   self.nextTrack = function() {
-    let nextTrackPath = self.paths[self.curIndex + 1]
+    // Last track, reset to start. Can count on both lists being the same size
+    if (self.curIndex === self.ids.length - 1) {
+      self.curIndex = 0;
+    } else {
+      self.curIndex += 1;
+    }
 
-    if (nextTrackPath) {
-      $musicPlayer.src = nextTrackPath;
-      $musicPlayer.play();
-      self.curIndex++;
+    // Get proper list according to shuffle status
+    let nextTrackPath;
+    if (!self.shuffleActivated) {
+      nextTrackPath = self.paths[self.curIndex];
       self.curTrackId = self.ids[self.curIndex];
     } else {
-      self.curIndex = 0;
-      self.curTrackId = self.ids[self.curIndex];
-      $musicPlayer.src = self.paths[self.curIndex];
-      $musicPlayer.play();
+      nextTrackPath = self.shuffledPaths[self.curIndex];
+      self.curTrackId = self.shuffledIds[self.curIndex];
     }
+
+    $musicPlayer.src = nextTrackPath;
+    $musicPlayer.play();
   }
 
   self.previousTrack = function() {
-    let previousTrackPath = self.paths[self.curIndex - 1];
+    // Last track, reset to start. Can count on both lists being the same size
+    if (self.curIndex === 0) {
+      self.curIndex = self.ids.length - 1;
+    } else {
+      self.curIndex -= 1;
+    }
 
-    if (previousTrackPath) {
-      $musicPlayer.src = previousTrackPath;
-      $musicPlayer.play();
-      self.curIndex--;
+    // Get proper list according to shuffle status
+    let prevTrackPath;
+    if (!self.shuffleActivated) {
+      prevTrackPath = self.paths[self.curIndex];
       self.curTrackId = self.ids[self.curIndex];
     } else {
-      self.curIndex = self.paths.length - 1;
-      self.curTrackId = self.ids[self.curIndex];
-      $musicPlayer.src = self.paths[self.curIndex];
-      $musicPlayer.play();
+      prevTrackPath = self.shuffledPaths[self.curIndex];
+      self.curTrackId = self.shuffledIds[self.curIndex];
     }
+
+    $musicPlayer.src = prevTrackPath;
+    $musicPlayer.play();
   }
 
   self.queueNext = function(songId) {
-    let songIndex = self.ids.indexOf(songId);
-    let songPath = self.paths[songIndex];
+    let songIndex, songPath;
+    if (!self.shuffleActivated) {
+      songIndex = self.ids.indexOf(songId);
+      songPath = self.paths[songIndex];
+    } else {
+      songIndex = self.shuffledIds.indexOf(songId);
+      songPath = self.shuffledPaths[songIndex];
+    }
 
     self.ids.splice(self.curIndex + 1, 0, songId);
     self.paths.splice(self.curIndex + 1, 0, songPath);
@@ -83,14 +104,41 @@ var musicPlayer = function() {
   }
 
   self.updateListData = function(tracks) {
-    var idArray = tracks.map(track => {
+    let idArray = tracks.map(track => {
       return track._id;
     });
-    var pathArray = tracks.map(track => {
+    let pathArray = tracks.map(track => {
       return track.path;
     });
     self.ids = idArray;
     self.paths = pathArray;
+    self.shuffleList(true);
+  }
+
+  // Shuffle function. Need to shuffle the ids and paths the same way to maintain functionality
+  // For now, reset to start of list
+  self.shuffleList = function(initialShuffle = false) {
+    let idCopy = self.ids.slice();
+    let pathsCopy = self.paths.slice();
+    self.shuffledIds = [];
+    self.shuffledPaths = [];
+    while (idCopy.length > 0) {
+      let randomIndex = Math.floor(Math.random() * idCopy.length);
+      let tempId = idCopy.splice(randomIndex - 1,1);
+      let tempPath = pathsCopy.splice(randomIndex - 1,1);
+      self.shuffledIds.push(tempId);
+      self.shuffledPaths.push(tempPath);
+    }
+  }
+
+  self.toggleShuffle = function() {
+    if (!self.shuffleActivated) {
+      self.shuffleActivated = true;
+    } else {
+      self.shuffleActivated = false;
+    }
+    self.curIndex = -1;
+    self.nextTrack();
   }
 
   self.audio = $musicPlayer;

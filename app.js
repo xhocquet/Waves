@@ -1,12 +1,7 @@
 'use strict';
 
 const electron = require('electron');
-const ipcMain = electron.ipcMain;
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
-const GlobalShortcut = electron.globalShortcut;
-const Menu = electron.Menu;
-const Tray = electron.Tray;
+const {ipcMain, app, BrowserWindow, globalShortcut, Menu, Tray} = electron;
 
 const dm = require('./scripts/utils/databaseManager.js');
 const databaseManager = new dm();
@@ -69,15 +64,15 @@ function afterSettingsLoad() {
 }
 
 function setupGlobalShorcuts() {
-  GlobalShortcut.unregisterAll();
+  globalShortcut.unregisterAll();
 
   var playPauseHotkey = databaseManager.userSettings.playPauseHotkey;
   var previousTrackHotkey = databaseManager.userSettings.previousTrackHotkey;
   var nextTrackHotkey = databaseManager.userSettings.nextTrackHotkey;
 
-  playPauseHotkey ? GlobalShortcut.register(playPauseHotkey, app.playPause) : null;
-  previousTrackHotkey? GlobalShortcut.register(previousTrackHotkey, app.previousTrack) : null;
-  nextTrackHotkey ? GlobalShortcut.register(nextTrackHotkey, app.nextTrack) : null;
+  playPauseHotkey ? globalShortcut.register(playPauseHotkey, app.playPause) : null;
+  previousTrackHotkey? globalShortcut.register(previousTrackHotkey, app.previousTrack) : null;
+  nextTrackHotkey ? globalShortcut.register(nextTrackHotkey, app.nextTrack) : null;
 }
 
 function afterLibraryDataLoad() {
@@ -132,7 +127,7 @@ function setupAppListeners() {
   });
 
   app.on('will-quit', function(e) {
-    GlobalShortcut.unregisterAll();
+    globalShortcut.unregisterAll();
     playerWindow = null;
     settingsWindow = null;
     trayIcon = null;
@@ -210,7 +205,7 @@ app.setVolume = function(value) {
 }
 
 app.openSettings = function() {
-  GlobalShortcut.unregisterAll();
+  globalShortcut.unregisterAll();
   settingsWindow.show();
 }
 

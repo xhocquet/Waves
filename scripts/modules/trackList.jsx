@@ -1,9 +1,9 @@
-var React = require('react');
-var Track = require('./track.jsx');
+const React = require('react');
+const Track = require('./track.jsx');
 
-var trackList = React.createClass({
+let trackList = React.createClass({
   getInitialState: function() {
-    var recordsPerBody = Math.floor((this.props.height - 2) / this.props.recordHeight);
+    let recordsPerBody = Math.floor((this.props.height - 2) / this.props.recordHeight);
     return {
       displayEnd: recordsPerBody * 2,
       displayStart: 0,
@@ -28,15 +28,15 @@ var trackList = React.createClass({
   // Calculates new visible and display limits based on scroll.
   // Only set the display if the visible is approaching the limit. Reduces number of re-renders.
   scrollState: function(scroll) {
-    var recordHeight = this.state.recordHeight;
-    var recordsPerBody = this.state.recordsPerBody;
-    var total = this.state.total;
+    let recordHeight = this.state.recordHeight;
+    let recordsPerBody = this.state.recordsPerBody;
+    let total = this.state.total;
 
-    var visibleStart = Math.floor(scroll / recordHeight);
-    var visibleEnd = Math.min(visibleStart + recordsPerBody, total - 1);
+    let visibleStart = Math.floor(scroll / recordHeight);
+    let visibleEnd = Math.min(visibleStart + recordsPerBody, total - 1);
 
-    var displayStart = Math.max(0, visibleStart - recordsPerBody * 1.5);
-    var displayEnd = Math.min(displayStart + (4 * recordsPerBody), total - 1);
+    let displayStart = Math.max(0, visibleStart - recordsPerBody * 1.5);
+    let displayEnd = Math.min(displayStart + (4 * recordsPerBody), total - 1);
 
     if (visibleEnd - displayEnd < 5 || visibleStart - displayStart < 5) {
       this.setState({
@@ -55,23 +55,25 @@ var trackList = React.createClass({
 
   // Returns the Tracks and filler divs to space out the scrollbar
   getTrackEntries: function(){
-    var trackEntries = [];
-    var counter = 0;
+    let trackEntries = [];
+    let counter = 0;
+    let prevAlbum = null;
+    let prevArtist = null;
 
-    var displayStart = this.state.displayStart;
-    var displayEnd = this.state.displayEnd > this.state.total - 1 ? Math.min(this.state.recordsPerBody * 2, this.state.total - 1) : this.state.displayEnd;
+    let displayStart = this.state.displayStart;
+    let displayEnd = this.state.displayEnd > this.state.total - 1 ? Math.min(this.state.recordsPerBody * 2, this.state.total - 1) : this.state.displayEnd;
     
-    var topFillerHeight = this.state.displayStart * this.state.recordHeight;
-    var bottomFillerHeight = (this.state.tracks.length - this.state.displayEnd) * this.state.recordHeight;
+    let topFillerHeight = this.state.displayStart * this.state.recordHeight;
+    let bottomFillerHeight = (this.state.tracks.length - this.state.displayEnd) * this.state.recordHeight;
 
     // Top filler for scrollbar to look the right size
-    trackEntries.push(<div key={1} style={{height: topFillerHeight}}></div>);
+    trackEntries.push(<div key={'topFiller'} style={{height: topFillerHeight}}></div>);
     
-    for (var i = displayStart; i <= displayEnd; i++) {
-      var track = this.state.tracks[i];
-      var rowClass = counter % 2 ? "songListItem" : "songListItemAlternate";
-      var playing = false;
-      var selected = this.state.selectedTrackComponents.map(module=>module.props.track._id).indexOf(track._id) > -1;
+    for (let i = displayStart; i <= displayEnd; i++) {
+      let track = this.state.tracks[i];
+      let rowClass = counter % 2 ? "songListItem" : "songListItemAlternate";
+      let playing = false;
+      let selected = this.state.selectedTrackComponents.map(module=>module.props.track._id).indexOf(track._id) > -1;
 
       // Set playing child properly
       if (this.state.playingTrackId) {
@@ -94,13 +96,13 @@ var trackList = React.createClass({
     }
 
     // Bottom filler for scrollbar
-    trackEntries.push(<div key={2} style={{height: bottomFillerHeight}}></div>);
+    trackEntries.push(<div key={'bottomFiller'} style={{height: bottomFillerHeight}}></div>);
 
     return trackEntries;
   },
 
   clickHandler: function(element, event) {
-    var clickTrack = element.props.track;
+    let clickTrack = element.props.track;
     switch(event.button) {
       case 0: // Left click
         if(event.ctrlKey) {
@@ -139,8 +141,8 @@ var trackList = React.createClass({
   },
 
   playSong: function(element, event) {
-    var trackId = element.props.track._id;
-    var trackComponent = this.refs[trackId];
+    let trackId = element.props.track._id;
+    let trackComponent = this.refs[trackId];
 
     this.props.musicPlayer.playSong(trackId);
 
@@ -152,7 +154,7 @@ var trackList = React.createClass({
 
   render: function() {
     if (this.state.total > 0) {
-      var trackEntries = this.getTrackEntries();
+      let trackEntries = this.getTrackEntries();
       return (
         <div className="songList" ref="scrollable" onScroll={this.onScroll}>
           <div className="songListHeader" key={0}>

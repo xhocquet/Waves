@@ -1,7 +1,7 @@
 // MODULES
-var ipcRenderer = require('electron').ipcRenderer;
-var Remote = require('electron').remote;
-var Menu = Remote.Menu;
+const ipcRenderer = require('electron').ipcRenderer;
+const Remote = require('electron').remote;
+const Menu = Remote.Menu;
 var playerWindow = Remote.getCurrentWindow();
 var mp = require('../scripts/utils/musicPlayer.js');
 const MetaData = require('musicmetadata');
@@ -17,6 +17,7 @@ var contentDiv = document.getElementById("content");
 var pauseButton = document.getElementById("pause");
 var previousButton = document.getElementById("previous");
 var nextButton = document.getElementById("next");
+var shuffleButton = document.getElementById("shuffle");
 var progressBarDiv = document.getElementById("progressBar");
 var curProgressDiv = document.getElementById("curProgress");
 var songList = document.getElementById("songList");
@@ -27,12 +28,12 @@ var artistListContainer = document.getElementById("artistListContainer");
 playerWindow.musicPlayer = new mp();
 
 // REACT
-var React = require('react');
-var ReactDOM = require('react-dom');
-var TrackList = require('../scripts/modules/trackList.jsx');
-var ArtistList = require('../scripts/modules/artistList.jsx');
+const React = require('react');
+const ReactDOM = require('react-dom');
+let TrackList = require('../scripts/modules/trackList.jsx');
+let ArtistList = require('../scripts/modules/artistList.jsx');
 
-var TrackListComponent = ReactDOM.render(<TrackList
+let TrackListComponent = ReactDOM.render(<TrackList
   height={770}
   musicPlayer={playerWindow.musicPlayer}
   playerWindow={playerWindow}
@@ -52,7 +53,7 @@ function artistClick(artist, event) {
   }
 }
 
-var ArtistListComponent = ReactDOM.render(<ArtistList
+let ArtistListComponent = ReactDOM.render(<ArtistList
   onClick={artistClick}
 />, artistListContainer);
 
@@ -190,6 +191,7 @@ function setupEventListeners() {
   pauseButton.onclick = playPause;
   previousButton.onclick = playerWindow.musicPlayer.previousTrack;
   nextButton.onclick = playerWindow.musicPlayer.nextTrack;
+  shuffleButton.onclick = playerWindow.musicPlayer.toggleShuffle;
   // Set volume with the volume slider
   volumeSlider.oninput = playerWindow.musicPlayer.setVolume;
   // Seek track on clicking the progress bar
@@ -213,5 +215,6 @@ function setupEventListeners() {
     }
   }
 
+  // Initial album art load
   updateAlbumArtImage();
 }

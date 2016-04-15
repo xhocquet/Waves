@@ -134,6 +134,10 @@ function playHandler() {
   updateAlbumArtImage(playerWindow.musicPlayer.audio.src);
 }
 
+function deleteTrack(trackId) {
+  databaseManager.deleteTrack(trackId);
+}
+
 function search(event) {
   let searchTerm = searchDiv.value;
   if (searchTerm === "") {

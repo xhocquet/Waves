@@ -32,15 +32,26 @@ var databaseManager = function() {
     }
   });
 
-  let trackDataWorker = async.queue(function (file, callback) {
-    console.log("Worker processing data for ", file.path);
-    self.createTrackData(file.path, callback);
+  let trackDataWorker = async.queue(function (path, callback) {
+    console.log("Worker processing data for ", path);
+    self.createTrackData(path, callback);
   }, 5);
+
+  let libraryDataCleaner = async.queue(function(data, callback) {
+    console.log("Worker cleaning library data for " + data.value + " on " + data.index);
+    self.confirmLibraryData(data.index, data.value, callback);
+  }, 1);
 
   trackDataWorker.drain = function() {
     self.saveLibraryData();
     app.afterNewLibraryData();
     console.log("All tracks in the queue have been processed");
+  };
+
+  libraryDataCleaner.drain = function() {
+    self.saveLibraryData();
+    app.afterNewLibraryData();
+    console.log("Library data is squeaky clean!");
   };
 
   // Returns the specified tracks with options.
@@ -118,7 +129,8 @@ var databaseManager = function() {
       if (err) {
         callback(err);
       }
-    })
+    });
+
     db.settings.insert(settings, function(err, newDoc) {
       if (err) {
         callback(err);
@@ -127,7 +139,7 @@ var databaseManager = function() {
         self.userSettings = newDoc; // Update usersettings so it stays up to date.
         callback("Successfully saved settings");
       }
-    })
+    });
   }
 
   // Returns the single record in the libraryDataDB, the user's library data
@@ -139,7 +151,7 @@ var databaseManager = function() {
         self.libraryData = docs[0];
         callback();
       }
-    })
+    });
   }
 
   self.setupInitialLibraryData = function(callback) {
@@ -182,13 +194,12 @@ var databaseManager = function() {
     }
     // Dragging in a single file
     if (pathTools.extname(path) === ".mp3") {
-      trackDataWorker.push({path: path}, function(err) {
+      trackDataWorker.push(path, function(err) {
         if (!err) {
           console.log('Processed ', path);
         } else {
           console.log(err);
         }
-        return;
       });
       return;
     }
@@ -200,13 +211,12 @@ var databaseManager = function() {
       if (curFileStats.isDirectory()) {
         self.generateLibrary(curFilePath);
       } else if (pathTools.extname(curFilePath) === ".mp3") {
-        trackDataWorker.push({path: curFilePath}, function(err) {
+        trackDataWorker.push(curFilePath, function(err) {
           if (!err) {
             console.log('Processed ', curFilePath);
           } else {
             console.log(err);
           }
-          return;
         });
       }
     }
@@ -216,6 +226,75 @@ var databaseManager = function() {
   self.generateLibraryFromSettings = function() {
     self.userSettings.importFolders.forEach(function(element, index, array) {
       self.generateLibrary(element);
+    });
+  }
+
+  // Remove the track and update library data
+  self.deleteTrack = function(trackId) {
+    db.songs.find({_id: trackId}, function( err, docs) {
+      if (docs.length === 0) {
+        return;
+      } else {
+        let trackToRemove = docs[0];
+
+        db.songs.remove({ _id: trackToRemove._id },{}, function (err, numRemoved) {
+          if (!err && numRemoved === 1) {
+            console.log(numRemoved + ' record removed, updating library data');
+
+            libraryDataCleaner.push({ index: 'artists', value: trackToRemove.artist }, function(err) {
+              if (!err) {
+                console.log('Removed ' + trackToRemove.artist + ' from artists.');
+              } else {
+                console.log(err);
+              }
+            });
+
+            libraryDataCleaner.push({ index: 'albumArtists', value: trackToRemove.albumArtist }, function(err) {
+              if (!err) {
+                console.log('Removed ' + trackToRemove.albumArtist + ' from album artists.');
+              } else {
+                console.log(err);
+              }
+            });
+
+            libraryDataCleaner.push({ index: 'albums', value: trackToRemove.album }, function(err) {
+              if (!err) {
+                console.log('Removed ' + trackToRemove.album + ' from albums.');
+              } else {
+                console.log(err);
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // Check type and value of library data to ensure it still exists in the library.
+  // If not, remove from library data. Used in a worker queue because of DB operations.
+  self.confirmLibraryData = function(index, value, callback) {
+    // No empty values, so we can skip the update
+    if (value.length === 0) {
+      callback();
+      return;
+    }
+    // A little abstraction to use a variable as a hash index
+    let dbIndex = index.slice(0, -1);
+    let search = {}
+    search[dbIndex] = value;
+    
+    db.songs.find(search, function(err, docs) {
+      if (docs.length > 0) {
+        console.log(value + ' still present, keeping in library data');
+        callback();
+      } else {
+        console.log('Last instance of ' + value + ", removing from library data.");
+        let dataIndex = self.libraryData[index].indexOf(value);
+        if (dataIndex > -1) {
+          self.libraryData[index].splice(dataIndex, 1);
+          callback();
+        }
+      }
     });
   }
 
@@ -235,15 +314,16 @@ var databaseManager = function() {
       songData.disk = metaData.disk || "";
       songData.duration = metaData.duration || "";
 
+      // Update library data, don't save empty fields
       db.songs.insert(songData, function(err, newDoc) {
         if (!err) {
-          if (self.libraryData.artists.indexOf(songData.artist) < 0) {
+          if (self.libraryData.artists.indexOf(songData.artist) < 0 && songData.artist.length > 0) {
             self.libraryData.artists.push(songData.artist);
           }
-          if (self.libraryData.albumArtists.indexOf(songData.albumArtist) < 0) {
+          if (self.libraryData.albumArtists.indexOf(songData.albumArtist) < 0 && songData.albumArtist.length > 0) {
             self.libraryData.albumArtists.push(songData.albumArtist);
           }
-          if (self.libraryData.albums.indexOf(songData.album) < 0) {
+          if (self.libraryData.albums.indexOf(songData.album) < 0 && songData.album.length > 0) {
             self.libraryData.albums.push(songData.album);
           }
 
@@ -252,6 +332,7 @@ var databaseManager = function() {
           callback();
         } else {
           console.log("Error inserting: " + err);
+          fileStream ? fileStream.destroy() : null;
           callback();
         }
       });

@@ -51,8 +51,16 @@ var mainMenu = [
   {
     label: 'Add to Queue',
     click: function(item, curWindow) {
-      curWindow.selectedTracks.forEach(track => {
-        curWindow.musicPlayer.queueNext(track);
+      curWindow.selectedTracks.forEach(trackId => {
+        curWindow.musicPlayer.queueNext(trackId);
+      });
+    }
+  },
+  {
+    label: 'Remove from Library',
+    click: function(item, curWindow) {
+      curWindow.selectedTracks.forEach(trackId => {
+        require('electron').remote.app.deleteTrack(trackId);
       });
     }
   },

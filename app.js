@@ -213,3 +213,7 @@ app.closeSettings = function() {
   settingsWindow.hide();
   setupGlobalShorcuts();
 }
+
+app.deleteTrack = function(trackId) {
+  databaseManager.deleteTrack(trackId);
+}

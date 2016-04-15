@@ -54,8 +54,8 @@ let artistList = React.createClass({
       );
     } else {
       return (
-        <div  className="artistList">
-          Add some artists!
+        <div  className="artistList artistListEmpty">
+          Add some tracks!
         </div>
       );
     }

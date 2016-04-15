@@ -170,8 +170,8 @@ let trackList = React.createClass({
       );
     } else {
       return (
-        <div className="songList" ref="scrollable" onScroll={this.onScroll}>
-          No tracks found.
+        <div className="songList songListEmpty" ref="scrollable" onScroll={this.onScroll}>
+          Add some tracks by dragging in a folder, or adding your music folder to the settings!
         </div>
       );
     }

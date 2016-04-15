@@ -1,8 +1,8 @@
 'use strict';
-var musicPlayer = function() {
-  var self = this;
+let musicPlayer = function() {
+  let self = this;
 
-  var $musicPlayer = document.createElement('audio');
+  let $musicPlayer = document.createElement('audio');
   // var $musicPlayerNextBuffer = document.createElement('audio');
   // var $musicPlayerPreviousBuffer = document.createElement('audio');
 
@@ -112,12 +112,12 @@ var musicPlayer = function() {
     });
     self.ids = idArray;
     self.paths = pathArray;
-    self.shuffleList(true);
+    self.shuffleList();
   }
 
   // Shuffle function. Need to shuffle the ids and paths the same way to maintain functionality
   // For now, reset to start of list
-  self.shuffleList = function(initialShuffle = false) {
+  self.shuffleList = function() {
     let idCopy = self.ids.slice();
     let pathsCopy = self.paths.slice();
     self.shuffledIds = [];
@@ -133,6 +133,7 @@ var musicPlayer = function() {
 
   self.toggleShuffle = function() {
     if (!self.shuffleActivated) {
+      self.shuffleList();
       self.shuffleActivated = true;
     } else {
       self.shuffleActivated = false;

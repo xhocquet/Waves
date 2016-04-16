@@ -124,8 +124,8 @@ let musicPlayer = function() {
     self.shuffledPaths = [];
     while (idCopy.length > 0) {
       let randomIndex = Math.floor(Math.random() * idCopy.length);
-      let tempId = idCopy.splice(randomIndex - 1,1);
-      let tempPath = pathsCopy.splice(randomIndex - 1,1);
+      let tempId = idCopy.splice(randomIndex - 1,1)[0];
+      let tempPath = pathsCopy.splice(randomIndex - 1,1)[0];
       self.shuffledIds.push(tempId);
       self.shuffledPaths.push(tempPath);
     }

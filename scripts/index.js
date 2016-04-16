@@ -115,7 +115,11 @@ function playPause() {
 
 function playHandler() {
   var trackId = playerWindow.musicPlayer.curTrackId;
-  var trackComponent = TrackListComponent.refs;
+  var trackComponent = TrackListComponent.refs[trackId];
+
+  // console.log(trackId)
+  // console.log(trackComponent)
+
 
   // Update now playing track
   TrackListComponent.setState({

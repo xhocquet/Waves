@@ -98,6 +98,8 @@ function generateLibrary() {
 }
 
 function renderTracklist(tracks) {
+  // Reset scroll so we don't just see blank
+  TrackListComponent.refs.scrollable.scrollTop = 0;
   TrackListComponent.setState({
     tracks: tracks,
     total: tracks.length,

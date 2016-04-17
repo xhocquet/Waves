@@ -156,7 +156,7 @@ let trackList = React.createClass({
     if (this.state.total > 0) {
       let trackEntries = this.getTrackEntries();
       return (
-        <div className="songList" ref="scrollable" onScroll={this.onScroll}>
+        <div className="songListContainer">
           <div className="songListHeader" key={0}>
             <div className="rowItem rowIndex"></div>
             <div className="rowItem rowPlaying"></div>
@@ -165,7 +165,9 @@ let trackList = React.createClass({
             <div className="rowItem rowTitle">Title</div>
             <div className="rowItem rowDuration">Duration</div>
           </div>
-          {trackEntries}
+          <div className="songList" ref="scrollable" onScroll={this.onScroll}>
+            {trackEntries}
+          </div>
         </div>
       );
     } else {

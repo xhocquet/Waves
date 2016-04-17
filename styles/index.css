@@ -1,45 +1,45 @@
 /*MAIN COMPONENTS*/
 #sidebar {
   float: left;
-  position: fixed;
   height: calc(100vh - 60px);
-  width: 20%;
   min-width: 200px;
+  position: fixed;
+  width: 20%;
 }
 
 #content {
   border-left: 1px solid black;
-  left: 20%;
   height: calc(100vh - 60px);
+  left: 20%;
   position: absolute;
   width: calc(80% - 1px);
 }
 
 #footer {
+  border-top: 1px solid black;
   bottom: 0;
   height: 65px;
   position: fixed;
   width: 100%;
-  border-top: 1px solid black;
 }
 
 /*HEADER COMPONENTS*/
 #search {
-  margin: 5px auto;
-  width: 90%;
-  height: 25px;
-  padding: 2px 5px;
   display: block;
+  height: 25px;
+  margin: 5px auto;
   outline: none;
+  padding: 2px 5px;
+  width: 90%;
 }
 
 /*SIDEBAR COMPONENTS*/
 /*Hack to make width = height*/
 #albumArt {
+  border-top: 1px solid black;
   display: inline-block;
   position: relative;
   width: 100%;
-  border-top: 1px solid black;
 }
 
 #albumArtFiller {
@@ -47,18 +47,18 @@
 }
 
 #albumArtContainer {
-  position: absolute;
-  top: 0;
   bottom: 0;
   left: 0;
+  position: absolute;
   right: 0;
+  top: 0;
 }
 
 #albumArtImage {
-  max-width:100%;
   max-height:100%;
-  min-width:100%;
+  max-width:100%;
   min-height:100%;
+  min-width:100%;
 }
 
 /*TODO: How do I make this fill out?*/
@@ -159,14 +159,18 @@
 }
 
 /*CONTENT COMPONENTS*/
-.songList {
+.songListContainer {
   height: 100%;
+}
+
+.songList {
+  height: calc(100% - 26px);
   overflow-y: auto;
 }
 
 .songListEmpty {
-  text-align: center;
   line-height: 90vh;
+  text-align: center;
 }
 
 .songListItem, .songListItemAlternate, .songListHeader {
@@ -177,8 +181,9 @@
 }
 
 .songListHeader {
-  font-weight: bold;
   border-bottom: 1px solid black;
+  font-weight: bold;
+  width: calc(100% - 12px); /*Take scrollbar into account*/
 }
 
 .songListItemAlternate {

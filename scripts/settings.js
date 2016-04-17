@@ -1,4 +1,3 @@
-'use strict';
 let ipcRenderer = require('electron').ipcRenderer;
 
 let userSettings;
@@ -44,20 +43,20 @@ playPauseInput.addEventListener("keydown", function(e) {
 
 nextTrackInput.addEventListener("keydown", function(e) {
   e.preventDefault();
-  var accelerator = eventToAcceleratorString(e);
+  let accelerator = eventToAcceleratorString(e);
   nextTrackInput.value = accelerator;
   userSettings.nextTrackHotkey = accelerator;
 });
 
 previousTrackInput.addEventListener("keydown", function(e) {
   e.preventDefault();
-  var accelerator = eventToAcceleratorString(e);
+  let accelerator = eventToAcceleratorString(e);
   previousTrackInput.value = accelerator;
   userSettings.previousTrackHotkey = accelerator;
 });
 
 let eventToAcceleratorString = function(e) {
-  var accelerator = "";
+  let accelerator = "";
   e.ctrlKey ? accelerator += "Ctrl+" : null;
   e.shiftKey ? accelerator += "Shift+" : null;
   switch(e.keyCode) {

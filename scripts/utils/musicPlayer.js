@@ -1,148 +1,150 @@
-'use strict';
-let musicPlayer = function() {
-  let self = this;
+class musicPlayer {
+  constructor() {
+    let self = this;
 
-  let $musicPlayer = document.createElement('audio');
-  // var $musicPlayerNextBuffer = document.createElement('audio');
-  // var $musicPlayerPreviousBuffer = document.createElement('audio');
+    this._musicPlayer = document.createElement('audio');
 
-  $musicPlayer.volume = 1;
-  self.ids = [];
-  self.paths = [];
-  self.shuffledIds = [];
-  self.shuffledPaths = [];
-  self.shuffleActivated = false;
-  self.curIndex = 0;
-  self.curTrackId = 0;
+    this._musicPlayer.volume = 1;
+    this.ids = [];
+    this.paths = [];
+    this.shuffledIds = [];
+    this.shuffledPaths = [];
+    this.shuffleActivated = false;
+    this.curIndex = 0;
+    this.curTrackId = 0;
 
-  // LISTENERS
-  $musicPlayer.onended = function() {
-    self.nextTrack();
-  }
-  
-  self.playSong = function(songId) {
-    self.curTrackId = songId;
-    self.curIndex = self.ids.indexOf(songId);
-    $musicPlayer.src = self.paths[self.curIndex];
-    $musicPlayer.play();
-  }
-
-  self.playPause = function() {
-    if ($musicPlayer.src === '') {
-      self.curIndex = 0;
-      $musicPlayer.src = self.paths[self.curIndex];
+    this._musicPlayer.onended = function() {
+      self.nextTrack();
     }
-    $musicPlayer.paused ? $musicPlayer.play() : $musicPlayer.pause();
   }
 
-  self.nextTrack = function() {
+  playSong(songId) {
+    this.curTrackId = songId;
+    this.curIndex = this.ids.indexOf(songId);
+    this._musicPlayer.src = this.paths[this.curIndex];
+    this._musicPlayer.play();
+  }
+
+  playPause() {
+    if (this._musicPlayer.src === '') {
+      this.curIndex = 0;
+      this._musicPlayer.src = this.paths[this.curIndex];
+    }
+    this._musicPlayer.paused ? this._musicPlayer.play() : this._musicPlayer.pause();
+  }
+
+  // Play next track
+  nextTrack() {
     // Last track, reset to start. Can count on both lists being the same size
-    if (self.curIndex === self.ids.length - 1) {
-      self.curIndex = 0;
+    if (this.curIndex === this.ids.length - 1) {
+      this.curIndex = 0;
     } else {
-      self.curIndex += 1;
+      this.curIndex += 1;
     }
 
     // Get proper list according to shuffle status
     let nextTrackPath;
-    if (!self.shuffleActivated) {
-      nextTrackPath = self.paths[self.curIndex];
-      self.curTrackId = self.ids[self.curIndex];
+    if (!this.shuffleActivated) {
+      nextTrackPath = this.paths[this.curIndex];
+      this.curTrackId = this.ids[this.curIndex];
     } else {
-      nextTrackPath = self.shuffledPaths[self.curIndex];
-      self.curTrackId = self.shuffledIds[self.curIndex];
+      nextTrackPath = this.shuffledPaths[this.curIndex];
+      this.curTrackId = this.shuffledIds[this.curIndex];
     }
 
-    $musicPlayer.src = nextTrackPath;
-    $musicPlayer.play();
+    this._musicPlayer.src = nextTrackPath;
+    this._musicPlayer.play();
   }
 
-  self.previousTrack = function() {
+  // Play previous track
+  previousTrack() {
     // Last track, reset to start. Can count on both lists being the same size
-    if (self.curIndex === 0) {
-      self.curIndex = self.ids.length - 1;
+    if (this.curIndex === 0) {
+      this.curIndex = this.ids.length - 1;
     } else {
-      self.curIndex -= 1;
+      this.curIndex -= 1;
     }
 
     // Get proper list according to shuffle status
     let prevTrackPath;
-    if (!self.shuffleActivated) {
-      prevTrackPath = self.paths[self.curIndex];
-      self.curTrackId = self.ids[self.curIndex];
+    if (!this.shuffleActivated) {
+      prevTrackPath = this.paths[this.curIndex];
+      this.curTrackId = this.ids[this.curIndex];
     } else {
-      prevTrackPath = self.shuffledPaths[self.curIndex];
-      self.curTrackId = self.shuffledIds[self.curIndex];
+      prevTrackPath = this.shuffledPaths[this.curIndex];
+      this.curTrackId = this.shuffledIds[this.curIndex];
     }
 
-    $musicPlayer.src = prevTrackPath;
-    $musicPlayer.play();
+    this._musicPlayer.src = prevTrackPath;
+    this._musicPlayer.play();
   }
 
-  self.queueNext = function(songId) {
+  queueNext(songId) {
     let songIndex, songPath;
-    if (!self.shuffleActivated) {
-      songIndex = self.ids.indexOf(songId);
-      songPath = self.paths[songIndex];
+    if (!this.shuffleActivated) {
+      songIndex = this.ids.indexOf(songId);
+      songPath = this.paths[songIndex];
     } else {
-      songIndex = self.shuffledIds.indexOf(songId);
-      songPath = self.shuffledPaths[songIndex];
+      songIndex = this.shuffledIds.indexOf(songId);
+      songPath = this.shuffledPaths[songIndex];
     }
 
-    self.ids.splice(self.curIndex + 1, 0, songId);
-    self.paths.splice(self.curIndex + 1, 0, songPath);
+    this.ids.splice(this.curIndex + 1, 0, songId);
+    this.paths.splice(this.curIndex + 1, 0, songPath);
   }
 
-  self.setVolume = function(event) {
-    $musicPlayer.volume = event.target.value / 100;
+  setVolume(event) {
+    this._musicPlayer.volume = event.target.value / 100;
   }
 
-  self.seek = function(event) {
+  seek(event) {
     let percentage = event.x / event.target.clientWidth;
-    let targetTime = Math.round($musicPlayer.duration * percentage);
-    $musicPlayer.currentTime = targetTime;
+    let targetTime = Math.round(this._musicPlayer.duration * percentage);
+    this._musicPlayer.currentTime = targetTime;
   }
 
-  self.updateListData = function(tracks) {
+  updateListData(tracks) {
     let idArray = tracks.map(track => {
       return track._id;
     });
     let pathArray = tracks.map(track => {
       return track.path;
     });
-    self.ids = idArray;
-    self.paths = pathArray;
-    self.shuffleList();
+    this.ids = idArray;
+    this.paths = pathArray;
+    this.shuffleList();
   }
 
   // Shuffle function. Need to shuffle the ids and paths the same way to maintain functionality
   // For now, reset to start of list
-  self.shuffleList = function() {
-    let idCopy = self.ids.slice();
-    let pathsCopy = self.paths.slice();
-    self.shuffledIds = [];
-    self.shuffledPaths = [];
+  shuffleList() {
+    let idCopy = this.ids.slice();
+    let pathsCopy = this.paths.slice();
+    this.shuffledIds = [];
+    this.shuffledPaths = [];
     while (idCopy.length > 0) {
       let randomIndex = Math.floor(Math.random() * idCopy.length);
       let tempId = idCopy.splice(randomIndex - 1,1)[0];
       let tempPath = pathsCopy.splice(randomIndex - 1,1)[0];
-      self.shuffledIds.push(tempId);
-      self.shuffledPaths.push(tempPath);
+      this.shuffledIds.push(tempId);
+      this.shuffledPaths.push(tempPath);
     }
   }
 
-  self.toggleShuffle = function() {
-    if (!self.shuffleActivated) {
-      self.shuffleList();
-      self.shuffleActivated = true;
+  toggleShuffle() {
+    if (!this.shuffleActivated) {
+      this.shuffleList();
+      this.shuffleActivated = true;
     } else {
-      self.shuffleActivated = false;
+      this.shuffleActivated = false;
     }
-    self.curIndex = -1;
-    self.nextTrack();
+    this.curIndex = -1;
+    this.nextTrack();
   }
 
-  self.audio = $musicPlayer;
+  get audio() {
+    return this._musicPlayer;
+  }
 }
 
 module.exports = musicPlayer;

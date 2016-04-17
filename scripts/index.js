@@ -8,22 +8,22 @@ const MetaData = require('musicmetadata');
 const fs = require('graceful-fs');
 
 // ELECTRON MENUS
-var trackContextMenuSource = require('../scripts/menus/trackContextMenu.js');
-var trackContextMenu = Menu.buildFromTemplate(trackContextMenuSource);
+const trackContextMenuSource = require('../scripts/menus/trackContextMenu.js');
+const trackContextMenu = Menu.buildFromTemplate(trackContextMenuSource);
 
 // DOM REFERENCES
-var searchDiv = document.getElementById("search");
-var contentDiv = document.getElementById("content");
-var pauseButton = document.getElementById("pause");
-var previousButton = document.getElementById("previous");
-var nextButton = document.getElementById("next");
-var shuffleButton = document.getElementById("shuffle");
-var progressBarDiv = document.getElementById("progressBar");
-var curProgressDiv = document.getElementById("curProgress");
-var songList = document.getElementById("songList");
-var volumeSlider = document.getElementById("volumeSlider");
-var albumArtImage = document.getElementById("albumArtImage");
-var artistListContainer = document.getElementById("artistListContainer");
+let searchDiv = document.getElementById("search");
+let contentDiv = document.getElementById("content");
+let pauseButton = document.getElementById("pause");
+let previousButton = document.getElementById("previous");
+let nextButton = document.getElementById("next");
+let shuffleButton = document.getElementById("shuffle");
+let progressBarDiv = document.getElementById("progressBar");
+let curProgressDiv = document.getElementById("curProgress");
+let songList = document.getElementById("songList");
+let volumeSlider = document.getElementById("volumeSlider");
+let albumArtImage = document.getElementById("albumArtImage");
+let artistListContainer = document.getElementById("artistListContainer");
 
 playerWindow.musicPlayer = new mp();
 
@@ -114,12 +114,8 @@ function playPause() {
 }
 
 function playHandler() {
-  var trackId = playerWindow.musicPlayer.curTrackId;
-  var trackComponent = TrackListComponent.refs[trackId];
-
-  // console.log(trackId)
-  // console.log(trackComponent)
-
+  let trackId = playerWindow.musicPlayer.curTrackId;
+  let trackComponent = TrackListComponent.refs[trackId];
 
   // Update now playing track
   TrackListComponent.setState({
@@ -161,11 +157,11 @@ function updateAlbumArtImage(filePath) {
     MetaData(fileStream, function(err, metaData) {
       let coverImage = metaData.picture[0];
       if (coverImage) {
-        var base64String = "";
-        for (var i = 0; i < coverImage.data.length; i++) {
+        let base64String = "";
+        for (let i = 0; i < coverImage.data.length; i++) {
           base64String += String.fromCharCode(coverImage.data[i]);
         }
-        var base64 = "data:" + coverImage.format + ";base64," + window.btoa(base64String);
+        let base64 = "data:" + coverImage.format + ";base64," + window.btoa(base64String);
 
         albumArtImage.setAttribute('src',base64);
       } else {
@@ -179,9 +175,9 @@ function updateAlbumArtImage(filePath) {
 
 function progressHandler() {
   if (!playerWindow.musicPlayer.audio.ended) {
-    var progress = playerWindow.musicPlayer.audio.currentTime;
-    var total = playerWindow.musicPlayer.audio.duration;
-    var ratio = (progress/total) * 100;
+    let progress = playerWindow.musicPlayer.audio.currentTime;
+    let total = playerWindow.musicPlayer.audio.duration;
+    let ratio = (progress/total) * 100;
     curProgressDiv.style.width = ratio+"%";
   } else {
     curProgressDiv.style.width = "0%";
@@ -189,7 +185,7 @@ function progressHandler() {
 }
 
 function volumeHandler() {
-  var volume = playerWindow.musicPlayer.audio.volume;
+  let volume = playerWindow.musicPlayer.audio.volume;
   volumeSlider.value = volume * 100;
 }
 
@@ -197,13 +193,13 @@ function setupEventListeners() {
   // Search
   searchDiv.oninput = search;
   pauseButton.onclick = playPause;
-  previousButton.onclick = playerWindow.musicPlayer.previousTrack;
-  nextButton.onclick = playerWindow.musicPlayer.nextTrack;
-  shuffleButton.onclick = playerWindow.musicPlayer.toggleShuffle;
+  previousButton.onclick = playerWindow.musicPlayer.previousTrack.bind(playerWindow.musicPlayer);
+  nextButton.onclick = playerWindow.musicPlayer.nextTrack.bind(playerWindow.musicPlayer);
+  shuffleButton.onclick = playerWindow.musicPlayer.toggleShuffle.bind(playerWindow.musicPlayer);
   // Set volume with the volume slider
-  volumeSlider.oninput = playerWindow.musicPlayer.setVolume;
+  volumeSlider.oninput = playerWindow.musicPlayer.setVolume.bind(playerWindow.musicPlayer);
   // Seek track on clicking the progress bar
-  progressBarDiv.onclick = playerWindow.musicPlayer.seek;
+  progressBarDiv.onclick = playerWindow.musicPlayer.seek.bind(playerWindow.musicPlayer);
   playerWindow.musicPlayer.audio.onplay = playHandler;
   playerWindow.musicPlayer.audio.onpause = playHandler;
   playerWindow.musicPlayer.audio.ontimeupdate = progressHandler;

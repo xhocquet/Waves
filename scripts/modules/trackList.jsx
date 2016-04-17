@@ -118,7 +118,7 @@ let trackList = React.createClass({
         element.setState({selected: true});
         break;
       case 1: // Middle click
-        var trackID = element.props.track._id;
+        let trackID = element.props.track._id;
         this.props.musicPlayer.queueNext(trackID);
         break;
       case 2: // Right click

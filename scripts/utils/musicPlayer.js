@@ -103,13 +103,7 @@ class musicPlayer {
     this._musicPlayer.currentTime = targetTime;
   }
 
-  updateListData(tracks) {
-    let idArray = tracks.map(track => {
-      return track._id;
-    });
-    let pathArray = tracks.map(track => {
-      return track.path;
-    });
+  updateListData(idArray, pathArray) {
     this.ids = idArray;
     this.paths = pathArray;
     this.shuffleList();
@@ -144,6 +138,14 @@ class musicPlayer {
 
   get audio() {
     return this._musicPlayer;
+  }
+
+  get idArray() {
+    return this.ids;
+  }
+
+  get pathArray() {
+    return this.paths;
   }
 }
 

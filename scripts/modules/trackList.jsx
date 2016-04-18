@@ -106,7 +106,12 @@ let trackList = React.createClass({
     switch(event.button) {
       case 0: // Left click
         if(event.ctrlKey) {
-          this.state.selectedTrackComponents.push(element);
+          let newComponents = this.state.selectedTrackComponents;
+          newComponents.push(element);
+          
+          this.setState({
+            selectedTrackComponents: newComponents
+          });
         } else {
           this.state.selectedTrackComponents.forEach(trackComponent => {
             if (trackComponent.isMounted()) {
@@ -123,7 +128,12 @@ let trackList = React.createClass({
         break;
       case 2: // Right click
         if(event.ctrlKey) {
-          this.state.selectedTrackComponents.push(element)
+          let newComponents = this.state.selectedTrackComponents;
+          newComponents.push(element);
+
+          this.setState({
+            selectedTrackComponents: newComponents
+          });
         } else {
           this.state.selectedTrackComponents.forEach(trackComponent => {
             if (trackComponent.isMounted()) {
@@ -141,6 +151,8 @@ let trackList = React.createClass({
   },
 
   playSong: function(element, event) {
+    this.props.playerWindow.updateMusicPlayerData();
+
     let trackId = element.props.track._id;
     let trackComponent = this.refs[trackId];
 

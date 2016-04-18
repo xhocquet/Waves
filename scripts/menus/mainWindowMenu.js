@@ -38,7 +38,7 @@ var mainMenu = [
       {
         label: 'Generate Library',
         click: function(item, focusedWindow) {
-          focusedWindow.generateLibrary();
+          focusedWindow.generateLibraryFromSettings();
         }
       },
       {

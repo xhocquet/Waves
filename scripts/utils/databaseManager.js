@@ -120,7 +120,7 @@ class databaseManager {
     let self = this;
     this.db.settings.find({ settingName: 'user' }, function( err, docs) {
       if (docs.length === 0) {
-        setupInitialSettings(callback);
+        self.setupInitialSettings(callback);
       } else {
         self.userSettings = docs[0];
         callback();
@@ -154,7 +154,7 @@ class databaseManager {
     let self = this;
     this.db.libraryData.find({settingName: 'user'}, function( err, docs) {
       if (docs.length === 0) {
-        setupInitialLibraryData(callback);
+        self.setupInitialLibraryData(callback);
       } else {
         self.libraryData = docs[0];
         callback();
@@ -198,6 +198,7 @@ class databaseManager {
 
   // Iterate folders and push filepaths to track data workers
   generateLibrary(path) {
+    let self = this;
     if (!fs.existsSync(path)) {
       console.log(path ," does not exist.");
       return;
@@ -219,7 +220,7 @@ class databaseManager {
       let curFilePath = pathTools.join(path, items[i]);
       let curFileStats = fs.lstatSync(curFilePath);
       if (curFileStats.isDirectory()) {
-        generateLibrary(curFilePath);
+        this.generateLibrary(curFilePath);
       } else if (pathTools.extname(curFilePath) === ".mp3") {
         this.trackDataWorker.push(curFilePath, function(err) {
           if (!err) {
@@ -234,8 +235,9 @@ class databaseManager {
 
   // Calls generateLibrary on all the folders in userSettings.importFolders
   generateLibraryFromSettings() {
+    let self = this;
     this.userSettings.importFolders.forEach(function(element, index, array) {
-      generateLibrary(element);
+      self.generateLibrary(element);
     });
   }
 

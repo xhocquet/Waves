@@ -26,6 +26,8 @@ let albumArtImage = document.getElementById("albumArtImage");
 let artistListContainer = document.getElementById("artistListContainer");
 
 playerWindow.musicPlayer = new mp();
+playerWindow.displayedTrackIds = null;
+playerWindow.displayedTrackPaths = null;
 
 // REACT
 const React = require('react');
@@ -61,8 +63,31 @@ setupIPCListeners();
 setupEventListeners();
 
 function setupIPCListeners() {
+  // Only update trackList, update player list when user plays something new
   ipcRenderer.on('listData', function(event, response) {
-    playerWindow.musicPlayer.updateListData(response);
+    let idArray = response.map(track => {
+      return track._id;
+    });
+    let pathArray = response.map(track => {
+      return track.path;
+    });
+    playerWindow.displayedTrackIds = idArray;
+    playerWindow.displayedTrackPaths = pathArray;
+
+    renderTracklist(response);
+  });
+
+  ipcRenderer.on('initialListData', function(event, response) {
+    let idArray = response.map(track => {
+      return track._id;
+    });
+    let pathArray = response.map(track => {
+      return track.path;
+    });
+    playerWindow.displayedTrackIds = idArray;
+    playerWindow.displayedTrackPaths = pathArray;
+
+    playerWindow.updateMusicPlayerData();
     renderTracklist(response);
   });
 
@@ -91,10 +116,6 @@ function setupIPCListeners() {
       artists: response
     })
   });
-}
-
-function generateLibrary() {
-  ipcRenderer.send('generateLibrary', {});
 }
 
 function renderTracklist(tracks) {
@@ -166,12 +187,18 @@ function updateAlbumArtImage(filePath) {
         let base64 = "data:" + coverImage.format + ";base64," + window.btoa(base64String);
 
         albumArtImage.setAttribute('src',base64);
-      } else {
+      } else {0
         albumArtImage.setAttribute('src', "../assets/albumArt.png");
       }
     });
   } else {
     albumArtImage.setAttribute('src', "../assets/albumArt.png");
+  }
+}
+
+playerWindow.updateMusicPlayerData = function() {
+  if (playerWindow.displayedTrackIds !== playerWindow.musicPlayer.idArray) {
+    playerWindow.musicPlayer.updateListData(playerWindow.displayedTrackIds, playerWindow.displayedTrackPaths);
   }
 }
 

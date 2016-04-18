@@ -87,15 +87,15 @@ function sendLibraryData() {
 
 function sendInitialLibrary() {
   databaseManager.queryLibrary({}, function(response) {
-    playerWindow.webContents.send("listData", response);
+    playerWindow.webContents.send("initialListData", response);
   });
 }
 
 function setupPlayerWindow() {
   playerWindow.loadURL('file://' + __dirname + '/views/index.html');
   
-  playerWindow.refreshLibrary = function() {
-    // librarymanager.generate
+  playerWindow.generateLibraryFromSettings = function() {
+    databaseManager.generateLibraryFromSettings();
   }
   playerWindow.playPause = function() {
     playerWindow.webContents.send("playPause", {});

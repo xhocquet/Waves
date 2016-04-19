@@ -21,6 +21,11 @@ let trackList = React.createClass({
     }
   },
 
+  //TODO: Prevent a rerender if the only difference is visible
+  // shouldComponentUpdate: function(nextProps, nextState) {
+  //   return true;
+  // },
+
   onScroll: function(event) {
     this.scrollState(this.refs.scrollable.scrollTop);
   },
@@ -35,10 +40,10 @@ let trackList = React.createClass({
     let visibleStart = Math.floor(scroll / recordHeight);
     let visibleEnd = Math.min(visibleStart + recordsPerBody, total - 1);
 
-    let displayStart = Math.max(0, visibleStart - recordsPerBody * 1.5);
-    let displayEnd = Math.min(displayStart + (4 * recordsPerBody), total - 1);
+    let displayStart = Math.max(0, visibleStart - (recordsPerBody * 0.5));
+    let displayEnd = Math.min(displayStart + (2 * recordsPerBody), total - 1);
 
-    if (visibleEnd - displayEnd < 5 || visibleStart - displayStart < 5) {
+    if (this.state.displayEnd - visibleEnd < 5 || visibleStart - this.state.displayStart < 5) {
       this.setState({
         displayEnd: displayEnd,
         displayStart: displayStart,

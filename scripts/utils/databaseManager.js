@@ -68,12 +68,12 @@ class databaseManager {
         }
       });
     } else if (options.searchAll) {
-      // Current only searches title, need to add artist, album, etc
       let searchTerm = new RegExp(options.searchAll, 'i');
-      this.db.songs.find({ title: { $regex: searchTerm } }).sort(this.DEFAULT_SORT).exec(function(err, docs) {
+      this.db.songs.find({ $or: [{ title: { $regex: searchTerm } },{ albumArtist: { $regex: searchTerm } },{ album: { $regex: searchTerm } }] }).sort(this.DEFAULT_SORT).exec(function(err, docs) {
         if (!err) {
           callback(docs);
         } else {
+          console.log(err)
           callback(err);
         }
       });

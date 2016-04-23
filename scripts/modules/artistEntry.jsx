@@ -6,14 +6,14 @@ let artistEntry = React.createClass({
     this.props.onClick(this.props.artist, event.nativeEvent);
   },
 
-  // Play artist
-  // doubleClickHandler: function(event) {
-  //   this.props.onDoubleClick(this, event.nativeEvent);
-  // },
+  // Artist should be loaded, so just play
+  doubleClickHandler: function(event) {
+    this.props.onDoubleClick();
+  },
 
   render: function() {
     return (
-      <div className={this.props.rowClass} onMouseDown={this.clickHandler}>
+      <div className={this.props.rowClass} onMouseDown={this.clickHandler} onDoubleClick={this.doubleClickHandler}>
         {this.props.artist}
       </div>
     );

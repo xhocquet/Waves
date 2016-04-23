@@ -57,6 +57,8 @@ function artistClick(artist, event) {
 
 let ArtistListComponent = ReactDOM.render(<ArtistList
   onClick={artistClick}
+  playerWindow={playerWindow}
+  musicPlayer={playerWindow.musicPlayer}
 />, artistListContainer);
 
 setupIPCListeners();

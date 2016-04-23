@@ -12,6 +12,11 @@ let artistList = React.createClass({
     this.props.onClick(artist, event);
   },
 
+  doubleClickHandler: function() {
+    this.props.playerWindow.updateMusicPlayerData();
+    this.props.musicPlayer.playSong(this.props.musicPlayer.ids[0]);
+  },
+
   getArtistEntries: function() {
     let artistEntries = [];
     let counter = 0;
@@ -22,6 +27,7 @@ let artistList = React.createClass({
         rowClass={"artistEntry"}
         key={1}
         onClick={this.clickHandler}
+        onDoubleClick={this.doubleClickHandler}
         artist={"All"}
       />
     );
@@ -36,6 +42,7 @@ let artistList = React.createClass({
             rowClass={rowClass}
             key={this.state.artists[i]}
             onClick={this.clickHandler}
+            onDoubleClick={this.doubleClickHandler}
             artist={this.state.artists[i]}
           />
         );

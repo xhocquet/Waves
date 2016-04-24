@@ -153,11 +153,21 @@
   text-align: center;
 }
 
-.songListItem, .songListItemAlternate, .songListHeader {
+.songListItem, .songListItemAlternate, .songListHeader, .songListSeparator {
+  -webkit-user-select: none;
   background-color: #fff;
+  cursor: default;
   height: 25px;
   line-height: 25px;
   width: 100%;
+}
+
+.songListSeparator {
+  border-bottom: 1px solid black;
+  font-weight: bold;
+  margin-top: 25px;
+  padding-left: 5px;
+  width: 80%;
 }
 
 .songListHeader {
@@ -175,8 +185,6 @@
 }
 
 .rowItem {
-  -webkit-user-select: none; /* webkit (safari, chrome) browsers */
-  cursor: default;
   float: left;
   height: 100%;
   overflow: hidden;

@@ -40,7 +40,7 @@ let artistList = React.createClass({
         artistEntries.push(
           <ArtistEntry
             rowClass={rowClass}
-            key={this.state.artists[i]}
+            key={"artistList_"+this.state.artists[i]}
             onClick={this.clickHandler}
             onDoubleClick={this.doubleClickHandler}
             artist={this.state.artists[i]}

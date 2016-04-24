@@ -62,8 +62,7 @@ let trackList = React.createClass({
   getTrackEntries: function(){
     let trackEntries = [];
     let counter = 0;
-    let prevAlbum = null;
-    let prevArtist = null;
+    let prevAlbumArtist = ''; 
 
     let displayStart = this.state.displayStart;
     let displayEnd = this.state.displayEnd > this.state.total - 1 ? Math.min(this.state.recordsPerBody * 2, this.state.total - 1) : this.state.displayEnd;
@@ -79,6 +78,15 @@ let trackList = React.createClass({
       let rowClass = counter % 2 ? "songListItem" : "songListItemAlternate";
       let playing = false;
       let selected = this.state.selectedTrackComponents.map(module=>module.props.track._id).indexOf(track._id) > -1;
+
+      if (prevAlbumArtist !== track.albumArtist) {
+        prevAlbumArtist = track.albumArtist;
+        trackEntries.push(
+          <div className="songListSeparator" key={"separator_"+track.albumArtist}>{track.albumArtist}</div>
+        );
+        bottomFillerHeight -= this.state.recordHeight * 2;
+
+      }
 
       // Set playing child properly
       if (this.state.playingTrackId) {

@@ -2,8 +2,8 @@
 const ipcRenderer = require('electron').ipcRenderer;
 const Remote = require('electron').remote;
 const Menu = Remote.Menu;
-var playerWindow = Remote.getCurrentWindow();
-var mp = require('../scripts/utils/musicPlayer.js');
+let playerWindow = Remote.getCurrentWindow();
+let mp = require('../scripts/utils/musicPlayer.js');
 const MetaData = require('musicmetadata');
 const fs = require('graceful-fs');
 
@@ -45,7 +45,6 @@ let TrackListComponent = ReactDOM.render(<TrackList
 
 
 function artistClick(artist, event) {
-  event.preventDefault();
   if (artist === "All") {
     ipcRenderer.send('getListData', {});
   } else {
@@ -126,8 +125,13 @@ function renderTracklist(tracks) {
   TrackListComponent.setState({
     tracks: tracks,
     total: tracks.length,
-    selectedTrackComponents: []
+    selectedTrackComponents: [],
+    displayStart: 0,
+    displayEnd: 200,
+    visibleStart: 0,
+    visibleEnd: 25
   });
+  TrackListComponent.refs.scrollable.scrollTop = 0;
 }
 
 function addTracksToQueue(...tracks) {

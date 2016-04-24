@@ -68,7 +68,7 @@ let trackList = React.createClass({
     let displayEnd = this.state.displayEnd > this.state.total - 1 ? Math.min(this.state.recordsPerBody * 2, this.state.total - 1) : this.state.displayEnd;
 
     let topFillerHeight = this.state.displayStart * this.state.recordHeight;
-    let bottomFillerHeight = (this.state.tracks.length - this.state.displayEnd - 1) * this.state.recordHeight;
+    let bottomFillerHeight = (this.state.total - this.state.displayEnd - 1) * this.state.recordHeight;
 
     // Top filler for scrollbar to look the right size
     trackEntries.push(<div key={'topFiller'} style={{height: topFillerHeight}}></div>);
@@ -109,6 +109,7 @@ let trackList = React.createClass({
     }
 
     // Bottom filler for scrollbar
+    bottomFillerHeight = Math.max(0, bottomFillerHeight);
     trackEntries.push(<div key={'bottomFiller'} style={{height: bottomFillerHeight}}></div>);
 
     return trackEntries;

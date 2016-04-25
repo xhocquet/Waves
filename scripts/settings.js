@@ -1,7 +1,7 @@
 let ipcRenderer = require('electron').ipcRenderer;
 
 let userSettings;
-let curWindow = this;
+let optionTabs = document.querySelectorAll(".settingsTab");
 let importFolderTextarea = document.getElementsByClassName("importFolders")[0];
 let minimizeOnCloseCheckbox = document.getElementsByClassName("minimizeOnClose")[0];
 let hotkeyInputs = document.querySelectorAll(".hotkeyInput");
@@ -13,7 +13,7 @@ let nextTrackInput = document.getElementsByClassName("nextTrackInput")[0];
 ipcRenderer.on('settingsData', function(event, response) {
   delete response._id
   userSettings = response;
-  fillInCurrentSettings();
+  // fillInCurrentSettings();
 });
 
 // Reponse from saving settings
@@ -25,36 +25,60 @@ ipcRenderer.on('saveResponse', function(event, response) {
   }
 });
 
+for (let i = 0; i < optionTabs.length; i++) {
+  optionTabs[i].addEventListener("click", function(event) {
+    document.querySelector('.settingsTabSelected').classList.remove('settingsTabSelected');
+    event.target.classList.add('settingsTabSelected');
+
+    document.querySelector('.settingsTabContentsSelected').classList.remove('settingsTabContentsSelected');
+    switch (event.target.innerHTML) {
+      case 'General':
+        document.querySelector('.generalSettings').classList.add('settingsTabContentsSelected');
+        break;
+      case 'Layout':
+        document.querySelector('.layoutSettings').classList.add('settingsTabContentsSelected');
+        break;
+      case 'Library':
+        document.querySelector('.librarySettings').classList.add('settingsTabContentsSelected');
+        break;
+      case 'Hotkeys':
+        document.querySelector('.hotkeySettings').classList.add('settingsTabContentsSelected');
+        break;
+    }
+  });
+}
+
 // Update import folders on keypress
-importFolderTextarea.addEventListener("input", function() {
-  userSettings.importFolders = importFolderTextarea.value.split('\n');
-}, false);
+// importFolderTextarea.addEventListener("input", function() {
+//   userSettings.importFolders = importFolderTextarea.value.split('\n');
+// }, false);
 
-minimizeOnCloseCheckbox.addEventListener("click", function() {
-  userSettings.minimizeOnClose = minimizeOnCloseCheckbox.checked;
-});
+// minimizeOnCloseCheckbox.addEventListener("click", function() {
+//   userSettings.minimizeOnClose = minimizeOnCloseCheckbox.checked;
+// });
 
-playPauseInput.addEventListener("keydown", function(e) {
-  e.preventDefault();
-  var accelerator = eventToAcceleratorString(e);
-  playPauseInput.value = accelerator;
-  userSettings.playPauseHotkey = accelerator;
-});
+// playPauseInput.addEventListener("keydown", function(e) {
+//   e.preventDefault();
+//   var accelerator = eventToAcceleratorString(e);
+//   playPauseInput.value = accelerator;
+//   userSettings.playPauseHotkey = accelerator;
+// });
 
-nextTrackInput.addEventListener("keydown", function(e) {
-  e.preventDefault();
-  let accelerator = eventToAcceleratorString(e);
-  nextTrackInput.value = accelerator;
-  userSettings.nextTrackHotkey = accelerator;
-});
+// nextTrackInput.addEventListener("keydown", function(e) {
+//   e.preventDefault();
+//   let accelerator = eventToAcceleratorString(e);
+//   nextTrackInput.value = accelerator;
+//   userSettings.nextTrackHotkey = accelerator;
+// });
 
-previousTrackInput.addEventListener("keydown", function(e) {
-  e.preventDefault();
-  let accelerator = eventToAcceleratorString(e);
-  previousTrackInput.value = accelerator;
-  userSettings.previousTrackHotkey = accelerator;
-});
+// previousTrackInput.addEventListener("keydown", function(e) {
+//   e.preventDefault();
+//   let accelerator = eventToAcceleratorString(e);
+//   previousTrackInput.value = accelerator;
+//   userSettings.previousTrackHotkey = accelerator;
+// });
 
+// TODO: Beef this up to support more keys
 let eventToAcceleratorString = function(e) {
   let accelerator = "";
   e.ctrlKey ? accelerator += "Ctrl+" : null;

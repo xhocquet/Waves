@@ -32,16 +32,18 @@ function createWindows () {
   setupPlayerWindowListeners();
 
   settingsWindow = new BrowserWindow({
-    width: 400,
-    height: 400,
+    width: 500,
+    height: 600,
     show: false,
     center: true,
-    frame: false,
+    title: "Waves Settings",
+    autoHideMenuBar: true,
     resizable: false,
     movable: false
   });
 
   settingsWindow.loadURL('file://' + __dirname + '/views/settings.html');
+  settingsWindow.show();
 
   trayIcon = new Tray('assets/icon.png');
   trayIcon.setContextMenu(Menu.buildFromTemplate(trayIconMenu));
@@ -92,7 +94,7 @@ function sendInitialLibrary() {
 }
 
 function setupPlayerWindow() {
-  playerWindow.loadURL('file://' + __dirname + '/views/index.html');
+  playerWindow.loadURL('file://' + __dirname +'/views/index.html');
   
   playerWindow.generateLibraryFromSettings = function() {
     databaseManager.generateLibraryFromSettings();

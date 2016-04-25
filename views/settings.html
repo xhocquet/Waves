@@ -2,34 +2,49 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../styles/normalize.css">
     <link rel="stylesheet" type="text/css" href="../styles/settings.css">
   </head>
   <body>
-    <table class="settingsTable">
-    <tr class="settingRow">
-      <td class="label">Music Folders</td>
-      <td class="setting"><textarea rows="5" class="importFolders"></textarea></td>
-    </tr>
-    <tr>
-      <td class="label">Minimize on Close?</td>
-      <td class="setting"><input type="checkbox" class="minimizeOnClose" /></td>
-    </tr>
-    <tr>
-      <td class="label">Play/Pause Hotekey</td>
-      <td class="setting"><input type="text" class="playPauseInput" /></td>
-    </tr>
-    <tr>
-      <td class="label">Previous Track Hotkey</td>
-      <td class="setting"><input type="text" class="previousTrackInput" /></td>
-    </tr>
-    <tr>
-      <td class="label">Next Track Hotkey</td>
-      <td class="setting"><input type="text" class="nextTrackInput" /></td>
-    </tr>
-    </table>
+    <ul class="settingsTabHeader">
+      <li class="settingsTab settingsTabSelected">General</li>
+      <li class="settingsTab">Hotkeys</li>
+      <li class="settingsTab">Layout</li>
+      <li class="settingsTab">Library</li>
+    </ul>
+    <div class="settingsTabContents settingsTabContentsSelected generalSettings">
+      <table class="settingsTable">
+        <tr class="settingRow">
+          <td class="label">Music Folders</td>
+          <td class="setting"><textarea rows="5" class="importFolders"></textarea></td>
+        </tr>
+        <tr>
+          <td class="label">Minimize on Close?</td>
+          <td class="setting"><input type="checkbox" class="minimizeOnClose" /></td>
+        </tr>
+      </table>
+    </div>
+    <div class="settingsTabContents hotkeySettings">
+      <table class="settingsTable">
+        <tr>
+          <td class="label">Play/Pause Hotekey</td>
+          <td class="setting"><input type="text" class="playPauseInput" /></td>
+        </tr>
+        <tr>
+          <td class="label">Previous Track Hotkey</td>
+          <td class="setting"><input type="text" class="previousTrackInput" /></td>
+        </tr>
+        <tr>
+          <td class="label">Next Track Hotkey</td>
+          <td class="setting"><input type="text" class="nextTrackInput" /></td>
+        </tr>
+      </table>
+    </div>
+    <div class="settingsTabContents layoutSettings">layout settings</div>
+    <div class="settingsTabContents librarySettings">library settings</div>
     <div class="saveClose">
-      <button class="saveCloseButton saveButton" onclick="saveSettings()">Save</button>
-      <button class="saveCloseButton closeButton" onclick="closeWindow()">Close</button>
+      <div class="saveCloseButton saveButton" onclick="saveSettings()">Save</div>
+      <div class="saveCloseButton closeButton" onclick="closeWindow()">Close</div>
     </div>
 
   </body>

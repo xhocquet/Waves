@@ -1,5 +1,38 @@
-body {
-  margin: 5px;
+.settingsTabHeader {
+   background-color: #333;
+   clear: both;
+   float: left;
+   height: 30px;
+   list-style: none;
+   margin: 0 0 5px;
+   padding: 0;
+   width: 100%;
+}
+
+.settingsTab {
+  -webkit-user-select: none;
+  background-color: #333;
+  color: #eee;
+  cursor: default;
+  float: left;
+  height: 30px;
+  line-height: 30px;
+  margin-right: 5px;
+  padding: 0 10px;
+}
+
+.settingsTabSelected {
+  background-color: #fff;
+  color: #333;
+}
+
+.settingsTabContents {
+  display: none;
+  padding: 20px 5px;
+}
+
+.settingsTabContentsSelected {
+  display: block;
 }
 
 .settingsTable {
@@ -7,7 +40,7 @@ body {
 }
 
 .label {
-  width: 30%;
+  width: 40%;
   padding: 5px;
   border-right: 1px solid #777;
 }
@@ -22,8 +55,8 @@ body {
 
 .saveClose {
   background-color: #333;
-  width: 400px;
-  height: 40px;
+  width: 100%;
+  height: 35px;
   padding: 5px;
   position: fixed;
   bottom: 0;
@@ -32,7 +65,11 @@ body {
 }
 
 .saveCloseButton {
+  cursor: default;
+  padding: 0 5px;
   height: 30px;
+  line-height: 30px;
+  background-color: #ccc;
   margin: auto;
   display: inline-block;
 }

@@ -6,12 +6,14 @@
     <link rel="stylesheet" type="text/css" href="../styles/settings.css">
   </head>
   <body>
+    <!-- HEADER -->
     <ul class="settingsTabHeader">
       <li class="settingsTab settingsTabSelected">General</li>
       <li class="settingsTab">Hotkeys</li>
       <li class="settingsTab">Layout</li>
       <li class="settingsTab">Library</li>
     </ul>
+    <!-- GENERAL SETTINGS -->
     <div class="settingsTabContents settingsTabContentsSelected generalSettings">
       <table class="settingsTable">
         <tr class="settingRow">
@@ -24,6 +26,7 @@
         </tr>
       </table>
     </div>
+    <!-- HOTKEY SETTINGS -->
     <div class="settingsTabContents hotkeySettings">
       <table class="settingsTable">
         <tr>
@@ -40,11 +43,26 @@
         </tr>
       </table>
     </div>
-    <div class="settingsTabContents layoutSettings">layout settings</div>
+    <!-- LAYOUT SETTINGS -->
+    <div class="settingsTabContents layoutSettings">
+      <table class="settingsTable">
+        <tr>
+          <td class="label">Track Grouping Method</td>
+          <td class="setting">
+            <select type="text" class="trackGroupingMethod">
+              <option value="albumArtist">Album Artist</option>
+              <option value="artist">Artist</option>
+              <option value="album">Album</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <!-- LIBRARY SETTINGS -->
     <div class="settingsTabContents librarySettings">library settings</div>
     <div class="saveClose">
-      <div class="saveCloseButton saveButton" onclick="saveSettings()">Save</div>
-      <div class="saveCloseButton closeButton" onclick="closeWindow()">Close</div>
+      <div class="saveCloseButton saveButton">Save</div>
+      <div class="saveCloseButton closeButton">Close</div>
     </div>
 
   </body>

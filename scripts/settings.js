@@ -8,12 +8,15 @@ let hotkeyInputs = document.querySelectorAll(".hotkeyInput");
 let playPauseInput = document.getElementsByClassName("playPauseInput")[0];
 let previousTrackInput = document.getElementsByClassName("previousTrackInput")[0];
 let nextTrackInput = document.getElementsByClassName("nextTrackInput")[0];
+let trackGroupingMethodSelect = document.getElementsByClassName("trackGroupingMethod")[0];
+let saveButton = document.getElementsByClassName("saveButton")[0];
+let closeButton = document.getElementsByClassName("closeButton")[0];
 
 // When you receive settings data, populate the form
 ipcRenderer.on('settingsData', function(event, response) {
   delete response._id
   userSettings = response;
-  // fillInCurrentSettings();
+  fillInCurrentSettings();
 });
 
 // Reponse from saving settings
@@ -48,35 +51,49 @@ for (let i = 0; i < optionTabs.length; i++) {
   });
 }
 
+// Save and close button listeners
+saveButton.addEventListener("click", function() {
+  saveSettings();
+});
+
+closeButton.addEventListener("click", function() {
+  closeWindow();
+})
+
 // Update import folders on keypress
-// importFolderTextarea.addEventListener("input", function() {
-//   userSettings.importFolders = importFolderTextarea.value.split('\n');
-// }, false);
+importFolderTextarea.addEventListener("input", function() {
+  userSettings.importFolders = importFolderTextarea.value.split('\n');
+}, false);
 
-// minimizeOnCloseCheckbox.addEventListener("click", function() {
-//   userSettings.minimizeOnClose = minimizeOnCloseCheckbox.checked;
-// });
+minimizeOnCloseCheckbox.addEventListener("click", function() {
+  userSettings.minimizeOnClose = minimizeOnCloseCheckbox.checked;
+});
 
-// playPauseInput.addEventListener("keydown", function(e) {
-//   e.preventDefault();
-//   var accelerator = eventToAcceleratorString(e);
-//   playPauseInput.value = accelerator;
-//   userSettings.playPauseHotkey = accelerator;
-// });
+playPauseInput.addEventListener("keydown", function(e) {
+  e.preventDefault();
+  let acceleratorString = eventToAcceleratorString(e);
+  playPauseInput.value = acceleratorString;
+  userSettings.playPauseHotkey = acceleratorString;
+});
 
-// nextTrackInput.addEventListener("keydown", function(e) {
-//   e.preventDefault();
-//   let accelerator = eventToAcceleratorString(e);
-//   nextTrackInput.value = accelerator;
-//   userSettings.nextTrackHotkey = accelerator;
-// });
+nextTrackInput.addEventListener("keydown", function(e) {
+  e.preventDefault();
+  let acceleratorString = eventToAcceleratorString(e);
+  nextTrackInput.value = acceleratorString;
+  userSettings.nextTrackHotkey = acceleratorString;
+});
 
-// previousTrackInput.addEventListener("keydown", function(e) {
-//   e.preventDefault();
-//   let accelerator = eventToAcceleratorString(e);
-//   previousTrackInput.value = accelerator;
-//   userSettings.previousTrackHotkey = accelerator;
-// });
+previousTrackInput.addEventListener("keydown", function(e) {
+  e.preventDefault();
+  let acceleratorString = eventToAcceleratorString(e);
+  previousTrackInput.value = acceleratorString;
+  userSettings.previousTrackHotkey = acceleratorString;
+});
+
+trackGroupingMethodSelect.addEventListener("change", function(e) {
+  e.preventDefault();
+  userSettings.trackGroupingMethod = trackGroupingMethodSelect.value;
+});
 
 // TODO: Beef this up to support more keys
 let eventToAcceleratorString = function(e) {
@@ -105,7 +122,7 @@ let eventToAcceleratorString = function(e) {
 
 // Send updated settings back to main for saving
 let saveSettings = function() {
-  ipcRenderer.send("saveSettings", { userSettings });
+  ipcRenderer.send("saveSettings", userSettings);
 }
 
 // Remote close window
@@ -117,6 +134,7 @@ let closeWindow = function() {
 let fillInCurrentSettings = function() {
   // Import folder list
   importFolderTextarea.value = '';
+
   userSettings.importFolders.forEach(function(folder, index, array) {
     if (index > 0) { importFolderTextarea.value += "\n"; };
     importFolderTextarea.value += (folder);
@@ -128,4 +146,6 @@ let fillInCurrentSettings = function() {
   playPauseInput.value = userSettings.playPauseHotkey;
   previousTrackInput.value = userSettings.previousTrackHotkey;
   nextTrackInput.value = userSettings.nextTrackHotkey;
+
+  trackGroupingMethodSelect.value = userSettings.trackGroupingMethod;
 }

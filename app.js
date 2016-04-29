@@ -60,6 +60,8 @@ function createWindows () {
 function afterSettingsLoad() {
   setupGlobalShorcuts();
 
+  playerWindow.webContents.send("settingsData", databaseManager.userSettings)
+
   settingsWindow.webContents.on('did-finish-load', function() {
     settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
   });
@@ -159,8 +161,8 @@ function setupIPCListeners() {
   });
 
   // Save the settings in the db
-  ipcMain.on('saveSettings', function(event, message) {
-    databaseManager.saveSettings(message.userSettings, function(response) {
+  ipcMain.on('saveSettings', function(event, settings) {
+    databaseManager.saveSettings(settings, function(response) {
       event.sender.send("saveResponse", response);
     });
   });
@@ -212,6 +214,7 @@ app.openSettings = function() {
 }
 
 app.closeSettings = function() {
+  playerWindow.webContents.send("settingsData", databaseManager.userSettings);
   settingsWindow.hide();
   setupGlobalShorcuts();
 }

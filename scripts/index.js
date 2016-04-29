@@ -117,6 +117,12 @@ function setupIPCListeners() {
       artists: response
     })
   });
+
+  ipcRenderer.on('settingsData', function(event, response) {
+    TrackListComponent.setState({
+      groupMethod: response.trackGroupingMethod
+    });
+  })
 }
 
 function renderTracklist(tracks) {

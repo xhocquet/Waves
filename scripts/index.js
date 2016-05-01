@@ -109,8 +109,19 @@ function setupIPCListeners() {
   });
 
   ipcRenderer.on('setVolume', function(event, response) {
-    playerWindow.musicPlayer.audio.volume = response.value;
+    playerWindow.musicPlayer.setVolume(response.value);
   });
+
+  ipcRenderer.on('volumeUp', function(event, response) {
+    playerWindow.musicPlayer.volumeUp();
+  })
+  ipcRenderer.on('volumeDown', function(event, response) {
+    playerWindow.musicPlayer.volumeDown();
+  })
+  ipcRenderer.on('volumeMuteToggle', function(event, response) {
+    playerWindow.musicPlayer.volumeMuteToggle();
+  })
+
 
   ipcRenderer.on('artistListData', function(event, response) {
     ArtistListComponent.setState({
@@ -238,7 +249,9 @@ function setupEventListeners() {
   nextButton.onclick = playerWindow.musicPlayer.nextTrack.bind(playerWindow.musicPlayer);
   shuffleButton.onclick = playerWindow.musicPlayer.toggleShuffle.bind(playerWindow.musicPlayer);
   // Set volume with the volume slider
-  volumeSlider.oninput = playerWindow.musicPlayer.setVolume.bind(playerWindow.musicPlayer);
+  volumeSlider.oninput = function(event) {
+    playerWindow.musicPlayer.setVolume(event.target.value / 100);
+  }
   // Seek track on clicking the progress bar
   progressBarDiv.onclick = playerWindow.musicPlayer.seek.bind(playerWindow.musicPlayer);
   playerWindow.musicPlayer.audio.onplay = playHandler;

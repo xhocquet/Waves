@@ -5,9 +5,6 @@ let optionTabs = document.querySelectorAll(".settingsTab");
 let importFolderTextarea = document.getElementsByClassName("importFolders")[0];
 let minimizeOnCloseCheckbox = document.getElementsByClassName("minimizeOnClose")[0];
 let hotkeyInputs = document.querySelectorAll(".hotkeyInput");
-let playPauseInput = document.getElementsByClassName("playPauseInput")[0];
-let previousTrackInput = document.getElementsByClassName("previousTrackInput")[0];
-let nextTrackInput = document.getElementsByClassName("nextTrackInput")[0];
 let trackGroupingMethodSelect = document.getElementsByClassName("trackGroupingMethod")[0];
 let saveButton = document.getElementsByClassName("saveButton")[0];
 let closeButton = document.getElementsByClassName("closeButton")[0];
@@ -69,49 +66,99 @@ minimizeOnCloseCheckbox.addEventListener("click", function() {
   userSettings.minimizeOnClose = minimizeOnCloseCheckbox.checked;
 });
 
-playPauseInput.addEventListener("keydown", function(e) {
-  e.preventDefault();
-  let acceleratorString = eventToAcceleratorString(e);
-  playPauseInput.value = acceleratorString;
-  userSettings.playPauseHotkey = acceleratorString;
-});
-
-nextTrackInput.addEventListener("keydown", function(e) {
-  e.preventDefault();
-  let acceleratorString = eventToAcceleratorString(e);
-  nextTrackInput.value = acceleratorString;
-  userSettings.nextTrackHotkey = acceleratorString;
-});
-
-previousTrackInput.addEventListener("keydown", function(e) {
-  e.preventDefault();
-  let acceleratorString = eventToAcceleratorString(e);
-  previousTrackInput.value = acceleratorString;
-  userSettings.previousTrackHotkey = acceleratorString;
-});
+for (let i = 0; i < hotkeyInputs.length; i++) {
+  let currentInput = hotkeyInputs[i];
+  let currentHotkey = currentInput.classList[1];
+  currentInput.addEventListener("keydown", function(e) {
+    e.preventDefault();
+    let acceleratorString = eventToAcceleratorString(e);
+    currentInput.value = acceleratorString;
+    userSettings[currentHotkey] = acceleratorString;
+  });
+}
 
 trackGroupingMethodSelect.addEventListener("change", function(e) {
   e.preventDefault();
   userSettings.trackGroupingMethod = trackGroupingMethodSelect.value;
 });
 
-// TODO: Beef this up to support more keys
 let eventToAcceleratorString = function(e) {
   let accelerator = "";
   e.ctrlKey ? accelerator += "Ctrl+" : null;
   e.shiftKey ? accelerator += "Shift+" : null;
+  e.altKey ? accelerator += "Alt+" : null;
   switch(e.keyCode) {
+    case 8:
+      accelerator += "BackSpace";
+      break;
+    case 32:
+      accelerator += "Space";
+      break;
+    case 33:
+      accelerator += "PageUp";
+      break;
+    case 34:
+      accelerator += "PageDown";
+      break;
+    case 35:
+      accelerator += "End";
+      break;
+    case 36:
+      accelerator += "Home";
+      break;
+    case 37:  
+      accelerator += "Left";
+      break;
     case 38: 
       accelerator += "Up";
+      break;
+    case 39: 
+      accelerator += "Right";
       break;
     case 40: 
       accelerator += "Down";
       break;
-    case 37: 
-      accelerator += "Left";
+    case 45:
+      accelerator += "Insert";
       break;
-    case 39: 
-      accelerator += "Right";
+    case 46:
+      accelerator += "Delete";
+      break;
+    case 112: 
+      accelerator += "F1";
+      break;
+    case 113: 
+      accelerator += "F2";
+      break;
+    case 114: 
+      accelerator += "F3";
+      break;
+    case 115: 
+      accelerator += "F4";
+      break;
+    case 116: 
+      accelerator += "F5";
+      break;
+    case 117: 
+      accelerator += "F6";
+      break;
+    case 118: 
+      accelerator += "F7";
+      break;
+    case 119: 
+      accelerator += "F8";
+      break;
+    case 120: 
+      accelerator += "F9";
+      break;
+    case 121: 
+      accelerator += "F10";
+      break;
+    case 122: 
+      accelerator += "F11";
+      break;
+    case 123: 
+      accelerator += "F12";
       break;
     default: 
       accelerator += String.fromCharCode(e.keyCode);
@@ -143,9 +190,11 @@ let fillInCurrentSettings = function() {
 
   minimizeOnCloseCheckbox.checked = userSettings.minimizeOnClose
 
-  playPauseInput.value = userSettings.playPauseHotkey;
-  previousTrackInput.value = userSettings.previousTrackHotkey;
-  nextTrackInput.value = userSettings.nextTrackHotkey;
+  for (let i = 0; i < hotkeyInputs.length; i++) {
+    let currentInput = hotkeyInputs[i];
+    let currentHotkey = currentInput.classList[1];
+    currentInput.value = userSettings[currentHotkey];
+  }
 
   trackGroupingMethodSelect.value = userSettings.trackGroupingMethod;
 }

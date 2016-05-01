@@ -93,10 +93,6 @@ class musicPlayer {
     this.paths.splice(this.curIndex + 1, 0, songPath);
   }
 
-  setVolume(event) {
-    this._musicPlayer.volume = event.target.value / 100;
-  }
-
   seek(event) {
     let percentage = event.x / event.target.clientWidth;
     let targetTime = Math.round(this._musicPlayer.duration * percentage);
@@ -135,6 +131,23 @@ class musicPlayer {
     this.curIndex = -1;
     this.nextTrack();
   }
+
+  setVolume(value) {
+    this._musicPlayer.volume = value;
+  }
+
+  volumeUp() {
+    this.setVolume(Math.min(this._musicPlayer.volume += 0.1, 1));
+  }
+
+  volumeDown() {
+    this.setVolume(Math.max(this._musicPlayer.volume -= 0.1, 0));
+  }
+
+  volumeMuteToggle() {
+    this._musicPlayer.muted = this._musicPlayer.muted ? false : true;
+  }
+
 
   get audio() {
     return this._musicPlayer;

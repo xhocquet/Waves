@@ -43,7 +43,6 @@ function createWindows () {
   });
 
   settingsWindow.loadURL('file://' + __dirname + '/views/settings.html');
-  settingsWindow.show();
 
   trayIcon = new Tray('assets/icon.png');
   trayIcon.setContextMenu(Menu.buildFromTemplate(trayIconMenu));
@@ -73,10 +72,16 @@ function setupGlobalShorcuts() {
   var playPauseHotkey = databaseManager.userSettings.playPauseHotkey;
   var previousTrackHotkey = databaseManager.userSettings.previousTrackHotkey;
   var nextTrackHotkey = databaseManager.userSettings.nextTrackHotkey;
+  var volumeUpHotkey = databaseManager.userSettings.volumeUpHotkey;
+  var volumeDownHotkey = databaseManager.userSettings.volumeDownHotkey;
+  var volumeMuteHotkey = databaseManager.userSettings.volumeMuteHotkey;
 
   playPauseHotkey ? globalShortcut.register(playPauseHotkey, app.playPause) : null;
   previousTrackHotkey? globalShortcut.register(previousTrackHotkey, app.previousTrack) : null;
   nextTrackHotkey ? globalShortcut.register(nextTrackHotkey, app.nextTrack) : null;
+  volumeUpHotkey ? globalShortcut.register(volumeUpHotkey, app.volumeUp) : null;
+  volumeDownHotkey ? globalShortcut.register(volumeDownHotkey, app.volumeDown) : null;
+  volumeMuteHotkey ? globalShortcut.register(volumeMuteHotkey, app.volumeMuteToggle) : null;
 }
 
 function afterLibraryDataLoad() {
@@ -101,6 +106,8 @@ function setupPlayerWindow() {
   playerWindow.generateLibraryFromSettings = function() {
     databaseManager.generateLibraryFromSettings();
   }
+
+  // CONTROLS
   playerWindow.playPause = function() {
     playerWindow.webContents.send("playPause", {});
   }
@@ -113,8 +120,19 @@ function setupPlayerWindow() {
   playerWindow.addToQueue = function(track) {
     playerWindow.webContents.send("addToQueue", { trackID: track });
   }
+
+  // VOLUME
   playerWindow.setVolume = function(value) {
     playerWindow.webContents.send("setVolume", { value: value });
+  }
+  playerWindow.volumeUp = function() {
+    playerWindow.webContents.send("volumeUp", {});
+  }
+  playerWindow.volumeDown = function() {
+    playerWindow.webContents.send("volumeDown", {});
+  }
+  playerWindow.volumeMuteToggle = function() {
+    playerWindow.webContents.send("volumeMuteToggle", {});
   }
 
   playerWindow.setMenu(Menu.buildFromTemplate(mainWindowMenu));
@@ -206,6 +224,18 @@ app.afterNewLibraryData = function() {
 
 app.setVolume = function(value) {
   playerWindow.setVolume(value);
+}
+
+app.volumeDown = function() {
+  playerWindow.volumeDown();
+}
+
+app.volumeUp = function() {
+  playerWindow.volumeUp();
+}
+
+app.volumeMuteToggle = function() {
+  playerWindow.volumeMuteToggle();
 }
 
 app.openSettings = function() {

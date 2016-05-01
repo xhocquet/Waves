@@ -106,7 +106,10 @@ class databaseManager {
       minimizeOnClose: false,
       nextTrackHotkey: null,
       previousTrackHotkey: null,
-      playPauseHotkey: null
+      playPauseHotkey: null,
+      volumeUpHotkey: null,
+      volumeDownHotkey: null,
+      volumeMuteHotkey: null
     }, function(err, newDoc) {
       if (!err) {
         self.userSettings = newDoc;

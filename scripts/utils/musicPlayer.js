@@ -3,8 +3,10 @@ class musicPlayer {
     let self = this;
 
     this._musicPlayer = document.createElement('audio');
+    this._nextMusicPlayer = document.createElement('audio');
 
     this._musicPlayer.volume = 1;
+    this._nextMusicPlayer.volume = this._musicPlayer.volume;
     this.ids = [];
     this.paths = [];
     this.shuffledIds = [];
@@ -23,6 +25,8 @@ class musicPlayer {
     this.curIndex = this.ids.indexOf(songId);
     this._musicPlayer.src = this.paths[this.curIndex];
     this._musicPlayer.play();
+
+    this.loadNextTrack();
   }
 
   playPause() {
@@ -33,27 +37,48 @@ class musicPlayer {
     this._musicPlayer.paused ? this._musicPlayer.play() : this._musicPlayer.pause();
   }
 
-  // Play next track
-  nextTrack() {
+  loadNextTrack() {
+    this._nextMusicPlayer.src = this.nextSrc;
+    this._nextMusicPlayer.load();
+  }
+
+  get nextSrc() {
+    let nextIndex = this.curIndex;
     // Last track, reset to start. Can count on both lists being the same size
-    if (this.curIndex === this.ids.length - 1) {
-      this.curIndex = 0;
+    if (nextIndex === this.ids.length - 1) {
+      nextIndex = 0;
     } else {
-      this.curIndex += 1;
+      nextIndex += 1;
     }
 
     // Get proper list according to shuffle status
     let nextTrackPath;
     if (!this.shuffleActivated) {
-      nextTrackPath = this.paths[this.curIndex];
-      this.curTrackId = this.ids[this.curIndex];
+      nextTrackPath = this.paths[nextIndex];
+      this.curTrackId = this.ids[nextIndex];
     } else {
-      nextTrackPath = this.shuffledPaths[this.curIndex];
-      this.curTrackId = this.shuffledIds[this.curIndex];
+      nextTrackPath = this.shuffledPaths[nextIndex];
+      this.curTrackId = this.shuffledIds[nextIndex];
     }
 
-    this._musicPlayer.src = nextTrackPath;
+    return nextTrackPath;
+  }
+
+  // Play next track
+  nextTrack() {
+    console.log('nextTrack');
+    console.log(this._musicPlayer);
+    this._musicPlayer = this._nextMusicPlayer;
     this._musicPlayer.play();
+    console.log(this._musicPlayer);
+    if (this.curIndex === this.ids.length - 1) {
+      this.curIndex = 0;
+    } else {
+      this.curIndex += 1;
+    }
+    this._nextMusicPlayer = document.createElement('audio');
+    this._nextMusicPlayer.volume = this._musicPlayer.volume;
+    this.loadNextTrack();
   }
 
   // Play previous track

@@ -1,5 +1,6 @@
 node_modules
 electron_music_app.sublime
 data
+backup
 .babelrc
 .eslintrc

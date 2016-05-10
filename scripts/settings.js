@@ -1,11 +1,17 @@
 let ipcRenderer = require('electron').ipcRenderer;
+let asar = require('asar');
+let async = require('async');
 
 let userSettings;
+const backupDirectory = __dirname + '/../backup/';
+const dataDirectory = __dirname + '/../data/';
 let optionTabs = document.querySelectorAll(".settingsTab");
 let importFolderTextarea = document.getElementsByClassName("importFolders")[0];
 let minimizeOnCloseCheckbox = document.getElementsByClassName("minimizeOnClose")[0];
 let hotkeyInputs = document.querySelectorAll(".hotkeyInput");
 let trackGroupingMethodSelect = document.getElementsByClassName("trackGroupingMethod")[0];
+let exportLibraryButton = document.getElementById("exportLibraryButton");
+let importLibraryButton = document.getElementById("importLibraryButton");
 let saveButton = document.getElementsByClassName("saveButton")[0];
 let closeButton = document.getElementsByClassName("closeButton")[0];
 
@@ -24,6 +30,12 @@ ipcRenderer.on('saveResponse', function(event, response) {
     console.log(response);
   }
 });
+
+ipcRenderer.on('refreshedData', function(event, response) {
+  delete response._id
+  userSettings = response;
+  fillInCurrentSettings();
+})
 
 for (let i = 0; i < optionTabs.length; i++) {
   optionTabs[i].addEventListener("click", function(event) {
@@ -46,6 +58,21 @@ for (let i = 0; i < optionTabs.length; i++) {
         break;
     }
   });
+}
+
+
+let exportLibraryHandler = function(e) {
+  asar.createPackage(dataDirectory, backupDirectory + 'backup.wvs', function() {
+    console.log('Saved to ' + backupDirectory + 'backup.wvs');
+  });
+}
+
+let importLibraryHandler = function(e) {
+  let backupPath = this.files[0].path;
+  async.waterfall([
+    async.asyncify(asar.extractAll(backupPath, dataDirectory)),
+    ipcRenderer.send('importedData', {})
+  ]);
 }
 
 // Save and close button listeners
@@ -81,6 +108,9 @@ trackGroupingMethodSelect.addEventListener("change", function(e) {
   e.preventDefault();
   userSettings.trackGroupingMethod = trackGroupingMethodSelect.value;
 });
+
+exportLibraryButton.addEventListener("click", exportLibraryHandler, false);
+importLibraryButton.addEventListener("change", importLibraryHandler, false);
 
 let eventToAcceleratorString = function(e) {
   let accelerator = "";
@@ -176,6 +206,11 @@ let saveSettings = function() {
 let closeWindow = function() {
   ipcRenderer.send("closeSettings",{});
 }
+
+let refreshDatabase = function() {
+  ipcRenderer.send("refreshDatabase",{});
+}
+
 
 // Fill in forms with current values from file
 let fillInCurrentSettings = function() {

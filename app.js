@@ -5,8 +5,8 @@ const {ipcMain, app, BrowserWindow, globalShortcut, Menu, Tray} = electron;
 
 const dm = require('./scripts/utils/databaseManager.js');
 const databaseManager = new dm();
-databaseManager.loadSettings(afterSettingsLoad);
-databaseManager.loadLibraryData(afterLibraryDataLoad);
+
+resetDatabases();
 
 const mainWindowMenu = require('./scripts/menus/mainWindowMenu.js');
 const trayIconMenu = require('./scripts/menus/trayContextMenu.js');
@@ -56,14 +56,18 @@ function createWindows () {
   });
 }
 
+function resetDatabases() {
+  databaseManager.initializeDatabases();
+  databaseManager.loadLibraryData(afterLibraryDataLoad);
+  databaseManager.loadSettings(afterSettingsLoad);
+}
+
 function afterSettingsLoad() {
   setupGlobalShorcuts();
 
   playerWindow.webContents.send("settingsData", databaseManager.userSettings)
 
-  settingsWindow.webContents.on('did-finish-load', function() {
-    settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
-  });
+  settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
 }
 
 function setupGlobalShorcuts() {
@@ -183,6 +187,10 @@ function setupIPCListeners() {
     databaseManager.saveSettings(settings, function(response) {
       event.sender.send("saveResponse", response);
     });
+  });
+
+  ipcMain.on('importedData', function(event, blank) {
+    resetDatabases();
   });
 }
 

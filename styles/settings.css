@@ -73,3 +73,8 @@
   margin: auto;
   display: inline-block;
 }
+
+.libraryButton {
+  outline: none;
+  background-color: #ccc;
+}

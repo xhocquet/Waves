@@ -9,29 +9,12 @@ const pathTools = require('path');
 
 class databaseManager {
   constructor() {
-    let self = this;
-    this.db = {};
     this.DEFAULT_SORT = {
       'albumArtist': 1,
       'album': 1,
       'track.no': 1,
       'artist': 1
     };
-
-    this.libraryData = '';
-    this.userSettings = '';
-
-    this.db.libraryData =  new Datastore({ filename: './data/libraryData.json', autoload: true });
-    this.db.settings =  new Datastore({ filename: './data/settings.json', autoload: true});
-    this.db.songs =  new Datastore({ filename: './data/songs.json', autoload: true });
-
-    this.db.songs.persistence.setAutocompactionInterval(10000);
-
-    this.db.songs.ensureIndex({ fieldName: 'path', unique: true}, function(err) {
-      if (err) {
-        console.log("Attempted to add duplicate file: ", err);
-      }
-    });
 
     this.trackDataWorker = async.queue(function (path, callback) {
       console.log("Worker processing data for ", path);
@@ -54,6 +37,24 @@ class databaseManager {
       app.afterNewLibraryData();
       console.log("Library data is squeaky clean!");
     };
+  }
+
+  initializeDatabases() {
+    this.libraryData = '';
+    this.userSettings = '';
+
+    this.db = {};
+    this.db.libraryData =  new Datastore({ filename: './data/libraryData.json', autoload: true });
+    this.db.settings =  new Datastore({ filename: './data/settings.json', autoload: true});
+    this.db.songs =  new Datastore({ filename: './data/songs.json', autoload: true });
+
+    this.db.songs.persistence.setAutocompactionInterval(10000);
+
+    this.db.songs.ensureIndex({ fieldName: 'path', unique: true}, function(err) {
+      if (err) {
+        console.log("Attempted to add duplicate file: ", err);
+      }
+    });
   }
 
   // Returns the specified tracks with options.

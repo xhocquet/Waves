@@ -15,27 +15,8 @@ let importLibraryButton = document.getElementById("importLibraryButton");
 let saveButton = document.getElementsByClassName("saveButton")[0];
 let closeButton = document.getElementsByClassName("closeButton")[0];
 
-// When you receive settings data, populate the form
-ipcRenderer.on('settingsData', function(event, response) {
-  delete response._id
-  userSettings = response;
-  fillInCurrentSettings();
-});
-
-// Reponse from saving settings
-ipcRenderer.on('saveResponse', function(event, response) {
-  if (response === 'Success') {
-    console.log("SUCCESS")
-  } else {
-    console.log(response);
-  }
-});
-
-ipcRenderer.on('refreshedData', function(event, response) {
-  delete response._id
-  userSettings = response;
-  fillInCurrentSettings();
-})
+setupRendererListeners();
+setupInputListeners();
 
 for (let i = 0; i < optionTabs.length; i++) {
   optionTabs[i].addEventListener("click", function(event) {
@@ -60,14 +41,72 @@ for (let i = 0; i < optionTabs.length; i++) {
   });
 }
 
+function setupRendererListeners() {
+  // When you receive settings data, populate the form
+  ipcRenderer.on('settingsData', function(event, response) {
+    console.log('settingsData Event')
+    delete response._id
+    userSettings = response;
+    fillInCurrentSettings();
+  });
 
-let exportLibraryHandler = function(e) {
+  // Reponse from saving settings
+  ipcRenderer.on('saveResponse', function(event, response) {
+    if (response === 'Success') {
+      console.log("SUCCESS")
+    } else {
+      console.log(response);
+    }
+  });
+}
+
+function setupInputListeners() {
+  // Save and close button listeners
+  saveButton.addEventListener("click", function() {
+    saveSettings();
+  });
+
+  closeButton.addEventListener("click", function() {
+    closeWindow();
+  })
+
+  // Update import folders on keypress
+  importFolderTextarea.addEventListener("input", function() {
+    userSettings.importFolders = importFolderTextarea.value.split('\n');
+  }, false);
+
+  minimizeOnCloseCheckbox.addEventListener("click", function() {
+    userSettings.minimizeOnClose = minimizeOnCloseCheckbox.checked;
+  });
+
+  for (let i = 0; i < hotkeyInputs.length; i++) {
+    let currentInput = hotkeyInputs[i];
+    let currentHotkey = currentInput.classList[1];
+    currentInput.addEventListener("keydown", function(e) {
+      e.preventDefault();
+      let acceleratorString = eventToAcceleratorString(e);
+      currentInput.value = acceleratorString;
+      userSettings[currentHotkey] = acceleratorString;
+    });
+  }
+
+  trackGroupingMethodSelect.addEventListener("change", function(e) {
+    e.preventDefault();
+    userSettings.trackGroupingMethod = trackGroupingMethodSelect.value;
+  });
+
+  exportLibraryButton.addEventListener("click", exportLibraryHandler, false);
+  importLibraryButton.addEventListener("change", importLibraryHandler, false);
+}
+
+// TODO: Let the user select where to save it
+function exportLibraryHandler(e) {
   asar.createPackage(dataDirectory, backupDirectory + 'backup.wvs', function() {
     console.log('Saved to ' + backupDirectory + 'backup.wvs');
   });
 }
 
-let importLibraryHandler = function(e) {
+function importLibraryHandler(e) {
   let backupPath = this.files[0].path;
   async.waterfall([
     async.asyncify(asar.extractAll(backupPath, dataDirectory)),
@@ -75,44 +114,7 @@ let importLibraryHandler = function(e) {
   ]);
 }
 
-// Save and close button listeners
-saveButton.addEventListener("click", function() {
-  saveSettings();
-});
-
-closeButton.addEventListener("click", function() {
-  closeWindow();
-})
-
-// Update import folders on keypress
-importFolderTextarea.addEventListener("input", function() {
-  userSettings.importFolders = importFolderTextarea.value.split('\n');
-}, false);
-
-minimizeOnCloseCheckbox.addEventListener("click", function() {
-  userSettings.minimizeOnClose = minimizeOnCloseCheckbox.checked;
-});
-
-for (let i = 0; i < hotkeyInputs.length; i++) {
-  let currentInput = hotkeyInputs[i];
-  let currentHotkey = currentInput.classList[1];
-  currentInput.addEventListener("keydown", function(e) {
-    e.preventDefault();
-    let acceleratorString = eventToAcceleratorString(e);
-    currentInput.value = acceleratorString;
-    userSettings[currentHotkey] = acceleratorString;
-  });
-}
-
-trackGroupingMethodSelect.addEventListener("change", function(e) {
-  e.preventDefault();
-  userSettings.trackGroupingMethod = trackGroupingMethodSelect.value;
-});
-
-exportLibraryButton.addEventListener("click", exportLibraryHandler, false);
-importLibraryButton.addEventListener("change", importLibraryHandler, false);
-
-let eventToAcceleratorString = function(e) {
+function eventToAcceleratorString(e) {
   let accelerator = "";
   e.ctrlKey ? accelerator += "Ctrl+" : null;
   e.shiftKey ? accelerator += "Shift+" : null;
@@ -198,22 +200,22 @@ let eventToAcceleratorString = function(e) {
 }
 
 // Send updated settings back to main for saving
-let saveSettings = function() {
+function saveSettings() {
   ipcRenderer.send("saveSettings", userSettings);
 }
 
 // Remote close window
-let closeWindow = function() {
+function closeWindow() {
   ipcRenderer.send("closeSettings",{});
 }
 
-let refreshDatabase = function() {
+function refreshDatabase() {
   ipcRenderer.send("refreshDatabase",{});
 }
 
 
 // Fill in forms with current values from file
-let fillInCurrentSettings = function() {
+function fillInCurrentSettings() {
   // Import folder list
   importFolderTextarea.value = '';
 

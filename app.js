@@ -65,9 +65,33 @@ function resetDatabases() {
 function afterSettingsLoad() {
   setupGlobalShorcuts();
 
-  playerWindow.webContents.send("settingsData", databaseManager.userSettings)
+  // Send data now or later depending on if the page is loading
+  if (playerWindow.webContents.isLoading()) {
+    playerWindow.webContents.on('did-finish-load', function() {
+      playerWindow.webContents.send("settingsData", databaseManager.userSettings);
+    });
+  } else {
+    playerWindow.webContents.send("settingsData", databaseManager.userSettings);
+  }
 
-  settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
+  if (settingsWindow.webContents.isLoading()) {
+    settingsWindow.webContents.on('did-finish-load', function() {
+      settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
+    });
+  } else {
+    settingsWindow.webContents.send("settingsData", databaseManager.userSettings);
+  }
+}
+
+// Send data now or later depending on if the page is loading
+function afterLibraryDataLoad() {
+  if (playerWindow.webContents.isLoading()) {
+    playerWindow.webContents.on('did-finish-load', function() {
+      playerWindow.webContents.send("artistListData", databaseManager.libraryData.albumArtists);
+    });
+  } else {
+    playerWindow.webContents.send("artistListData", databaseManager.libraryData.albumArtists);
+  }
 }
 
 function setupGlobalShorcuts() {
@@ -86,12 +110,6 @@ function setupGlobalShorcuts() {
   volumeUpHotkey ? globalShortcut.register(volumeUpHotkey, app.volumeUp) : null;
   volumeDownHotkey ? globalShortcut.register(volumeDownHotkey, app.volumeDown) : null;
   volumeMuteHotkey ? globalShortcut.register(volumeMuteHotkey, app.volumeMuteToggle) : null;
-}
-
-function afterLibraryDataLoad() {
-  playerWindow.webContents.on('did-finish-load', function() {
-    playerWindow.webContents.send("artistListData", databaseManager.libraryData.albumArtists);
-  })
 }
 
 function sendLibraryData() {

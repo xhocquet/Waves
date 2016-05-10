@@ -148,7 +148,7 @@ class databaseManager {
       } else {
         self.db.settings.persistence.compactDatafile();
         self.userSettings = newDoc; // Update usersettings so it stays up to date.
-        callback("Successfully saved settings");
+        callback("SUCCESS");
       }
     });
   }

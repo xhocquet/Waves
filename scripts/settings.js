@@ -12,6 +12,7 @@ let hotkeyInputs = document.querySelectorAll(".hotkeyInput");
 let trackGroupingMethodSelect = document.getElementsByClassName("trackGroupingMethod")[0];
 let exportLibraryButton = document.getElementById("exportLibraryButton");
 let importLibraryButton = document.getElementById("importLibraryButton");
+let noticePopup = document.getElementsByClassName("noticePopup")[0];
 let saveButton = document.getElementsByClassName("saveButton")[0];
 let closeButton = document.getElementsByClassName("closeButton")[0];
 
@@ -52,10 +53,22 @@ function setupRendererListeners() {
 
   // Reponse from saving settings
   ipcRenderer.on('saveResponse', function(event, response) {
-    if (response === 'Success') {
-      console.log("SUCCESS")
+    if (response === 'SUCCESS') {
+      console.log('Successfully saved settings.');
+      noticePopup.innerHTML = 'Successfully saved settings.';
+      noticePopup.style.backgroundColor = 'green';
+      noticePopup.classList.add('show');
+      setTimeout(function() {
+        noticePopup.classList.remove('show');
+      }, 3000);
     } else {
       console.log(response);
+      noticePopup.innerHTML = 'There was an error saving.';
+      noticePopup.style.backgroundColor = 'red';
+      noticePopup.classList.add('show');
+      setTimeout(function() {
+        noticePopup.classList.remove('show');
+      }, 3000);
     }
   });
 }

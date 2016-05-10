@@ -9,7 +9,7 @@
 ### Actual builds to come when project is more well-rounded.
 
 ## Features (+ planned):
-* Custom React hot-loading system to seamlessly browse tens of thousands of tracks.
+* Custom React hot-loading system to seamlessly browse your entire library without lag.
 * Blazing-fast search.
 * Cross-platform
   * Open API for plugins

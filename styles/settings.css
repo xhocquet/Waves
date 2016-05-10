@@ -49,32 +49,57 @@
   text-align: center;
 }
 
+.libraryButton {
+  background-color: #ccc;
+  outline: none;
+}
+
 .hotkeyInput {
   outline: none;
 }
 
 .saveClose {
   background-color: #333;
-  width: 100%;
+  bottom: 0;
   height: 35px;
+  left: 0;
   padding: 5px;
   position: fixed;
-  bottom: 0;
-  left: 0;
-  vertical-align: middle;
+  text-align: center;
+  width: 100%;
+  z-index: 5;
 }
 
 .saveCloseButton {
-  cursor: default;
-  padding: 0 5px;
-  height: 30px;
-  line-height: 30px;
+  z-index: 8;
   background-color: #ccc;
-  margin: auto;
+  cursor: default;
   display: inline-block;
+  font-weight: bold;
+  line-height: 30px;
+  margin: 0 10px;
+  padding: 0 10px;
+  width: 50px;
 }
 
-.libraryButton {
-  outline: none;
-  background-color: #ccc;
+.noticePopup {
+  -webkit-transition: 1.5s;
+  background-color: green;
+  bottom: 25px;
+  display: block;
+  font-weight: bold;
+  height: 20px;
+  left: 25%;
+  line-height: 20px;
+  position: fixed;
+  text-align: center;
+  transition: 1.5s;
+  width: 50%;
+  z-index: 0;
+}
+
+.noticePopup.show {
+  -webkit-transition: 1.5s;
+  bottom: 45px;
+  transition: 1.5s;
 }

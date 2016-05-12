@@ -1,7 +1,7 @@
 'use strict';
 const app = require('electron').app;
 
-var trayMenu = [
+let trayMenu = [
   {
     label: 'Play/Pause',
     click: function(item, focusedWindow) {

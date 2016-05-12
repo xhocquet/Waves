@@ -43,29 +43,7 @@ let TrackListComponent = ReactDOM.render(<TrackList
   trackContextMenu={trackContextMenu}
 />, contentDiv);
 
-
-function explorerClickHandler(value, displayMethod, event) {
-  if (value === "All") {
-    ipcRenderer.send('getListData', {});
-  } else {
-    if (displayMethod === "artists") {
-      ipcRenderer.send('getListData', {
-        artist: value
-      });
-    } else if (displayMethod === "albums") {
-      ipcRenderer.send('getListData', {
-        album: value
-      });
-    } else if (displayMethod === "albumArtists") {
-      ipcRenderer.send('getListData', {
-        albumArtist: value
-      });
-    }
-  }
-}
-
 let ExplorerListComponent = ReactDOM.render(<ExplorerList
-  onClick={explorerClickHandler}
   playerWindow={playerWindow}
   musicPlayer={playerWindow.musicPlayer}
 />, explorerListContainer);
@@ -134,9 +112,9 @@ function setupIPCListeners() {
 
   ipcRenderer.on('libraryData', function(event, response) {
     ExplorerListComponent.setState({
-      artists: response.artists,
-      albums: response.albums,
-      albumArtists: response.albumArtists
+      artist: response.artists,
+      album: response.albums,
+      albumArtist: response.albumArtists
     })
   });
 

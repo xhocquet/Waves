@@ -234,8 +234,8 @@ function fillInCurrentSettings() {
 
   userSettings.importFolders.forEach(function(folder, index, array) {
     if (index > 0) { importFolderTextarea.value += "\n"; };
-    importFolderTextarea.value += (folder);
-  })
+    importFolderTextarea.value += folder;
+  });
   importFolderTextarea.focus();
 
   minimizeOnCloseCheckbox.checked = userSettings.minimizeOnClose

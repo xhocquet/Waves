@@ -1,6 +1,6 @@
 'use strict';
 
-var mainMenu = [
+let mainMenu = [
   {
     label: 'Play/Pause', //curWindow.playing? 'play' : 'pause'
     click: function(item, curWindow) {

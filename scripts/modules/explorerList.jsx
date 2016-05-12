@@ -1,40 +1,51 @@
+const ipcRenderer = require('electron').ipcRenderer;
 const React = require('react');
 const ArtistEntry = require('./explorerEntry.jsx');
 
 let explorerList = React.createClass({
   getInitialState: function() {
     return {
-      artists: [],
-      albums: [],
-      albumArtists: [],
-      displayMethod: 'artists'
+      artist: [],
+      album: [],
+      albumArtist: [],
+      displayMethod: 'artist'
     }
   },
 
-  clickHandler: function(artist, event) {
-    this.props.onClick(artist, this.state.displayMethod, event);
+  showSelection: function(value, event) {
+    let options = {};
+    options[this.state.displayMethod] = value;
+
+    if (value === "All") {
+      ipcRenderer.send('getListData', {});
+    } else {
+      ipcRenderer.send('getListData', options);
+    }
   },
 
-  doubleClickHandler: function() {
+  playSelection: function() {
     this.props.playerWindow.updateMusicPlayerData();
     this.props.musicPlayer.playSong(this.props.musicPlayer.ids[0]);
   },
 
   showArtists: function() {
+    this.refs.explorerList.scrollTop = 0;
     this.setState({
-      displayMethod: 'artists'
+      displayMethod: 'artist'
     });
   },
 
   showAlbums: function() {
+    this.refs.explorerList.scrollTop = 0;
     this.setState({
-      displayMethod: 'albums'
+      displayMethod: 'album'
     });
   },
 
   showAlbumArtists: function() {
+    this.refs.explorerList.scrollTop = 0;
     this.setState({
-      displayMethod: 'albumArtists'
+      displayMethod: 'albumArtist'
     });
   },
 
@@ -42,13 +53,13 @@ let explorerList = React.createClass({
     let explorerEntries = [];
     let counter = 0;
 
-    // All Artists entry
+    // 'All' Entry
     explorerEntries.push(
       <ArtistEntry
         rowClass={"artistEntry"}
         key={1}
-        onClick={this.clickHandler}
-        onDoubleClick={this.doubleClickHandler}
+        onClick={this.showSelection}
+        onDoubleClick={this.playSelection}
         value={"All"}
       />
     );
@@ -61,8 +72,8 @@ let explorerList = React.createClass({
           <ArtistEntry
             rowClass={rowClass}
             key={"explorerList_"+this.state[this.state.displayMethod][i]}
-            onClick={this.clickHandler}
-            onDoubleClick={this.doubleClickHandler}
+            onClick={this.showSelection}
+            onDoubleClick={this.playSelection}
             value={this.state[this.state.displayMethod][i]}
           />
         );
@@ -75,13 +86,13 @@ let explorerList = React.createClass({
     if (this.state[this.state.displayMethod].length > 0) {
       let artistEntries = this.getExplorerEntries();
       return (
-        <div>
+        <div className="randomAssContainer">
           <div className="explorerTabsContainer">
             <div className="explorerTab" onMouseDown={this.showArtists}>Artist</div>
             <div className="explorerTab" onMouseDown={this.showAlbums}>Album</div>
             <div className="explorerTab" onMouseDown={this.showAlbumArtists}>Album Artist</div>
           </div>
-          <div  className="explorerList">
+          <div  className="explorerList" ref="explorerList">
             {artistEntries}
           </div>
         </div>

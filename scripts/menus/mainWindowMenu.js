@@ -1,7 +1,7 @@
 'use strict';
-var app = require('electron').app;
+let app = require('electron').app;
 
-var mainMenu = [
+let mainMenu = [
   {
     label: 'Controls',
     submenu: [
@@ -69,7 +69,7 @@ var mainMenu = [
 ];
 
 if (process.platform == 'darwin') {
-  var name = require('electron').app.getName();
+  let name = require('electron').app.getName();
   template.unshift({
     label: name,
     submenu: [

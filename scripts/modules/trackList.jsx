@@ -64,6 +64,7 @@ let trackList = React.createClass({
     let trackEntries = [];
     let counter = 0;
     let prevGroupMethodValue = ''; 
+    let curGroupMethodValue = '';
     let groupMethod = this.state.groupMethod === "" ? "albumArtist" : this.state.groupMethod;
 
     let displayStart = this.state.displayStart;
@@ -81,10 +82,11 @@ let trackList = React.createClass({
       let playing = false;
       let selected = this.state.selectedTrackComponents.map(module=>module.props.track._id).indexOf(track._id) > -1;
 
-      if (prevGroupMethodValue !== track[groupMethod]) {
-        prevGroupMethodValue = track[groupMethod];
+      curGroupMethodValue = track[groupMethod] === "" ? "No " + this.state.groupMethod : track[groupMethod];
+      if (prevGroupMethodValue !== curGroupMethodValue) {
+        prevGroupMethodValue = curGroupMethodValue;
         trackEntries.push(
-          <div className="songListSeparator" key={"separator_"+track[groupMethod]}>{track[groupMethod]}</div>
+          <div className="songListSeparator" key={"separator_"+curGroupMethodValue}>{curGroupMethodValue}</div>
         );
         bottomFillerHeight -= this.state.recordHeight * 2;
 

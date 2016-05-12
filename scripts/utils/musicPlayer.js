@@ -3,10 +3,7 @@ class musicPlayer {
     let self = this;
 
     this._musicPlayer = document.createElement('audio');
-    this._nextMusicPlayer = document.createElement('audio');
-
     this._musicPlayer.volume = 1;
-    this._nextMusicPlayer.volume = this._musicPlayer.volume;
     this.ids = [];
     this.paths = [];
     this.shuffledIds = [];
@@ -25,8 +22,6 @@ class musicPlayer {
     this.curIndex = this.ids.indexOf(songId);
     this._musicPlayer.src = this.paths[this.curIndex];
     this._musicPlayer.play();
-
-    this.loadNextTrack();
   }
 
   playPause() {
@@ -37,48 +32,26 @@ class musicPlayer {
     this._musicPlayer.paused ? this._musicPlayer.play() : this._musicPlayer.pause();
   }
 
-  loadNextTrack() {
-    this._nextMusicPlayer.src = this.nextSrc;
-    this._nextMusicPlayer.load();
-  }
-
-  get nextSrc() {
-    let nextIndex = this.curIndex;
-    // Last track, reset to start. Can count on both lists being the same size
-    if (nextIndex === this.ids.length - 1) {
-      nextIndex = 0;
-    } else {
-      nextIndex += 1;
-    }
-
-    // Get proper list according to shuffle status
-    let nextTrackPath;
-    if (!this.shuffleActivated) {
-      nextTrackPath = this.paths[nextIndex];
-      this.curTrackId = this.ids[nextIndex];
-    } else {
-      nextTrackPath = this.shuffledPaths[nextIndex];
-      this.curTrackId = this.shuffledIds[nextIndex];
-    }
-
-    return nextTrackPath;
-  }
-
   // Play next track
   nextTrack() {
-    console.log('nextTrack');
-    console.log(this._musicPlayer);
-    this._musicPlayer = this._nextMusicPlayer;
-    this._musicPlayer.play();
-    console.log(this._musicPlayer);
     if (this.curIndex === this.ids.length - 1) {
       this.curIndex = 0;
     } else {
       this.curIndex += 1;
     }
-    this._nextMusicPlayer = document.createElement('audio');
-    this._nextMusicPlayer.volume = this._musicPlayer.volume;
-    this.loadNextTrack();
+
+    // Get proper list according to shuffle status
+    let nextTrackPath;
+    if (!this.shuffleActivated) {
+      nextTrackPath = this.paths[this.curIndex];
+      this.curTrackId = this.ids[this.curIndex];
+    } else {
+      nextTrackPath = this.shuffledPaths[this.curIndex];
+      this.curTrackId = this.shuffledIds[this.curIndex];
+    }
+
+    this._musicPlayer.src = nextTrackPath;
+    this._musicPlayer.play();
   }
 
   // Play previous track
@@ -130,11 +103,11 @@ class musicPlayer {
     this.shuffleList();
   }
 
-  // Shuffle function. Need to shuffle the ids and paths the same way to maintain functionality
-  // For now, reset to start of list
+  // Shuffle paths and ids
   shuffleList() {
     let idCopy = this.ids.slice();
-    let pathsCopy = this.paths.slice();
+    let pathsCopy = this.paths.slice();    
+
     this.shuffledIds = [];
     this.shuffledPaths = [];
     while (idCopy.length > 0) {
@@ -146,15 +119,16 @@ class musicPlayer {
     }
   }
 
+  // Shuffle if needed and set index to new position
   toggleShuffle() {
     if (!this.shuffleActivated) {
       this.shuffleList();
+      this.curIndex = this.shuffledIds.indexOf(this.curTrackId);
       this.shuffleActivated = true;
     } else {
+      this.curIndex = this.ids.indexOf(this.curTrackId);
       this.shuffleActivated = false;
     }
-    this.curIndex = -1;
-    this.nextTrack();
   }
 
   setVolume(value) {

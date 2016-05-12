@@ -23,7 +23,7 @@ let curProgressDiv = document.getElementById("curProgress");
 let songList = document.getElementById("songList");
 let volumeSlider = document.getElementById("volumeSlider");
 let albumArtImage = document.getElementById("albumArtImage");
-let artistListContainer = document.getElementById("artistListContainer");
+let explorerListContainer = document.getElementById("explorerListContainer");
 
 playerWindow.musicPlayer = new mp();
 playerWindow.displayedTrackIds = null;
@@ -33,7 +33,7 @@ playerWindow.displayedTrackPaths = null;
 const React = require('react');
 const ReactDOM = require('react-dom');
 let TrackList = require('../scripts/modules/trackList.jsx');
-let ArtistList = require('../scripts/modules/artistList.jsx');
+let ExplorerList = require('../scripts/modules/explorerList.jsx');
 
 let TrackListComponent = ReactDOM.render(<TrackList
   height={770}
@@ -44,21 +44,31 @@ let TrackListComponent = ReactDOM.render(<TrackList
 />, contentDiv);
 
 
-function artistClick(artist, event) {
-  if (artist === "All") {
+function explorerClickHandler(value, displayMethod, event) {
+  if (value === "All") {
     ipcRenderer.send('getListData', {});
   } else {
-    ipcRenderer.send('getListData', {
-      artist: artist
-    });
+    if (displayMethod === "artists") {
+      ipcRenderer.send('getListData', {
+        artist: value
+      });
+    } else if (displayMethod === "albums") {
+      ipcRenderer.send('getListData', {
+        album: value
+      });
+    } else if (displayMethod === "albumArtists") {
+      ipcRenderer.send('getListData', {
+        albumArtist: value
+      });
+    }
   }
 }
 
-let ArtistListComponent = ReactDOM.render(<ArtistList
-  onClick={artistClick}
+let ExplorerListComponent = ReactDOM.render(<ExplorerList
+  onClick={explorerClickHandler}
   playerWindow={playerWindow}
   musicPlayer={playerWindow.musicPlayer}
-/>, artistListContainer);
+/>, explorerListContainer);
 
 setupIPCListeners();
 setupEventListeners();
@@ -122,10 +132,11 @@ function setupIPCListeners() {
     playerWindow.musicPlayer.volumeMuteToggle();
   })
 
-
-  ipcRenderer.on('artistListData', function(event, response) {
-    ArtistListComponent.setState({
-      artists: response
+  ipcRenderer.on('libraryData', function(event, response) {
+    ExplorerListComponent.setState({
+      artists: response.artists,
+      albums: response.albums,
+      albumArtists: response.albumArtists
     })
   });
 

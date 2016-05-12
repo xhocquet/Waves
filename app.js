@@ -87,10 +87,10 @@ function afterSettingsLoad() {
 function afterLibraryDataLoad() {
   if (playerWindow.webContents.isLoading()) {
     playerWindow.webContents.on('did-finish-load', function() {
-      playerWindow.webContents.send("artistListData", databaseManager.libraryData.albumArtists);
+      playerWindow.webContents.send("libraryData", databaseManager.libraryData);
     });
   } else {
-    playerWindow.webContents.send("artistListData", databaseManager.libraryData.albumArtists);
+    playerWindow.webContents.send("libraryData", databaseManager.libraryData);
   }
 }
 
@@ -113,7 +113,7 @@ function setupGlobalShorcuts() {
 }
 
 function sendLibraryData() {
-  playerWindow.webContents.send("artistListData", databaseManager.libraryData.albumArtists);
+  playerWindow.webContents.send("libraryData", databaseManager.libraryData);
 }
 
 function sendInitialLibrary() {

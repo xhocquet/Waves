@@ -68,6 +68,24 @@ class databaseManager {
           callback(err);
         }
       });
+    } else if (options.album) {
+      let regexValue = new RegExp(options.album, 'i');
+      this.db.songs.find({ album: { $regex: regexValue }}).sort(this.DEFAULT_SORT).exec(function(err, docs) {
+        if (!err) {
+          callback(docs);
+        } else {
+          callback(err);
+        }
+      });
+    } else if (options.albumArtist) {
+      let regexValue = new RegExp(options.albumArtist, 'i');
+      this.db.songs.find({ albumArtist: { $regex: regexValue }}).sort(this.DEFAULT_SORT).exec(function(err, docs) {
+        if (!err) {
+          callback(docs);
+        } else {
+          callback(err);
+        }
+      });
     } else if (options.searchAll) {
       let searchTerm = new RegExp(options.searchAll, 'i');
       this.db.songs.find({ $or: [{ title: { $regex: searchTerm } },{ albumArtist: { $regex: searchTerm } },{ album: { $regex: searchTerm } }] }).sort(this.DEFAULT_SORT).exec(function(err, docs) {
@@ -189,7 +207,12 @@ class databaseManager {
       if (err) {
         console.log(err);
       }
-    })
+    });
+
+    self.libraryData.artists.sort();
+    self.libraryData.albums.sort();
+    self.libraryData.albumArtists.sort();
+
     this.db.libraryData.insert(self.libraryData, function(err, newDoc) {
       if (err) {
         console.log(err);

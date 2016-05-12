@@ -33,14 +33,35 @@
   width: 90%;
 }
 
-#artistListContainer {
+#explorerListContainer {
   border-top: 1px solid black;
   height: calc(60% - 25px);
   overflow-y: auto;
 }
 
-.artistListEmpty {
+.explorerListEmpty {
   padding: 5px;
+}
+
+.explorerTabsContainer {
+  width: 100%;
+  height: 20px;
+  background-color: #aaa;
+  border-bottom: 1px solid #333;
+}
+
+.explorerTab {
+  float: left;
+  background-color: #888;
+  border-right: 1px solid #eee;
+  height: 100%;
+  padding: 0 5px;
+  line-height: 20px;
+  cursor: default;
+}
+
+.explorerTab.selected {
+  background-color: #555;
 }
 
 .artistEntry, .artistEntryAlternate {

@@ -53,31 +53,19 @@ setupEventListeners();
 
 function setupIPCListeners() {
   // Only update trackList, update player list when user plays something new
-  ipcRenderer.on('listData', function(event, response) {
-    let idArray = response.map(track => {
-      return track._id;
-    });
-    let pathArray = response.map(track => {
-      return track.path;
-    });
-    playerWindow.displayedTrackIds = idArray;
-    playerWindow.displayedTrackPaths = pathArray;
+  ipcRenderer.on('listData', function(event, tracks) {
+    playerWindow.displayedTrackIds = tracks.map(track => track._id);
+    playerWindow.displayedTrackPaths = tracks.map(track => track.path);
 
-    renderTracklist(response);
+    renderTracklist(tracks);
   });
 
-  ipcRenderer.on('initialListData', function(event, response) {
-    let idArray = response.map(track => {
-      return track._id;
-    });
-    let pathArray = response.map(track => {
-      return track.path;
-    });
-    playerWindow.displayedTrackIds = idArray;
-    playerWindow.displayedTrackPaths = pathArray;
+  ipcRenderer.on('initialListData', function(event, tracks) {
+    playerWindow.displayedTrackIds = tracks.map(track => track._id);
+    playerWindow.displayedTrackPaths = tracks.map(track => track.path);
 
     playerWindow.updateMusicPlayerData();
-    renderTracklist(response);
+    renderTracklist(tracks);
   });
 
   ipcRenderer.on('playPause', function(event, response) {
@@ -125,8 +113,8 @@ function setupIPCListeners() {
   })
 }
 
+// Pass tracks to TrackList and reset positioning
 function renderTracklist(tracks) {
-  // Reset scroll so we don't just see blank
   TrackListComponent.refs.scrollable.scrollTop = 0;
   TrackListComponent.setState({
     tracks: tracks,
@@ -138,14 +126,6 @@ function renderTracklist(tracks) {
     visibleEnd: 25
   });
   TrackListComponent.refs.scrollable.scrollTop = 0;
-}
-
-function addTracksToQueue(...tracks) {
-  playerWindow.musicPlayer.queueNext(tracks[0]);
-}
-
-function playPause() {
-  playerWindow.musicPlayer.playPause();
 }
 
 function playHandler() {
@@ -233,7 +213,7 @@ function volumeHandler() {
 function setupEventListeners() {
   // Search
   searchDiv.oninput = search;
-  pauseButton.onclick = playPause;
+  pauseButton.onclick = playerWindow.musicPlayer.playPause.bind(playerWindow.musicPlayer);
   previousButton.onclick = playerWindow.musicPlayer.previousTrack.bind(playerWindow.musicPlayer);
   nextButton.onclick = playerWindow.musicPlayer.nextTrack.bind(playerWindow.musicPlayer);
   shuffleButton.onclick = playerWindow.musicPlayer.toggleShuffle.bind(playerWindow.musicPlayer);

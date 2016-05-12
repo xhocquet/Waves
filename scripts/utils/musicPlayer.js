@@ -77,18 +77,26 @@ class musicPlayer {
     this._musicPlayer.play();
   }
 
-  queueNext(songId) {
-    let songIndex, songPath;
+  queueNext(trackId) {
+    let trackIndex, trackPath;
     if (!this.shuffleActivated) {
-      songIndex = this.ids.indexOf(songId);
-      songPath = this.paths[songIndex];
+      trackIndex = this.ids.indexOf(trackId);
+      trackPath = this.paths[trackIndex];
     } else {
-      songIndex = this.shuffledIds.indexOf(songId);
-      songPath = this.shuffledPaths[songIndex];
+      trackIndex = this.shuffledIds.indexOf(trackId);
+      trackPath = this.shuffledPaths[trackIndex];
     }
+    this.ids.splice(this.curIndex + 1, 0, trackId);
+    this.paths.splice(this.curIndex + 1, 0, trackPath);
+  }
 
-    this.ids.splice(this.curIndex + 1, 0, songId);
-    this.paths.splice(this.curIndex + 1, 0, songPath);
+  // Queue up tracks in reverse order to preserve click order
+  queueMultipleNext(trackArray) {
+    console.log(trackArray)
+    for (let i = trackArray.length - 1; i > -1; i--) {
+      console.log(trackArray[i])
+      this.queueNext(trackArray[i]);
+    }
   }
 
   seek(event) {

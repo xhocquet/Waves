@@ -126,7 +126,7 @@ let trackList = React.createClass({
         if(event.ctrlKey) {
           let newComponents = this.state.selectedTrackComponents;
           newComponents.push(element);
-          
+          this.props.playerWindow.selectedTracks = newComponents.map(trackComponent => trackComponent.props.track._id);
           this.setState({
             selectedTrackComponents: newComponents
           });
@@ -136,7 +136,10 @@ let trackList = React.createClass({
               trackComponent.setState({selected: false});
             }
           });
-          this.state.selectedTrackComponents = [element];
+          this.props.playerWindow.selectedTracks = [element.props.track._id];
+          this.setState({
+            selectedTrackComponents: [element]
+          });
         }
         element.setState({selected: true});
         break;
@@ -145,6 +148,7 @@ let trackList = React.createClass({
         this.props.musicPlayer.queueNext(trackID);
         break;
       case 2: // Right click
+        event.preventDefault();
         if(event.ctrlKey) {
           let newComponents = this.state.selectedTrackComponents;
           newComponents.push(element);
@@ -152,13 +156,6 @@ let trackList = React.createClass({
           this.setState({
             selectedTrackComponents: newComponents
           });
-        } else {
-          this.state.selectedTrackComponents.forEach(trackComponent => {
-            if (trackComponent.isMounted()) {
-              trackComponent.setState({selected: false});
-            }
-          });
-          this.state.selectedTrackComponents = [element];
         }
         element.setState({selected: true});
         // Need to set the selection to the window so the menu can access it

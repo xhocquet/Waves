@@ -2,12 +2,6 @@
 
 let mainMenu = [
   {
-    label: 'Play/Pause', //curWindow.playing? 'play' : 'pause'
-    click: function(item, curWindow) {
-      curWindow.playPause();
-    }
-  },
-  {
     label: 'Set Volume',
     submenu: [
       {
@@ -51,9 +45,7 @@ let mainMenu = [
   {
     label: 'Add to Queue',
     click: function(item, curWindow) {
-      curWindow.selectedTracks.forEach(trackId => {
-        curWindow.musicPlayer.queueNext(trackId);
-      });
+      curWindow.musicPlayer.queueMultipleNext(curWindow.selectedTracks);
     }
   },
   {

@@ -130,9 +130,6 @@ function setupPlayerWindow() {
   }
 
   // CONTROLS
-  playerWindow.playPause = function() {
-    playerWindow.webContents.send("playPause", {});
-  }
   playerWindow.nextTrack = function() {
     playerWindow.webContents.send("nextTrack");
   }
@@ -232,7 +229,7 @@ function setupPlayerWindowListeners() {
 }
 
 app.playPause = function() {
-  playerWindow.playPause();
+  playerWindow.webContents.send("playPause", {});
 }
 
 app.nextTrack = function() {

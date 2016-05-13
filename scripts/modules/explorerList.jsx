@@ -30,6 +30,8 @@ let explorerList = React.createClass({
 
   showArtists: function() {
     this.refs.explorerList.scrollTop = 0;
+    document.querySelector('.explorerTabSelected').classList.remove('explorerTabSelected');
+    this.refs['artist'].classList.add('explorerTabSelected');
     this.setState({
       displayMethod: 'artist'
     });
@@ -37,6 +39,8 @@ let explorerList = React.createClass({
 
   showAlbums: function() {
     this.refs.explorerList.scrollTop = 0;
+    document.querySelector('.explorerTabSelected').classList.remove('explorerTabSelected');
+    this.refs['album'].classList.add('explorerTabSelected');
     this.setState({
       displayMethod: 'album'
     });
@@ -44,6 +48,8 @@ let explorerList = React.createClass({
 
   showAlbumArtists: function() {
     this.refs.explorerList.scrollTop = 0;
+    document.querySelector('.explorerTabSelected').classList.remove('explorerTabSelected');
+    this.refs['albumArtist'].classList.add('explorerTabSelected');
     this.setState({
       displayMethod: 'albumArtist'
     });
@@ -88,9 +94,9 @@ let explorerList = React.createClass({
       return (
         <div className="randomAssContainer">
           <div className="explorerTabsContainer">
-            <div className="explorerTab" onMouseDown={this.showArtists}>Artist</div>
-            <div className="explorerTab" onMouseDown={this.showAlbums}>Album</div>
-            <div className="explorerTab" onMouseDown={this.showAlbumArtists}>Album Artist</div>
+            <div className="explorerTab explorerTabSelected" onMouseDown={this.showArtists} ref="artist">Artist</div>
+            <div className="explorerTab" onMouseDown={this.showAlbums} ref="album">Album</div>
+            <div className="explorerTab" onMouseDown={this.showAlbumArtists} ref="albumArtist">Album Artist</div>
           </div>
           <div  className="explorerList" ref="explorerList">
             {artistEntries}

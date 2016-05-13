@@ -59,18 +59,22 @@
 .explorerTabsContainer {
   width: 100%;
   height: 20px;
-  background-color: #aaa;
+  background-color: #eee;
   border-bottom: 1px solid #333;
 }
 
 .explorerTab {
   float: left;
-  background-color: #888;
+  background-color: #aaa;
   border-right: 1px solid #eee;
   height: 100%;
   padding: 0 5px;
   line-height: 20px;
   cursor: default;
+}
+
+.explorerTabSelected {
+  background-color: #777;
 }
 
 .explorerTab.selected {

@@ -61,9 +61,11 @@
   height: 20px;
   background-color: #eee;
   border-bottom: 1px solid #333;
+  padding: 2px;
 }
 
 .explorerTab {
+  margin-left:  5px;
   float: left;
   background-color: #aaa;
   border-right: 1px solid #eee;
@@ -177,7 +179,8 @@
 }
 
 #shuffle {
-  background: url("../assets/repeat.svg") no-repeat left top;
+  background-color: #333;
+  -webkit-mask-image: url("../assets/shuffle.svg");
 }
 
 /*CONTENT COMPONENTS*/

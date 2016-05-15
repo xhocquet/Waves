@@ -154,6 +154,9 @@ class musicPlayer {
     this._musicPlayer.muted = this._musicPlayer.muted ? false : true;
   }
 
+  get shuffled() {
+    return this.shuffleActivated;
+  }
 
   get audio() {
     return this._musicPlayer;

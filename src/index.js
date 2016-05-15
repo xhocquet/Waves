@@ -3,12 +3,12 @@ const ipcRenderer = require('electron').ipcRenderer;
 const Remote = require('electron').remote;
 const Menu = Remote.Menu;
 let playerWindow = Remote.getCurrentWindow();
-let mp = require('../scripts/utils/musicPlayer.js');
+let mp = require('./../src/utils/musicPlayer.js');
 const MetaData = require('musicmetadata');
 const fs = require('graceful-fs');
 
 // ELECTRON MENUS
-const trackContextMenuSource = require('../scripts/menus/trackContextMenu.js');
+const trackContextMenuSource = require('./../src/menus/trackContextMenu.js');
 const trackContextMenu = Menu.buildFromTemplate(trackContextMenuSource);
 
 // DOM REFERENCES
@@ -32,8 +32,8 @@ playerWindow.displayedTrackPaths = null;
 // REACT
 const React = require('react');
 const ReactDOM = require('react-dom');
-let TrackList = require('../scripts/modules/trackList.jsx');
-let ExplorerList = require('../scripts/modules/explorerList.jsx');
+let TrackList = require('./../src/modules/trackList.jsx');
+let ExplorerList = require('./../src/modules/explorerList.jsx');
 
 let TrackListComponent = ReactDOM.render(<TrackList
   height={770}
@@ -98,17 +98,18 @@ function setupIPCListeners() {
     playerWindow.musicPlayer.volumeMuteToggle();
   })
 
-  ipcRenderer.on('libraryData', function(event, response) {
+  ipcRenderer.on('libraryData', function(event, libraryData) {
     ExplorerListComponent.setState({
-      artist: response.artists,
-      album: response.albums,
-      albumArtist: response.albumArtists
+      artist: libraryData.artists,
+      album: libraryData.albums,
+      albumArtist: libraryData.albumArtists
     })
   });
 
-  ipcRenderer.on('settingsData', function(event, response) {
+  ipcRenderer.on('settingsData', function(event, userSettings) {
+    playerWindow.musicPlayer.setVolume(userSettings.currentVolume);
     TrackListComponent.setState({
-      groupMethod: response.trackGroupingMethod
+      groupMethod: userSettings.trackGroupingMethod
     });
   })
 }
@@ -208,6 +209,7 @@ function progressHandler() {
 function volumeHandler() {
   let volume = playerWindow.musicPlayer.audio.volume;
   volumeSlider.value = volume * 100;
+  ipcRenderer.send('newVolume', volume);
 }
 
 function setupEventListeners() {
@@ -216,7 +218,14 @@ function setupEventListeners() {
   pauseButton.onclick = playerWindow.musicPlayer.playPause.bind(playerWindow.musicPlayer);
   previousButton.onclick = playerWindow.musicPlayer.previousTrack.bind(playerWindow.musicPlayer);
   nextButton.onclick = playerWindow.musicPlayer.nextTrack.bind(playerWindow.musicPlayer);
-  shuffleButton.onclick = playerWindow.musicPlayer.toggleShuffle.bind(playerWindow.musicPlayer);
+  shuffleButton.onclick = function(event) {
+    playerWindow.musicPlayer.toggleShuffle();
+    if (playerWindow.musicPlayer.shuffled) {
+      shuffleButton.style.backgroundColor = "orange";
+    } else {
+      shuffleButton.style.backgroundColor = "#333";
+    }
+  }
   // Set volume with the volume slider
   volumeSlider.oninput = function(event) {
     playerWindow.musicPlayer.setVolume(event.target.value / 100);
@@ -228,10 +237,7 @@ function setupEventListeners() {
   playerWindow.musicPlayer.audio.ontimeupdate = progressHandler;
   playerWindow.musicPlayer.audio.onvolumechange = volumeHandler;
 
-  contentDiv.ondragover = function() {
-    return false;
-  }
-  contentDiv.ondragleave = function() {
+  contentDiv.ondragover = contentDiv.ondragleave = function() {
     return false;
   }
   // Drag file handler

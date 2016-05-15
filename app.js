@@ -3,13 +3,13 @@
 const electron = require('electron');
 const {ipcMain, app, BrowserWindow, globalShortcut, Menu, Tray} = electron;
 
-const dm = require('./scripts/utils/databaseManager.js');
+const dm = require('./src/utils/databaseManager.js');
 const databaseManager = new dm();
 
 resetDatabases();
 
-const mainWindowMenu = require('./scripts/menus/mainWindowMenu.js');
-const trayIconMenu = require('./scripts/menus/trayContextMenu.js');
+const mainWindowMenu = require('./src/menus/mainWindowMenu.js');
+const trayIconMenu = require('./src/menus/trayContextMenu.js');
 
 let playerWindow;
 let settingsWindow;
@@ -204,8 +204,14 @@ function setupIPCListeners() {
     });
   });
 
+  // Called when new data is imported via settings
   ipcMain.on('importedData', function(event, blank) {
     resetDatabases();
+  });
+
+  ipcMain.on('newVolume', function(event, newVolume) {
+    databaseManager.userSettings.currentVolume = newVolume;
+    databaseManager.saveSettings(databaseManager.userSettings, function(response) {});
   });
 }
 

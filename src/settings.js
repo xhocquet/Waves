@@ -10,8 +10,8 @@ let importFolderTextarea = document.getElementsByClassName("importFolders")[0];
 let minimizeOnCloseCheckbox = document.getElementsByClassName("minimizeOnClose")[0];
 let hotkeyInputs = document.querySelectorAll(".hotkeyInput");
 let trackGroupingMethodSelect = document.getElementsByClassName("trackGroupingMethod")[0];
-let exportLibraryButton = document.getElementById("exportLibraryButton");
-let importLibraryButton = document.getElementById("importLibraryButton");
+let exportLibraryButton = document.querySelector("#exportLibraryButton");
+let importLibraryButton = document.querySelector("#importLibraryButton");
 let noticePopup = document.getElementsByClassName("noticePopup")[0];
 let saveButton = document.getElementsByClassName("saveButton")[0];
 let closeButton = document.getElementsByClassName("closeButton")[0];
@@ -92,6 +92,7 @@ function setupInputListeners() {
     userSettings.minimizeOnClose = minimizeOnCloseCheckbox.checked;
   });
 
+  // Event listeners for all the hotkey inputs
   for (let i = 0; i < hotkeyInputs.length; i++) {
     let currentInput = hotkeyInputs[i];
     let currentHotkey = currentInput.classList[1];
@@ -99,7 +100,7 @@ function setupInputListeners() {
       e.preventDefault();
       let acceleratorString = eventToAcceleratorString(e);
       currentInput.value = acceleratorString;
-      userSettings[currentHotkey] = acceleratorString;
+      userSettings.hotkeys[currentHotkey] = acceleratorString;
     });
   }
 
@@ -243,7 +244,7 @@ function fillInCurrentSettings() {
   for (let i = 0; i < hotkeyInputs.length; i++) {
     let currentInput = hotkeyInputs[i];
     let currentHotkey = currentInput.classList[1];
-    currentInput.value = userSettings[currentHotkey];
+    currentInput.value = userSettings.hotkeys[currentHotkey];
   }
 
   trackGroupingMethodSelect.value = userSettings.trackGroupingMethod;

@@ -124,12 +124,14 @@ class databaseManager {
       settingName: 'user',
       importFolders: [],
       minimizeOnClose: false,
-      nextTrackHotkey: null,
-      previousTrackHotkey: null,
-      playPauseHotkey: null,
-      volumeUpHotkey: null,
-      volumeDownHotkey: null,
-      volumeMuteHotkey: null
+      hotkeys: {
+        nextTrack: null,
+        previousTrack: null,
+        playPause: null,
+        volumeUp: null,
+        volumeDown: null,
+        volumeMute: null
+      }
     }, function(err, newDoc) {
       if (!err) {
         self.userSettings = newDoc;

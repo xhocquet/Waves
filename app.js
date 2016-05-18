@@ -97,12 +97,12 @@ function afterLibraryDataLoad() {
 function setupGlobalShorcuts() {
   globalShortcut.unregisterAll();
 
-  var playPauseHotkey = databaseManager.userSettings.playPauseHotkey;
-  var previousTrackHotkey = databaseManager.userSettings.previousTrackHotkey;
-  var nextTrackHotkey = databaseManager.userSettings.nextTrackHotkey;
-  var volumeUpHotkey = databaseManager.userSettings.volumeUpHotkey;
-  var volumeDownHotkey = databaseManager.userSettings.volumeDownHotkey;
-  var volumeMuteHotkey = databaseManager.userSettings.volumeMuteHotkey;
+  let playPauseHotkey = databaseManager.userSettings.hotkeys.playPause;
+  let previousTrackHotkey = databaseManager.userSettings.hotkeys.previousTrack;
+  let nextTrackHotkey = databaseManager.userSettings.hotkeys.nextTrack;
+  let volumeUpHotkey = databaseManager.userSettings.hotkeys.volumeUp;
+  let volumeDownHotkey = databaseManager.userSettings.hotkeys.volumeDown;
+  let volumeMuteHotkey = databaseManager.userSettings.hotkeys.volumeMute;
 
   playPauseHotkey ? globalShortcut.register(playPauseHotkey, app.playPause) : null;
   previousTrackHotkey? globalShortcut.register(previousTrackHotkey, app.previousTrack) : null;

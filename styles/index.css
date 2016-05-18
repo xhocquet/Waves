@@ -20,6 +20,7 @@
   bottom: 0;
   height: 65px;
   position: fixed;
+  text-align: center;
   width: 100%;
 }
 
@@ -129,18 +130,28 @@
   width: 100%;
 }
 
-#navContainer {
+#leftFooterContainer {
   display: block;
   float: left;
+  width: 300px;
   height: 50px;
-  width: 400px;
+}
+
+#centerFooterContainer {
+  display: inline-block;
+  height: 50px;
+}
+
+#rightFooterContainer {
+  display: block;
+  float: right;
+  height: 50px;
+  width: 300px;
 }
 
 #volumeContainer {
-  display: block;
-  float: left;
-  height: 100%;
-  width: 200px;
+  line-height: 50px;
+  margin-right: 5px;
 }
 
 #volumeSlider {
@@ -178,9 +189,29 @@
   background: url("../assets/play.svg") no-repeat left top;
 }
 
+#muteButton {
+  -webkit-user-select: none;
+  height: 26px;
+  width: 26px;
+  display: inline-block;
+  background: url("../assets/volume.svg") no-repeat left top;
+}
+
+#muteButton.muted {
+  background: url("../assets/volume_mute.svg") no-repeat left top;
+}
+
 #shuffle {
   background-color: #333;
   -webkit-mask-image: url("../assets/shuffle.svg");
+}
+
+#currentlyPlayingInfo {
+  text-align: left;
+  margin: 0 0 0 10px;
+  line-height: 50px;
+  font-size: 17px;
+  color: #333;
 }
 
 /*CONTENT COMPONENTS*/

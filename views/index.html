@@ -29,14 +29,20 @@
     <div id="content"></div>
     <div id="footer">
       <div id="progressBar"><div id="curProgress"></div></div>
-      <div id="navContainer">
+      <div id="leftFooterContainer">
+        <p id="currentlyPlayingInfo"></p>
+      </div>
+      <div id="centerFooterContainer">
         <div class="navButton previous" id="previous"></div>
         <div class="navButton pause" id="pause"></div>
         <div class="navButton next" id="next"></div>
         <div class="navButton shuffle" id="shuffle"></div>
       </div>
-      <div id="volumeContainer">
-        <input type="range" id="volumeSlider" min="0" max="100" value="100" />
+      <div id="rightFooterContainer">
+        <div id="volumeContainer">
+          <div id="muteButton"></div>
+          <input type="range" id="volumeSlider" min="0" max="100" value="100" />
+        </div>
       </div>
     </div>
   </body>

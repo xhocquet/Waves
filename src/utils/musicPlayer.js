@@ -150,8 +150,10 @@ class musicPlayer {
     this.setVolume(Math.max(this._musicPlayer.volume -= 0.1, 0));
   }
 
+  // Toggles mute, returns new status
   volumeMuteToggle() {
     this._musicPlayer.muted = this._musicPlayer.muted ? false : true;
+    return this._musicPlayer.muted;
   }
 
   get shuffled() {

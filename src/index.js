@@ -12,18 +12,20 @@ const trackContextMenuSource = require('./../src/menus/trackContextMenu.js');
 const trackContextMenu = Menu.buildFromTemplate(trackContextMenuSource);
 
 // DOM REFERENCES
-let searchDiv = document.getElementById("search");
-let contentDiv = document.getElementById("content");
-let pauseButton = document.getElementById("pause");
-let previousButton = document.getElementById("previous");
-let nextButton = document.getElementById("next");
-let shuffleButton = document.getElementById("shuffle");
-let progressBarDiv = document.getElementById("progressBar");
-let curProgressDiv = document.getElementById("curProgress");
-let songList = document.getElementById("songList");
-let volumeSlider = document.getElementById("volumeSlider");
-let albumArtImage = document.getElementById("albumArtImage");
-let explorerListContainer = document.getElementById("explorerListContainer");
+let searchDiv = document.querySelector("#search");
+let contentDiv = document.querySelector("#content");
+let pauseButton = document.querySelector("#pause");
+let previousButton = document.querySelector("#previous");
+let nextButton = document.querySelector("#next");
+let shuffleButton = document.querySelector("#shuffle");
+let progressBarDiv = document.querySelector("#progressBar");
+let curProgressDiv = document.querySelector("#curProgress");
+let currentlyPlayingInfo = document.querySelector("#currentlyPlayingInfo");
+let songList = document.querySelector("#songList");
+let muteButton = document.querySelector("#muteButton");
+let volumeSlider = document.querySelector("#volumeSlider");
+let albumArtImage = document.querySelector("#albumArtImage");
+let explorerListContainer = document.querySelector("#explorerListContainer");
 
 playerWindow.musicPlayer = new mp();
 playerWindow.displayedTrackIds = null;
@@ -132,6 +134,7 @@ function renderTracklist(tracks) {
 function playHandler() {
   let trackId = playerWindow.musicPlayer.curTrackId;
   let trackComponent = TrackListComponent.refs[trackId];
+  let curTrack = trackComponent.props.track;
 
   // Update now playing track
   TrackListComponent.setState({
@@ -145,6 +148,9 @@ function playHandler() {
   } else {
     pauseButton.style.background = "url('../assets/play.svg') no-repeat left top";
   }
+
+  // Update now playing info
+  currentlyPlayingInfo.innerHTML = curTrack.artist + " - " + curTrack.title;
 
   // Update album art
   updateAlbumArtImage(playerWindow.musicPlayer.audio.src);
@@ -229,6 +235,15 @@ function setupEventListeners() {
   // Set volume with the volume slider
   volumeSlider.oninput = function(event) {
     playerWindow.musicPlayer.setVolume(event.target.value / 100);
+  }
+  // Mute toggle button
+  muteButton.onclick = function(event) {
+    let status = playerWindow.musicPlayer.volumeMuteToggle();
+    if (status) {
+      muteButton.classList.add('muted')
+    } else {
+      muteButton.classList.remove('muted')
+    }
   }
   // Seek track on clicking the progress bar
   progressBarDiv.onclick = playerWindow.musicPlayer.seek.bind(playerWindow.musicPlayer);

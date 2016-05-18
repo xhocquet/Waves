@@ -9,6 +9,7 @@ const pathTools = require('path');
 
 class databaseManager {
   constructor() {
+    let self = this;
     this.DEFAULT_SORT = {
       'albumArtist': 1,
       'album': 1,

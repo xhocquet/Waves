@@ -84,7 +84,7 @@
   background-color: #555;
 }
 
-.artistEntry, .artistEntryAlternate {
+.explorerEntry, .explorerEntryAlternate {
   background-color: #fff;
   cursor: default;
   overflow: hidden;
@@ -93,7 +93,7 @@
   white-space: nowrap;
 }
 
-.artistEntryAlternate {
+.explorerEntryAlternate {
   background-color: #ccc;
 }
 

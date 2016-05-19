@@ -124,6 +124,7 @@ class databaseManager {
       settingName: 'user',
       importFolders: [],
       minimizeOnClose: false,
+      currentVolume: 1.0,
       hotkeys: {
         nextTrack: null,
         previousTrack: null,
@@ -194,7 +195,9 @@ class databaseManager {
       settingName: 'user',
       artists: [],
       albumArtists: [],
-      albums: []
+      albums: [],
+      totalDuration: 0,
+      totalItems: 0
     }, function(err, newDoc) {
       if (!err) {
         self.libraryData = newDoc;
@@ -307,6 +310,9 @@ class databaseManager {
                 console.log(err);
               }
             });
+
+            self.libraryData.totalItems -= 1;
+            self.libraryData.totalDuration -= trackToRemove.duration;
           }
         });
       }
@@ -371,6 +377,8 @@ class databaseManager {
           if (self.libraryData.albums.indexOf(songData.album) < 0 && songData.album.length > 0) {
             self.libraryData.albums.push(songData.album);
           }
+          self.libraryData.totalItems += 1;
+          self.libraryData.totalDuration += songData.duration;
 
           console.log("Inserted: " + newDoc.artist + " - " + newDoc.title);
           fileStream ? fileStream.destroy() : null;

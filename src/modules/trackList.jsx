@@ -144,22 +144,30 @@ let trackList = React.createClass({
         element.setState({selected: true});
         break;
       case 1: // Middle click
-        let trackID = element.props.track._id;
-        this.props.musicPlayer.queueNext(trackID);
-        break;
+        // let trackID = element.props.track._id;
+        // this.props.musicPlayer.queueNext(trackID);
+        // break;
       case 2: // Right click
         event.preventDefault();
         if(event.ctrlKey) {
           let newComponents = this.state.selectedTrackComponents;
           newComponents.push(element);
-
+          this.props.playerWindow.selectedTracks = newComponents.map(trackComponent => trackComponent.props.track._id);
           this.setState({
             selectedTrackComponents: newComponents
           });
+        } else {
+          this.state.selectedTrackComponents.forEach(trackComponent => {
+            if (trackComponent.isMounted()) {
+              trackComponent.setState({selected: false});
+            }
+          });
+          this.props.playerWindow.selectedTracks = [element.props.track._id];
+          this.setState({
+            selectedTrackComponents: [element]
+          });
         }
         element.setState({selected: true});
-        // Need to set the selection to the window so the menu can access it
-        this.props.playerWindow.selectedTracks = this.state.selectedTrackComponents.map(trackComponent => trackComponent.props.track._id);
         this.props.trackContextMenu.popup(this.props.playerWindow);
         break;
     }

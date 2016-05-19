@@ -94,6 +94,7 @@ function afterLibraryDataLoad() {
   }
 }
 
+// TODO: Make this generic
 function setupGlobalShorcuts() {
   globalShortcut.unregisterAll();
 
@@ -118,7 +119,7 @@ function sendLibraryData() {
 
 function sendInitialLibrary() {
   databaseManager.queryLibrary({}, function(response) {
-    playerWindow.webContents.send("initialListData", response);
+    playerWindow.webContents.send("listData", response);
   });
 }
 

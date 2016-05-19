@@ -1,6 +1,6 @@
 const ipcRenderer = require('electron').ipcRenderer;
 const React = require('react');
-const ArtistEntry = require('./explorerEntry.jsx');
+const ExplorerEntry = require('./explorerEntry.jsx');
 
 let explorerList = React.createClass({
   getInitialState: function() {
@@ -61,8 +61,8 @@ let explorerList = React.createClass({
 
     // 'All' Entry
     explorerEntries.push(
-      <ArtistEntry
-        rowClass={"artistEntry"}
+      <ExplorerEntry
+        rowClass={"explorerEntry"}
         key={1}
         onClick={this.showSelection}
         onDoubleClick={this.playSelection}
@@ -71,11 +71,11 @@ let explorerList = React.createClass({
     );
 
     for (let i = 0; i < this.state[this.state.displayMethod].length; i++) {
-      let rowClass = counter % 2 ? "artistEntry" : "artistEntryAlternate";
+      let rowClass = counter % 2 ? "explorerEntry" : "explorerEntryAlternate";
       if (this.state[this.state.displayMethod][i]) {
         counter++;
         explorerEntries.push(
-          <ArtistEntry
+          <ExplorerEntry
             rowClass={rowClass}
             key={"explorerList_"+this.state[this.state.displayMethod][i]}
             onClick={this.showSelection}
@@ -90,7 +90,7 @@ let explorerList = React.createClass({
 
   render: function() {
     if (this.state[this.state.displayMethod].length > 0) {
-      let artistEntries = this.getExplorerEntries();
+      let explorerEntries = this.getExplorerEntries();
       return (
         <div className="randomAssContainer">
           <div className="explorerTabsContainer">
@@ -99,7 +99,7 @@ let explorerList = React.createClass({
             <div className="explorerTab" onMouseDown={this.showAlbumArtists} ref="albumArtist">Album Artist</div>
           </div>
           <div  className="explorerList" ref="explorerList">
-            {artistEntries}
+            {explorerEntries}
           </div>
         </div>
       );

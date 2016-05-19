@@ -62,14 +62,6 @@ function setupIPCListeners() {
     renderTracklist(tracks);
   });
 
-  ipcRenderer.on('initialListData', function(event, tracks) {
-    playerWindow.displayedTrackIds = tracks.map(track => track._id);
-    playerWindow.displayedTrackPaths = tracks.map(track => track.path);
-
-    playerWindow.updateMusicPlayerData();
-    renderTracklist(tracks);
-  });
-
   ipcRenderer.on('playPause', function(event, response) {
     playerWindow.musicPlayer.playPause();
   });
@@ -156,10 +148,12 @@ function playHandler() {
   updateAlbumArtImage(playerWindow.musicPlayer.audio.src);
 }
 
+// Remove track from library and libraryData
 function deleteTrack(trackId) {
   databaseManager.deleteTrack(trackId);
 }
 
+// Generic search for search input
 function search(event) {
   let searchTerm = searchDiv.value;
   if (searchTerm === "") {
@@ -174,7 +168,6 @@ function search(event) {
 function updateAlbumArtImage(filePath) {
   if (filePath) {
     let newFilePath = decodeURI(filePath.slice(8));
-
     let fileStream = fs.createReadStream(newFilePath);
     MetaData(fileStream, function(err, metaData) {
       let coverImage = metaData.picture[0];
@@ -195,12 +188,14 @@ function updateAlbumArtImage(filePath) {
   }
 }
 
+// Set the musicplayer data to the displayed tracks. Activated when you play something new.
 playerWindow.updateMusicPlayerData = function() {
   if (playerWindow.displayedTrackIds !== playerWindow.musicPlayer.idArray) {
     playerWindow.musicPlayer.updateListData(playerWindow.displayedTrackIds, playerWindow.displayedTrackPaths);
   }
 }
 
+// Called by musicplayer.audio to update seek bar
 function progressHandler() {
   if (!playerWindow.musicPlayer.audio.ended) {
     let progress = playerWindow.musicPlayer.audio.currentTime;
@@ -212,11 +207,13 @@ function progressHandler() {
   }
 }
 
+// Called by musicPlayer.audio to update volume slider
 function volumeHandler() {
   let volume = playerWindow.musicPlayer.audio.volume;
   volumeSlider.value = volume * 100;
   ipcRenderer.send('newVolume', volume);
 }
+
 
 function setupEventListeners() {
   // Search

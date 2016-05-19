@@ -93,7 +93,6 @@ class musicPlayer {
   // Queue up tracks in reverse order to preserve click order
   queueMultipleNext(trackArray) {
     for (let i = trackArray.length - 1; i > -1; i--) {
-      console.log(trackArray[i])
       this.queueNext(trackArray[i]);
     }
   }

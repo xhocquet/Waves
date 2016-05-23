@@ -60,6 +60,7 @@ function resetDatabases() {
   databaseManager.initializeDatabases();
   databaseManager.loadLibraryData(afterLibraryDataLoad);
   databaseManager.loadSettings(afterSettingsLoad);
+  databaseManager.loadPlaylists(afterPlaylistsLoad);
 }
 
 function afterSettingsLoad() {
@@ -91,6 +92,16 @@ function afterLibraryDataLoad() {
     });
   } else {
     playerWindow.webContents.send("libraryData", databaseManager.libraryData);
+  }
+}
+
+function afterPlaylistsLoad() {
+  if (playerWindow.webContents.isLoading()) {
+    playerWindow.webContents.on('did-finish-load', function() {
+      playerWindow.webContents.send("playlists", databaseManager.playlists);
+    });
+  } else {
+    playerWindow.webContents.send("playlists", databaseManager.playlists);
   }
 }
 
@@ -281,4 +292,8 @@ app.closeSettings = function() {
 
 app.deleteTrack = function(trackId) {
   databaseManager.deleteTrack(trackId);
+}
+
+app.createNewPlaylist = function() {
+  
 }

@@ -12,7 +12,6 @@ const trackContextMenuSource = require('./../src/menus/trackContextMenu.js');
 const trackContextMenu = Menu.buildFromTemplate(trackContextMenuSource);
 
 // DOM REFERENCES
-let searchDiv = document.querySelector("#search");
 let contentDiv = document.querySelector("#content");
 let pauseButton = document.querySelector("#pause");
 let previousButton = document.querySelector("#previous");
@@ -21,11 +20,9 @@ let shuffleButton = document.querySelector("#shuffle");
 let progressBarDiv = document.querySelector("#progressBar");
 let curProgressDiv = document.querySelector("#curProgress");
 let currentlyPlayingInfo = document.querySelector("#currentlyPlayingInfo");
-let songList = document.querySelector("#songList");
 let muteButton = document.querySelector("#muteButton");
 let volumeSlider = document.querySelector("#volumeSlider");
-let albumArtImage = document.querySelector("#albumArtImage");
-let explorerListContainer = document.querySelector("#explorerListContainer");
+let leftSidebar = document.querySelector("#leftSidebar");
 
 playerWindow.musicPlayer = new mp();
 playerWindow.displayedTrackIds = null;
@@ -35,7 +32,12 @@ playerWindow.displayedTrackPaths = null;
 const React = require('react');
 const ReactDOM = require('react-dom');
 let TrackList = require('./../src/modules/trackList.jsx');
-let ExplorerList = require('./../src/modules/explorerList.jsx');
+let LeftSidebar = require('./../src/modules/leftSidebar.jsx');
+
+let LeftSidebarComponent = ReactDOM.render(<LeftSidebar
+  playerWindow={playerWindow}
+  musicPlayer={playerWindow.musicPlayer}
+/>, leftSidebar);
 
 let TrackListComponent = ReactDOM.render(<TrackList
   height={770}
@@ -44,11 +46,6 @@ let TrackListComponent = ReactDOM.render(<TrackList
   recordHeight={25}
   trackContextMenu={trackContextMenu}
 />, contentDiv);
-
-let ExplorerListComponent = ReactDOM.render(<ExplorerList
-  playerWindow={playerWindow}
-  musicPlayer={playerWindow.musicPlayer}
-/>, explorerListContainer);
 
 setupIPCListeners();
 setupEventListeners();
@@ -93,11 +90,11 @@ function setupIPCListeners() {
   })
 
   ipcRenderer.on('libraryData', function(event, libraryData) {
-    ExplorerListComponent.setState({
+    LeftSidebarComponent.setState({
       artist: libraryData.artists,
       album: libraryData.albums,
       albumArtist: libraryData.albumArtists
-    })
+    });
   });
 
   ipcRenderer.on('settingsData', function(event, userSettings) {
@@ -145,47 +142,14 @@ function playHandler() {
   currentlyPlayingInfo.innerHTML = curTrack.artist + " - " + curTrack.title;
 
   // Update album art
-  updateAlbumArtImage(playerWindow.musicPlayer.audio.src);
+  LeftSidebarComponent.setState({
+    trackFilepath: playerWindow.musicPlayer.audio.src
+  });
 }
 
 // Remove track from library and libraryData
 function deleteTrack(trackId) {
   databaseManager.deleteTrack(trackId);
-}
-
-// Generic search for search input
-function search(event) {
-  let searchTerm = searchDiv.value;
-  if (searchTerm === "") {
-    ipcRenderer.send('getListData', {});
-  } else {
-    ipcRenderer.send('getListData', {
-      searchAll: searchDiv.value
-    });
-  }
-}
-
-function updateAlbumArtImage(filePath) {
-  if (filePath) {
-    let newFilePath = decodeURI(filePath.slice(8));
-    let fileStream = fs.createReadStream(newFilePath);
-    MetaData(fileStream, function(err, metaData) {
-      let coverImage = metaData.picture[0];
-      if (coverImage) {
-        let base64String = "";
-        for (let i = 0; i < coverImage.data.length; i++) {
-          base64String += String.fromCharCode(coverImage.data[i]);
-        }
-        let base64 = "data:" + coverImage.format + ";base64," + window.btoa(base64String);
-
-        albumArtImage.setAttribute('src',base64);
-      } else {0
-        albumArtImage.setAttribute('src', "../assets/albumArt.png");
-      }
-    });
-  } else {
-    albumArtImage.setAttribute('src', "../assets/albumArt.png");
-  }
 }
 
 // Set the musicplayer data to the displayed tracks. Activated when you play something new.
@@ -216,8 +180,6 @@ function volumeHandler() {
 
 
 function setupEventListeners() {
-  // Search
-  searchDiv.oninput = search;
   pauseButton.onclick = playerWindow.musicPlayer.playPause.bind(playerWindow.musicPlayer);
   previousButton.onclick = playerWindow.musicPlayer.previousTrack.bind(playerWindow.musicPlayer);
   nextButton.onclick = playerWindow.musicPlayer.nextTrack.bind(playerWindow.musicPlayer);
@@ -259,7 +221,4 @@ function setupEventListeners() {
       ipcRenderer.send('generateLibrary', { path: e.dataTransfer.files[i].path });
     }
   }
-
-  // Initial album art load
-  updateAlbumArtImage();
 }

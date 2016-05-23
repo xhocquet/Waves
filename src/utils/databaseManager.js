@@ -17,9 +17,9 @@ class databaseManager {
       'artist': 1
     };
 
-    this.trackDataWorker = async.queue(function (path, callback) {
+    this.newTrackProcessor = async.queue(function (path, callback) {
       console.log("Worker processing data for ", path);
-      self.createTrackData(path, callback);
+      self.processNewTrack(path, callback);
     }, 5);
 
     this.libraryDataCleaner = async.queue(function(data, callback) {
@@ -27,7 +27,7 @@ class databaseManager {
       self.confirmLibraryData(data.index, data.value, callback);
     }, 1);
 
-    this.trackDataWorker.drain = function() {
+    this.newTrackProcessor.drain = function() {
       self.saveLibraryData();
       app.afterNewLibraryData();
       console.log("All tracks in the queue have been processed");
@@ -43,17 +43,25 @@ class databaseManager {
   initializeDatabases() {
     this.libraryData = '';
     this.userSettings = '';
+    this.playlists = {};
 
     this.db = {};
     this.db.libraryData =  new Datastore({ filename: './data/libraryData.json', autoload: true });
     this.db.settings =  new Datastore({ filename: './data/settings.json', autoload: true});
     this.db.songs =  new Datastore({ filename: './data/songs.json', autoload: true });
+    this.db.playlists = new Datastore({ filename: './data/playlists.json', autoload: true });
 
     this.db.songs.persistence.setAutocompactionInterval(10000);
 
     this.db.songs.ensureIndex({ fieldName: 'path', unique: true}, function(err) {
       if (err) {
         console.log("Attempted to add duplicate file: ", err);
+      }
+    });
+
+    this.db.playlists.ensureIndex({ fieldName: 'name', unique: true}, function(err) {
+      if (err) {
+        console.log("Attempted to create a duplicate playlist: ", err);
       }
     });
   }
@@ -238,7 +246,7 @@ class databaseManager {
     }
     // Dragging in a single file
     if (pathTools.extname(path) === ".mp3") {
-      this.trackDataWorker.push(path, function(err) {
+      this.newTrackProcessor.push(path, function(err) {
         if (!err) {
           console.log('Processed ', path);
         } else {
@@ -255,7 +263,7 @@ class databaseManager {
       if (curFileStats.isDirectory()) {
         this.generateLibrary(curFilePath);
       } else if (pathTools.extname(curFilePath) === ".mp3") {
-        this.trackDataWorker.push(curFilePath, function(err) {
+        this.newTrackProcessor.push(curFilePath, function(err) {
           if (!err) {
             console.log('Processed ', curFilePath);
           } else {
@@ -319,6 +327,35 @@ class databaseManager {
     });
   }
 
+  loadPlaylists(callback) {
+    let self = this;
+    this.db.playlists.find({}).sort({ name: 1 }).exec(function(err, playlists) {
+      if (err) {
+        callback(err);
+      } else {
+        playlists.forEach(playlist => {
+          self.playlists[playlist.name] = playlist;
+        });
+        callback(playlists);
+      }
+    });
+  }
+
+  // Create playlist
+  createPlaylist(name) {
+    let self = this;
+    this.db.playlists.insert({
+      name: name,
+      tracks: [],
+      count: 0,
+      duration: 0
+    }, function(err, newDoc) {
+      if (!err) {
+        self.playlists[name] = newDoc;
+      }
+    })
+  }
+
   // Check type and value of library data to ensure it still exists in the library.
   // If not, remove from library data. Used in a worker queue because of DB operations.
   confirmLibraryData(index, value, callback) {
@@ -348,7 +385,7 @@ class databaseManager {
     });
   }
 
-  createTrackData(filePath, callback) {
+  processNewTrack(filePath, callback) {
     let self = this;
     let fileStream = fs.createReadStream(filePath);
     MetaData(fileStream, { duration: true }, function(err, metaData) {

@@ -12,6 +12,15 @@ let explorerList = React.createClass({
     }
   },
 
+  componentWillReceiveProps : function(nextProps) {
+    this.setState({
+      artist: nextProps.artist,
+      album: nextProps.album,
+      albumArtist: nextProps.albumArtist,
+      displayMethod: nextProps.displayMethod
+    });
+  },
+
   showSelection: function(value, event) {
     let options = {};
     options[this.state.displayMethod] = value;

@@ -66,6 +66,17 @@ let mainMenu = [
       }
     ]
   },
+  {
+    label: 'Playlist',
+    submenu: [
+      {
+        label: 'Create New Playlist',
+        click: function(item, focusedWindow) { 
+          app.createNewPlaylist();
+        }
+      }
+    ]
+  }
 ];
 
 if (process.platform == 'darwin') {

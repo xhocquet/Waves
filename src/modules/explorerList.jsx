@@ -8,7 +8,8 @@ let explorerList = React.createClass({
       artist: [],
       album: [],
       albumArtist: [],
-      displayMethod: 'artist'
+      displayMethod: 'artist',
+      playlists: []
     }
   },
 
@@ -17,7 +18,8 @@ let explorerList = React.createClass({
       artist: nextProps.artist,
       album: nextProps.album,
       albumArtist: nextProps.albumArtist,
-      displayMethod: nextProps.displayMethod
+      displayMethod: nextProps.displayMethod,
+      playlists: nextProps.playlists
     });
   },
 
@@ -64,20 +66,31 @@ let explorerList = React.createClass({
     });
   },
 
+  showPlaylists: function() {
+    this.refs.explorerList.scrollTop = 0;
+    document.querySelector('.explorerTabSelected').classList.remove('explorerTabSelected');
+    this.refs['playlists'].classList.add('explorerTabSelected');
+    this.setState({
+      displayMethod: 'playlists'
+    });
+  },
+
   getExplorerEntries: function() {
     let explorerEntries = [];
     let counter = 0;
 
-    // 'All' Entry
-    explorerEntries.push(
-      <ExplorerEntry
-        rowClass={"explorerEntry"}
-        key={1}
-        onClick={this.showSelection}
-        onDoubleClick={this.playSelection}
-        value={"All"}
-      />
-    );
+    // 'All' Entry unless Playlist
+    if (this.state.displayMethod != 'playlists') {
+      explorerEntries.push(
+        <ExplorerEntry
+          rowClass={"explorerEntry"}
+          key={1}
+          onClick={this.showSelection}
+          onDoubleClick={this.playSelection}
+          value={"All"}
+        />
+      );
+    }
 
     for (let i = 0; i < this.state[this.state.displayMethod].length; i++) {
       let rowClass = counter % 2 ? "explorerEntry" : "explorerEntryAlternate";
@@ -101,11 +114,12 @@ let explorerList = React.createClass({
     if (this.state[this.state.displayMethod].length > 0) {
       let explorerEntries = this.getExplorerEntries();
       return (
-        <div className="randomAssContainer">
+        <div className="fullHeightContainer">
           <div className="explorerTabsContainer">
             <div className="explorerTab explorerTabSelected" onMouseDown={this.showArtists} ref="artist">Artist</div>
             <div className="explorerTab" onMouseDown={this.showAlbums} ref="album">Album</div>
             <div className="explorerTab" onMouseDown={this.showAlbumArtists} ref="albumArtist">Album Artist</div>
+            <div className="explorerTab" onMouseDown={this.showPlaylists} ref="playlists">Playlists</div>
           </div>
           <div  className="explorerList" ref="explorerList">
             {explorerEntries}
@@ -114,8 +128,16 @@ let explorerList = React.createClass({
       );
     } else {
       return (
-        <div  className="explorerList explorerListEmpty">
-          Add some tracks!
+        <div className="fullHeightContainer">
+          <div className="explorerTabsContainer">
+            <div className="explorerTab explorerTabSelected" onMouseDown={this.showArtists} ref="artist">Artist</div>
+            <div className="explorerTab" onMouseDown={this.showAlbums} ref="album">Album</div>
+            <div className="explorerTab" onMouseDown={this.showAlbumArtists} ref="albumArtist">Album Artist</div>
+            <div className="explorerTab" onMouseDown={this.showPlaylists} ref="playlists">Playlists</div>
+          </div>
+          <div  className="explorerList explorerListEmpty">
+            Add some tracks!
+          </div>
         </div>
       );
     }

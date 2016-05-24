@@ -45,14 +45,32 @@ let mainMenu = [
   {
     label: 'Add to Queue',
     click: function(item, curWindow) {
-      curWindow.musicPlayer.queueMultipleNext(curWindow.selectedTracks);
+      curWindow.musicPlayer.queueMultipleNext(curWindow.selectedTracks.map(track => track._id));
+    }
+  },
+  {
+    label: 'Add to Playlist',
+    click: function(item, curWindow) {
+      let playlistName = 'Test1';
+      curWindow.selectedTracks.forEach(track => {
+        require('electron').remote.app.addToPlaylist(track, playlistName);
+      });
+    }
+  },
+  {
+    label: 'Remove from Playlist',
+    click: function(item, curWindow) {
+      let playlistName = 'Test1';
+      curWindow.selectedTracks.forEach(track => {
+        require('electron').remote.app.removeFromPlaylist(track, playlistName);
+      });
     }
   },
   {
     label: 'Remove from Library',
     click: function(item, curWindow) {
-      curWindow.selectedTracks.forEach(trackId => {
-        require('electron').remote.app.deleteTrack(trackId);
+      curWindow.selectedTracks.forEach(track => {
+        require('electron').remote.app.deleteTrack(track._id);
       });
     }
   },
@@ -60,9 +78,7 @@ let mainMenu = [
     label: 'Open in Explorer',
     click: function(item, curWindow) {
       curWindow.selectedTracks.forEach(track => {
-        let trackIndex = curWindow.musicPlayer.ids.indexOf(track);
-        let trackPath = curWindow.musicPlayer.paths[trackIndex];
-        require('electron').shell.showItemInFolder(trackPath);
+        require('electron').shell.showItemInFolder(track.path);
       });
     }
   }

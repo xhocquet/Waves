@@ -103,6 +103,12 @@ function setupIPCListeners() {
       groupMethod: userSettings.trackGroupingMethod
     });
   })
+
+  ipcRenderer.on('playlistData', function(event, playlists) {
+    LeftSidebarComponent.setState({
+      playlists: playlists
+    });
+  });
 }
 
 // Pass tracks to TrackList and reset positioning

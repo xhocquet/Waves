@@ -12,7 +12,8 @@ let LeftSidebar = React.createClass({
       artist: [],
       album: [],
       albumArtist: [],
-      displayMethod: 'artist'
+      displayMethod: 'artist',
+      playlists: []
     }
   },
 
@@ -33,7 +34,7 @@ let LeftSidebar = React.createClass({
 
   render: function() {
     return (
-      <div>
+      <div className="fullHeightContainer">
         <div id="searchContainer">
           <input id="search" placeholder="Search..." onClick={this.select} onInput={this.search}></input>
         </div>
@@ -45,6 +46,7 @@ let LeftSidebar = React.createClass({
             album={this.state.album}
             albumArtist={this.state.albumArtist}
             displayMethod={this.state.displayMethod}
+            playlists={this.state.playlists}
           />
         </div>
         <AlbumArt filePath={this.state.trackFilepath} />

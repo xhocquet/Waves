@@ -98,10 +98,10 @@ function afterLibraryDataLoad() {
 function afterPlaylistsLoad() {
   if (playerWindow.webContents.isLoading()) {
     playerWindow.webContents.on('did-finish-load', function() {
-      playerWindow.webContents.send("playlists", databaseManager.playlists);
+      playerWindow.webContents.send("playlistData", databaseManager.playlists);
     });
   } else {
-    playerWindow.webContents.send("playlists", databaseManager.playlists);
+    playerWindow.webContents.send("playlistData", databaseManager.playlists);
   }
 }
 
@@ -294,6 +294,14 @@ app.deleteTrack = function(trackId) {
   databaseManager.deleteTrack(trackId);
 }
 
+app.addToPlaylist = function(trackId, playlistName) {
+  databaseManager.addToPlaylist(trackId, playlistName);
+}
+
+app.removeFromPlaylist = function(trackId, playlistName) {
+  databaseManager.removeFromPlaylist(trackId, playlistName);
+}
+
 app.createNewPlaylist = function() {
-  
+  databaseManager.createPlaylist('fakenaem');
 }

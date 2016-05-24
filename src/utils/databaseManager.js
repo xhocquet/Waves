@@ -48,12 +48,12 @@ class databaseManager {
     this.db = {};
     this.db.libraryData =  new Datastore({ filename: './data/libraryData.json', autoload: true });
     this.db.settings =  new Datastore({ filename: './data/settings.json', autoload: true});
-    this.db.songs =  new Datastore({ filename: './data/songs.json', autoload: true });
+    this.db.tracks =  new Datastore({ filename: './data/songs.json', autoload: true });
     this.db.playlists = new Datastore({ filename: './data/playlists.json', autoload: true });
 
-    this.db.songs.persistence.setAutocompactionInterval(10000);
+    this.db.tracks.persistence.setAutocompactionInterval(10000);
 
-    this.db.songs.ensureIndex({ fieldName: 'path', unique: true}, function(err) {
+    this.db.tracks.ensureIndex({ fieldName: 'path', unique: true}, function(err) {
       if (err) {
         console.log("Attempted to add duplicate file: ", err);
       }
@@ -70,7 +70,7 @@ class databaseManager {
   queryLibrary(options, callback) {
     if (options.artist) {
       let regexValue = new RegExp(options.artist, 'i');
-      this.db.songs.find({ artist: { $regex: regexValue }}).sort(this.DEFAULT_SORT).exec(function(err, docs) {
+      this.db.tracks.find({ artist: { $regex: regexValue }}).sort(this.DEFAULT_SORT).exec(function(err, docs) {
         if (!err) {
           callback(docs);
         } else {
@@ -79,7 +79,7 @@ class databaseManager {
       });
     } else if (options.album) {
       let regexValue = new RegExp(options.album, 'i');
-      this.db.songs.find({ album: { $regex: regexValue }}).sort(this.DEFAULT_SORT).exec(function(err, docs) {
+      this.db.tracks.find({ album: { $regex: regexValue }}).sort(this.DEFAULT_SORT).exec(function(err, docs) {
         if (!err) {
           callback(docs);
         } else {
@@ -88,25 +88,37 @@ class databaseManager {
       });
     } else if (options.albumArtist) {
       let regexValue = new RegExp(options.albumArtist, 'i');
-      this.db.songs.find({ albumArtist: { $regex: regexValue }}).sort(this.DEFAULT_SORT).exec(function(err, docs) {
+      this.db.tracks.find({ albumArtist: { $regex: regexValue }}).sort(this.DEFAULT_SORT).exec(function(err, docs) {
         if (!err) {
           callback(docs);
         } else {
           callback(err);
         }
       });
+    // Return playlist tracks
+    } else if (options.playlists) {
+      let self = this;
+      this.db.playlists.find({name: options.playlists}).exec(function(err, docs) {
+        if (!err) {
+          let trackIds = docs[0].tracks;
+          self.db.tracks.find( {_id: { $in: trackIds} } ).exec(function(err, docs) {
+            callback(err || docs);
+          });
+        } else {
+          callback(err);
+        }
+      })
     } else if (options.searchAll) {
       let searchTerm = new RegExp(options.searchAll, 'i');
-      this.db.songs.find({ $or: [{ title: { $regex: searchTerm } },{ albumArtist: { $regex: searchTerm } },{ album: { $regex: searchTerm } }] }).sort(this.DEFAULT_SORT).exec(function(err, docs) {
+      this.db.tracks.find({ $or: [{ title: { $regex: searchTerm } },{ albumArtist: { $regex: searchTerm } },{ album: { $regex: searchTerm } }] }).sort(this.DEFAULT_SORT).exec(function(err, docs) {
         if (!err) {
           callback(docs);
         } else {
-          console.log(err)
           callback(err);
         }
       });
     } else if (!options.search) {
-      this.db.songs.find({}).sort(this.DEFAULT_SORT).exec(function(err, docs) {
+      this.db.tracks.find({}).sort(this.DEFAULT_SORT).exec(function(err, docs) {
         if (!err) {
           callback(docs);
         } else {
@@ -115,7 +127,7 @@ class databaseManager {
       });
     } else {
       let regexValue = new RegExp(options.search, 'i');
-      this.db.songs.find({ title: { $regex: regexValue}}).sort({artist: 1}).exec(function(err, docs) {
+      this.db.tracks.find({ title: { $regex: regexValue}}).sort({artist: 1}).exec(function(err, docs) {
         if (!err) {
           callback(docs);
         } else {
@@ -285,13 +297,13 @@ class databaseManager {
   // Remove the track and update library data
   deleteTrack(trackId) {
     let self = this;
-    this.db.songs.find({_id: trackId}, function( err, docs) {
+    this.db.tracks.find({_id: trackId}, function( err, docs) {
       if (docs.length === 0) {
         return;
       } else {
         let trackToRemove = docs[0];
 
-        self.db.songs.remove({ _id: trackToRemove._id },{}, function (err, numRemoved) {
+        self.db.tracks.remove({ _id: trackToRemove._id },{}, function (err, numRemoved) {
           if (!err && numRemoved === 1) {
             console.log(numRemoved + ' record removed, updating library data');
 
@@ -330,30 +342,73 @@ class databaseManager {
   loadPlaylists(callback) {
     let self = this;
     this.db.playlists.find({}).sort({ name: 1 }).exec(function(err, playlists) {
-      if (err) {
-        callback(err);
-      } else {
-        playlists.forEach(playlist => {
-          self.playlists[playlist.name] = playlist;
-        });
-        callback(playlists);
+      if (!err) {
+        self.playlists = playlists.map(playlist => playlist.name);
+        callback();
       }
     });
   }
 
   // Create playlist
   createPlaylist(name) {
+    console.log('creating playlist')
     let self = this;
     this.db.playlists.insert({
-      name: name,
+      name: 'Test1',
       tracks: [],
       count: 0,
       duration: 0
     }, function(err, newDoc) {
       if (!err) {
-        self.playlists[name] = newDoc;
+        self.playlists.push(newDoc.name);
       }
     })
+  }
+
+  // Add track to playlist, as well as update metadata
+  addToPlaylist(track, playlistName) {
+    let self = this;
+    // If playlist exists
+    if(this.playlists.indexOf(playlistName) > -1) {
+      this.db.playlists.find({ name: playlistName }).exec(function(err, docs) {
+        if (!err) {
+          let newPlaylist = docs[0];
+          newPlaylist.tracks.push(track._id);
+          newPlaylist.count++;
+          newPlaylist.duration += track.duration;
+          self.db.playlists.update({ name: playlistName }, newPlaylist, {}, function(err) {
+            if (!err) {
+              self.db.playlists.persistence.compactDatafile();
+              console.log("Track " + track.title + " added to playlist " + playlistName);
+            }
+          });
+        }
+      });
+    }
+  }
+
+  // Fetch playlist data and remove track, as well as update metadata
+  removeFromPlaylist(track, playlistName) {
+    let self = this;
+    // If playlist exists
+    if(this.playlists.indexOf(playlistName) > -1) {
+      this.db.playlists.find({ name: playlistName }).exec(function(err, docs) {
+        if (!err) {
+          let newPlaylist = docs[0];
+          let trackIndex = newPlaylist.indexOf(track._id);
+          if (trackIndex < 0) return;
+          newPlaylist.splice(trackIndex,1);
+          newPlaylist.count--;
+          newPlaylist.duration -= track.duration;
+          self.db.playlists.update({ name: playlistName }, newPlaylist, {}, function(err) {
+            if (!err) {
+              self.db.playlists.persistence.compactDatafile();
+              console.log("Track " + track.title + " removed from playlist " + playlistName);
+            }
+          });
+        }
+      });
+    }
   }
 
   // Check type and value of library data to ensure it still exists in the library.
@@ -370,7 +425,7 @@ class databaseManager {
     let search = {}
     search[dbIndex] = value;
     
-    this.db.songs.find(search, function(err, docs) {
+    this.db.tracks.find(search, function(err, docs) {
       if (docs.length > 0) {
         console.log(value + ' still present, keeping in library data');
         callback();
@@ -403,7 +458,7 @@ class databaseManager {
       songData.duration = metaData.duration || "";
 
       // Update library data, don't save empty fields
-      self.db.songs.insert(songData, function(err, newDoc) {
+      self.db.tracks.insert(songData, function(err, newDoc) {
         if (!err) {
           if (self.libraryData.artists.indexOf(songData.artist) < 0 && songData.artist.length > 0) {
             self.libraryData.artists.push(songData.artist);

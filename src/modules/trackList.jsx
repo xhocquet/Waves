@@ -126,7 +126,7 @@ let trackList = React.createClass({
         if(event.ctrlKey) {
           let newComponents = this.state.selectedTrackComponents;
           newComponents.push(element);
-          this.props.playerWindow.selectedTracks = newComponents.map(trackComponent => trackComponent.props.track._id);
+          this.props.playerWindow.selectedTracks = newComponents.map(trackComponent => trackComponent.props.track);
           this.setState({
             selectedTrackComponents: newComponents
           });
@@ -136,7 +136,7 @@ let trackList = React.createClass({
               trackComponent.setState({selected: false});
             }
           });
-          this.props.playerWindow.selectedTracks = [element.props.track._id];
+          this.props.playerWindow.selectedTracks = [element.props.track];
           this.setState({
             selectedTrackComponents: [element]
           });
@@ -152,7 +152,7 @@ let trackList = React.createClass({
         if(event.ctrlKey) {
           let newComponents = this.state.selectedTrackComponents;
           newComponents.push(element);
-          this.props.playerWindow.selectedTracks = newComponents.map(trackComponent => trackComponent.props.track._id);
+          this.props.playerWindow.selectedTracks = newComponents.map(trackComponent => trackComponent.props.track);
           this.setState({
             selectedTrackComponents: newComponents
           });
@@ -162,7 +162,7 @@ let trackList = React.createClass({
               trackComponent.setState({selected: false});
             }
           });
-          this.props.playerWindow.selectedTracks = [element.props.track._id];
+          this.props.playerWindow.selectedTracks = [element.props.track];
           this.setState({
             selectedTrackComponents: [element]
           });

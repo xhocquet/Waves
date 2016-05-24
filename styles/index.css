@@ -52,7 +52,7 @@
   height: calc(53% - 28px);
 }
 
-.randomAssContainer {
+.fullHeightContainer {
   height: 100%;
 }
 
@@ -70,12 +70,11 @@
   height: 20px;
   background-color: #eee;
   border-bottom: 1px solid #333;
-  padding: 2px;
+  text-align: center;
 }
 
 .explorerTab {
-  margin-left:  5px;
-  float: left;
+  display: inline-block;
   background-color: #aaa;
   border-right: 1px solid #eee;
   height: 100%;
